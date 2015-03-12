@@ -1,0 +1,16 @@
+'use strict';
+
+var mongoose = require('mongoose'),
+  Schema = mongoose.Schema;
+
+var LectureSchema = new Schema({
+  id                   : String,
+  lectureID            : String,
+  _course              : {type : Number, ref : 'Course'},
+  locked               : String,
+  lectureIndexInCourse : String,
+  _period              : {type : Number, ref : 'Period'},
+  roomReference        : String
+});
+
+mongoose.model('Lecture', LectureSchema);

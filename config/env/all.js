@@ -2,8 +2,8 @@
 
 module.exports = {
 	app: {
-		title: 'timetable',
-		description: 'timetable editor',
+		title: 'Timetable Editor',
+		description: 'A MEAN.JS based web-app for editing timetables set with OptaPlanner.',
 		keywords: 'timetable, optaplanner'
 	},
 	port: process.env.PORT || 3000,
