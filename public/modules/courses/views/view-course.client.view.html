@@ -1,0 +1,19 @@
+<section data-ng-controller="CoursesController" data-ng-init="findOne()">
+  <div class="page-header">
+    <h1 data-ng-bind="course.code"></h1>
+  </div>
+  <div class="pull-right">
+    <a class="btn btn-primary" href="/#!/courses/{{course._id}}/edit">
+      <i class="glyphicon glyphicon-edit"></i>
+    </a>
+    <a class="btn btn-primary" data-ng-click="remove();">
+      <i class="glyphicon glyphicon-trash"></i>
+    </a>
+  </div>
+  <pre>{{course | json}}</pre>
+  <small>
+    <em class="text-muted">
+    </em>
+  </small>
+  <p class="lead" data-ng-bind="course.content"></p>
+</section>

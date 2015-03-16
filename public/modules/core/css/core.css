@@ -1,5 +1,5 @@
 .content {
-  margin-top : 50px;
+  margin : 50px 0;
 }
 
 .undecorated-link:hover {
@@ -19,11 +19,13 @@
 }
 
 footer {
-  position   : fixed;
-  left       : 0;
-  right      : 0;
-  bottom     : 0;
-  margin     : 10px;
-  border-top : solid 0.1em #ccc;
-  color      : #aaa;
+  position         : fixed;
+  left             : 0;
+  right            : 0;
+  bottom           : 0;
+  margin           : 0 10px;
+  padding          : 10px 0;
+  border-top       : solid 0.1em #ccc;
+  color            : #aaa;
+  background-color : #fff;
 }

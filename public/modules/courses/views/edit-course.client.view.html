@@ -1,0 +1,64 @@
+<section data-ng-controller="CoursesController" data-ng-init="findOne()">
+  <div class="page-header">
+    <h1>Edit Course: {{course.code}}</h1>
+  </div>
+  <div class="col-md-12">
+    <form name="courseForm" class="form-horizontal" data-ng-submit="update(courseForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group" ng-class="{ 'has-error' : submitted && courseForm.code.$invalid}">
+          <label class="control-label" for="code">Code</label>
+          <div class="controls">
+            <input name="title" type="text" data-ng-model="course.code" id="code" class="form-control" placeholder="Code" required>
+          </div>
+          <div ng-show="submitted && courseForm.code.$invalid" class="help-block">
+            <p ng-show="courseForm.code.$error.required" class="text-danger">Code is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : submitted && courseForm.courseID.$invalid}">
+          <label class="control-label" for="courseID">Course Id</label>
+          <div class="controls">
+            <input name="title" type="text" data-ng-model="course.courseID" id="courseID" class="form-control" placeholder="Course Id" required>
+          </div>
+          <div ng-show="submitted && courseForm.courseID.$invalid" class="help-block">
+            <p ng-show="courseForm.courseID.$error.required" class="text-danger">Course Id is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : submitted && courseForm.studentSize.$invalid}">
+          <label class="control-label" for="studentSize">Student Size</label>
+          <div class="controls">
+            <input name="studentSize" data-ng-model="course.studentSize" id="studentSize" class="form-control" placeholder="Student Size" required>
+          </div>
+          <div ng-show="submitted && courseForm.studentSize.$invalid" class="help-block">
+            <p ng-show="courseForm.studentSize.$error.required" class="text-danger">Student Size is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : submitted && courseForm.minWorkingDaySize.$invalid}">
+          <label class="control-label" for="minWorkingDaySize">Minimum Working Day Size</label>
+          <div class="controls">
+            <input name="minWorkingDaySize" data-ng-model="course.minWorkingDaySize" id="minWorkingDaySize" class="form-control"
+                   placeholder="Minimum Working Day Size" required>
+          </div>
+          <div ng-show="submitted && courseForm.minWorkingDaySize.$invalid" class="help-block">
+            <p ng-show="courseForm.minWorkingDaySize.$error.required" class="text-danger">Minimum Working Day Size is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : submitted && courseForm.lectureSize.$invalid}">
+          <label class="control-label" for="lectureSize">Lecture Size</label>
+          <div class="controls">
+            <input name="lectureSize" data-ng-model="course.lectureSize" id="lectureSize" class="form-control" placeholder="Lecture Size" required>
+          </div>
+          <div ng-show="submitted && courseForm.lectureSize.$invalid" class="help-block">
+            <p ng-show="courseForm.lectureSize.$error.required" class="text-danger">Lecture Size is required</p>
+          </div>
+        </div>
+        <pre contenteditable="true">{{course | json}}</pre>
+        <div class="form-group">
+          <input type="submit" value="Update" class="btn btn-default">
+        </div>
+        <div data-ng-show="error" class="text-danger">
+          <strong data-ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

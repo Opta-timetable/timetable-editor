@@ -1,0 +1,64 @@
+<section data-ng-controller="CoursesController">
+  <div class="page-header">
+    <h1>New Course</h1>
+  </div>
+  <div class="col-md-12">
+    <form name="courseForm" class="form-horizontal" data-ng-submit="create()" novalidate>
+      <fieldset>
+        <div class="form-group" ng-class="{ 'has-error' : courseForm.code.$dirty && courseForm.code.$invalid}">
+          <label class="control-label" for="code">Code</label>
+          <div class="controls">
+            <input name="code" type="text" data-ng-model="course.code" id="code" class="form-control" placeholder="Code" required>
+          </div>
+          <div ng-show="courseForm.code.$dirty && courseForm.code.$invalid" class="help-block">
+            <p ng-show="courseForm.code.$error.required" class="text-danger">Code is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : courseForm.courseID.$dirty && courseForm.courseID.$invalid}">
+          <label class="control-label" for="courseID">Course Id</label>
+          <div class="controls">
+            <input name="courseID" type="text" data-ng-model="course.courseID" id="courseID" class="form-control" placeholder="Course Id" required>
+          </div>
+          <div ng-show="courseForm.courseID.$dirty && courseForm.courseID.$invalid" class="help-block">
+            <p ng-show="courseForm.courseID.$error.required" class="text-danger">Course Id is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : courseForm.studentSize.$dirty && courseForm.studentSize.$invalid}">
+          <label class="control-label" for="studentSize">Student Size</label>
+          <div class="controls">
+            <input name="studentSize" data-ng-model="course.studentSize" id="studentSize" class="form-control" placeholder="Student Size" required>
+          </div>
+          <div ng-show="courseForm.studentSize.$dirty && courseForm.studentSize.$invalid" class="help-block">
+            <p ng-show="courseForm.studentSize.$error.required" class="text-danger">Student Size is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : courseForm.minWorkingDaySize.$dirty && courseForm.minWorkingDaySize.$invalid}">
+          <label class="control-label" for="minWorkingDaySize">Minimum Working Day Size</label>
+          <div class="controls">
+            <input name="minWorkingDaySize" data-ng-model="course.minWorkingDaySize" id="minWorkingDaySize" class="form-control"
+                   placeholder="Minimum Working Day Size" required>
+          </div>
+          <div ng-show="courseForm.minWorkingDaySize.$dirty && courseForm.minWorkingDaySize.$invalid" class="help-block">
+            <p ng-show="courseForm.minWorkingDaySize.$error.required" class="text-danger">Minimum Working Day Size is required</p>
+          </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : courseForm.lectureSize.$dirty && courseForm.lectureSize.$invalid}">
+          <label class="control-label" for="lectureSize">Lecture Size</label>
+          <div class="controls">
+            <input name="lectureSize" data-ng-model="course.lectureSize" id="lectureSize" class="form-control" placeholder="Lecture Size" required>
+          </div>
+          <div ng-show="courseForm.lectureSize.$dirty && courseForm.lectureSize.$invalid" class="help-block">
+            <p ng-show="courseForm.lectureSize.$error.required" class="text-danger">Lecture Size is required</p>
+          </div>
+        </div>
+        <pre contenteditable="true">{{course | json}}</pre>
+        <div class="form-group">
+          <input type="submit" class="btn btn-default" ng-disabled="!courseForm.$valid">
+        </div>
+        <div data-ng-show="error" class="text-danger">
+          <strong data-ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

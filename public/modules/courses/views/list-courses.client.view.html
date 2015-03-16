@@ -1,0 +1,44 @@
+<section data-ng-controller="CoursesController" data-ng-init="find()">
+  <div class="page-header">
+    <h1>Courses</h1>
+  </div>
+  <div class="clearfix">
+    <div class="pull-right">
+      <a class="btn btn-primary" href="/#!/courses/create">
+        <i class="glyphicon glyphicon-plus"></i>
+      </a>
+    </div>
+  </div>
+  <div class="list-group">
+    <a data-ng-repeat="course in courses" data-ng-href="#!/courses/{{course._id}}" class="list-group-item">
+      <h4 class="list-group-item-heading" data-ng-bind="course.code"></h4>
+      <p class="list-group-item-text">
+        <span>Course ID: </span>
+        <span data-ng-bind="course.courseId"></span>
+      </p>
+      <p class="list-group-item-text">
+        <span>Curriculum: </span>
+        <span data-ng-bind="course.curriculumReference"></span>
+      </p>
+      <p class="list-group-item-text">
+        <span>Teacher: </span>
+        <span data-ng-bind="course._teacher.code"></span>
+      </p>
+      <p class="list-group-item-text">
+        <span>Student Size: </span>
+        <span data-ng-bind="course.studentSize"></span>
+      </p>
+      <p class="list-group-item-text">
+        <span>Minimum Working Day Size: </span>
+        <span data-ng-bind="course.minWorkingDaySize"></span>
+      </p>
+      <p class="list-group-item-text">
+        <span>Lecture Size: </span>
+        <span data-ng-bind="course.lectureSize"></span>
+      </p>
+    </a>
+  </div>
+  <div class="alert alert-warning text-center" data-ng-if="courses.$resolved && !courses.length">
+    No courses yet, why don't you <a href="/#!/courses/create">create one</a>?
+  </div>
+</section>
