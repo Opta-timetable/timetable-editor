@@ -1,0 +1,18 @@
+<section data-ng-controller="TimetablesController" data-ng-init="findOne()">
+  <div class="page-header">
+    <h1 data-ng-bind="course.code"></h1>
+  </div>
+  <div class="pull-right">
+    <a class="btn btn-primary" href="/#!/timetables/{{curriculum.id}}/edit">
+      <i class="glyphicon glyphicon-edit"></i>
+    </a>
+    <a class="btn btn-primary" data-ng-click="remove();">
+      <i class="glyphicon glyphicon-trash"></i>
+    </a>
+  </div>
+  <pre>{{timetable | json}}</pre>
+  <small>
+    <em class="text-muted">
+    </em>
+  </small>
+</section>
