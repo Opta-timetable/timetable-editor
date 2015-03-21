@@ -10,11 +10,11 @@ module.exports = function(app) {
         .get(timetables.list);
         //.post(users.requiresLogin, timetables.create); //Later
 
-    app.route('/timetables/:curriculumID')
+    app.route('/timetables/:curriculumId')
         .get(timetables.read);
         //.put(users.requiresLogin, timetables.hasAuthorization, timetables.update)
         //.delete(users.requiresLogin, timetables.hasAuthorization, timetables.delete);
 
     // Finish by binding the course middleware
-    app.param('curriculumID', timetables.timetableByCurriculumID);
+    app.param('curriculumId', timetables.timetableByCurriculumID);
 };

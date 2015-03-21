@@ -51,7 +51,7 @@ exports.timetableByCurriculumID = function (req, res, next, id) {
                         message : errorHandler.getErrorMessage(err)
                     });
                 }else{
-                    res.json(lectures);
+                    res.json({lectures: lectures});
                 }
             });
         }

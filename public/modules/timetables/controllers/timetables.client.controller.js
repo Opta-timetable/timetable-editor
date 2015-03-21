@@ -13,7 +13,8 @@ angular.module('timetables').controller('TimetablesController', ['$scope', '$sta
     $scope.findOne = function () {
       Timetables.get({
         curriculumId : $stateParams.curriculumId
-      }, function(lectures){
+      }, function(result){
+          console.log("Within findOne of TimetablesController");
           //Translating lectures array into a timetable here. Have to discuss with Hari
           //using DataTables for now for helping with the export feature
           var timeTableData = [];
@@ -25,18 +26,19 @@ angular.module('timetables').controller('TimetablesController', ['$scope', '$sta
               allocationsForDayOfWeek.dayOfWeek = dayName[i];
               allocationsForDayOfWeek.dayIndex = i;
               for (var k=0; k<7; k++){
-                  allocationsForDayOfWeek["Period-"+k] = "";
+                  allocationsForDayOfWeek["Period-"+(k+1)] = "";
               }
               timeTableData.push(allocationsForDayOfWeek);
           }
 
-          for(var j=0; j<lectures.length; j++){
-              var dayIndex = lectures[j]._period.dayIndex;
-              var period = lectures[j]._period.timeslotIndex;
-              var subject = lectures[j]._course.code;
+          for(var j=0; j<result.lectures.length; j++){
+              var dayIndex = result.lectures[j]._period.dayIndex;
+              var period = result.lectures[j]._period.timeslotIndex;
+              var subject = result.lectures[j]._course.code;
 
-              timeTableData[parseInt(dayIndex)]["Period-"+parseInt(period)] = subject;
+              timeTableData[parseInt(dayIndex)]["Period-"+(parseInt(period)+1)] = subject;
           }
+          console.log(JSON.stringify(timeTableData));
           $scope.timetable = timeTableData;
       });
 

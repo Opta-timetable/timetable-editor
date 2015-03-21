@@ -10,7 +10,7 @@ angular.module('timetables').config(['$stateProvider',
         templateUrl : 'modules/timetables/views/list-timetables.client.view.html'
       }).
       state('viewTimetable', {
-        url         : '/timetables/:id',
+        url         : '/timetables/:curriculumId',
         templateUrl : 'modules/timetables/views/view-timetable.client.view.html'
       });
   }
