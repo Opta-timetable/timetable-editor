@@ -12,3 +12,17 @@ angular.module('timetables').factory('Timetables', ['$resource',
 	}
 ]);
 
+angular.module('timetables').factory('Curriculums', function() {
+        var curriculums = [];
+        function set(data) {
+            curriculums = data;
+        }
+        function get() {
+            return curriculums;
+        }
+        return {
+            set: set,
+            get: get
+        }
+    }
+);
