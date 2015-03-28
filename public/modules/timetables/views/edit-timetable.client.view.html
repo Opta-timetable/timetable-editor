@@ -1,0 +1,51 @@
+<section data-ng-controller="TimetableController" data-ng-init="findOne()">
+  <div class="page-header">
+    <h1> Edit {{ curriculumSelected.code }}'s timetable</h1>
+  </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Day</th>
+                <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
+                <th data-ng-repeat="(key, value) in timetable[0]" data-ng-if="key.indexOf('day') == -1">{{key}}</th>
+            </tr>
+            </thead>
+            <tr data-ng-repeat="day in timetable">
+                <td>{{day.dayOfWeek}}</td>
+                <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
+                <td data-ng-repeat="(key, value1) in day" data-ng-if="key.indexOf('day') == -1"
+                    ng-drop="true" ng-drop-success="onDropComplete($data,$event, day.dayIndex, key)">
+                    <!--Using dayIndex and Key to locate the timetable entry to update-->
+                    <!--Changed 'value' to 'value1' because the ng-drop directive seems to be using 'value' as a boolean -->
+                    {{value1}}
+                </td>
+            </tr>
+        </table>
+        </div>
+
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Subjects</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                       <li ng-drag="true" ng-drag-data="course" data-ng-repeat="course in courses" class="list-group-item">
+                        {{ course.code }} - {{ course._teacher.code }}
+                       </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <p>
+        <a class="btn btn-success" href="#!/timetables">Save Timetable</a>
+        <a class="btn btn-primary" href="#!/timetables">Cancel</a>
+    </p>
+</div>
+
+</section>

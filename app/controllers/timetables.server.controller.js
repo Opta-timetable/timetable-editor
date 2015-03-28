@@ -38,8 +38,7 @@ exports.list = function (req, res) {
  */
 exports.timetableByCurriculumID = function (req, res, next, id) {
     //Associations now. Will have to live with this now
-    console.log("called tt by curr");
-    course.find({curriculumReference: id}, function(err, courses){
+    course.find({curriculumReference: id}).populate('_teacher').exec(function(err, courses){
         if (err) {
             return res.status(400).send({
                 message : errorHandler.getErrorMessage(err)
@@ -51,7 +50,7 @@ exports.timetableByCurriculumID = function (req, res, next, id) {
                         message : errorHandler.getErrorMessage(err)
                     });
                 }else{
-                    res.json({lectures: lectures});
+                    res.json({courses: courses, lectures: lectures});
                 }
             });
         }

@@ -18,6 +18,10 @@ angular.module('timetables').controller('TimetableController', ['$scope', '$stat
     function ($scope, $stateParams, $location, Authentication, Timetables, Curriculums) {
         $scope.authentication = Authentication;
 
+        $scope.onDropComplete=function(data, evt, dayIndex, period){
+            $scope.timetable[parseInt(dayIndex)][period] = data.code;
+        };
+
         $scope.findOne = function () {
             Timetables.get({
                 curriculumId : $stateParams.curriculumId
@@ -48,6 +52,7 @@ angular.module('timetables').controller('TimetableController', ['$scope', '$stat
                 //console.log(JSON.stringify(timeTableData));
                 $scope.timetable = timeTableData;
                 //console.log("$scope.curriculums here : " + JSON.stringify($scope.curriculums));
+
                 //Which curriculum was selected?
                 var curriculums = Curriculums.get();
                 for(var k=0; k<curriculums.length; k++){
@@ -55,6 +60,8 @@ angular.module('timetables').controller('TimetableController', ['$scope', '$stat
                         $scope.curriculumSelected = curriculums[k];
                     }
                 }
+                //setup the courses for the curriculum
+                $scope.courses = result.courses;
             });
         };
     }
