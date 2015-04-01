@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
     lecture = mongoose.model('Lecture'),
     curriculum = mongoose.model('Curriculum'),
     course = mongoose.model('Course'),
+    timetable = mongoose.model('Timetable'),
     _ = require('lodash');
 
 /**
@@ -44,13 +45,14 @@ exports.timetableByCurriculumID = function (req, res, next, id) {
                 message : errorHandler.getErrorMessage(err)
             });
         } else {
-            lecture.find({_course: {$in: courses}}).populate('_course').populate('_period').exec(function(err, lectures){
+            timetable.findOne({curriculumReference : id}, function(err, timetable){
                 if (err) {
                     return res.status(400).send({
                         message : errorHandler.getErrorMessage(err)
                     });
                 }else{
-                    res.json({courses: courses, lectures: lectures});
+                    console.log("Extracted timetable " + timetable);
+                    res.json({courses: courses, timetable: timetable});
                 }
             });
         }

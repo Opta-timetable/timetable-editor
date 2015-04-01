@@ -10,20 +10,21 @@
             <tr>
                 <th>Day</th>
                 <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
-                <th data-ng-repeat="(key, value) in timetable[0]" data-ng-if="key.indexOf('day') == -1">{{key}}</th>
+                <th data-ng-repeat="period in timetable[0].periods">{{ "Period-" + period.index }}</th>
             </tr>
             </thead>
             <tr data-ng-repeat="day in timetable">
                 <td>{{day.dayOfWeek}}</td>
                 <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
-                <td data-ng-repeat="(key, value1) in day" data-ng-if="key.indexOf('day') == -1"
-                    ng-drop="true" ng-drop-success="onDropComplete($data,$event, day.dayIndex, key)">
+                <td data-ng-repeat="period in day.periods" ng-drop="true" ng-drop-success="onDropComplete($data,$event,
+                day.dayIndex, period.index)">
                     <!--Using dayIndex and Key to locate the timetable entry to update-->
                     <!--Changed 'value' to 'value1' because the ng-drop directive seems to be using 'value' as a boolean -->
-                    {{value1}}
+                    {{period.subject}}
                 </td>
             </tr>
         </table>
+
         </div>
 
         <div class="col-md-3">

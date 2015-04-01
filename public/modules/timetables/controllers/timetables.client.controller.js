@@ -19,39 +19,19 @@ angular.module('timetables').controller('TimetableController', ['$scope', '$stat
         $scope.authentication = Authentication;
 
         $scope.onDropComplete=function(data, evt, dayIndex, period){
-            $scope.timetable[parseInt(dayIndex)][period] = data.code;
+            $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
+            $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
         };
 
         $scope.findOne = function () {
             Timetables.get({
                 curriculumId : $stateParams.curriculumId
             }, function(result){
-                //Translating lectures array into a timetable here. Have to discuss with Hari
-                //using DataTables for now for helping with the export feature
-                var timeTableData = [];
-                var dayName = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
-                //Initialise - Assuming hardcoded metadata (number of days, number of periods)
-                for (var i=0; i<5; i++){
-                    var allocationsForDayOfWeek = {};
-                    allocationsForDayOfWeek.dayOfWeek = dayName[i];
-                    allocationsForDayOfWeek.dayIndex = i;
-                    for (var k=0; k<7; k++){
-                        allocationsForDayOfWeek["Period-"+(k+1)] = "";
-                    }
-                    timeTableData.push(allocationsForDayOfWeek);
-                }
-
-                for(var j=0; j<result.lectures.length; j++){
-                    var dayIndex = result.lectures[j]._period.dayIndex;
-                    var period = result.lectures[j]._period.timeslotIndex;
-                    var subject = result.lectures[j]._course.code;
-
-                    timeTableData[parseInt(dayIndex)]["Period-"+(parseInt(period)+1)] = subject;
-                }
-                //console.log(JSON.stringify(timeTableData));
-                $scope.timetable = timeTableData;
-                //console.log("$scope.curriculums here : " + JSON.stringify($scope.curriculums));
+                $scope.timetable = result.timetable.timetable;
+                console.log("TimeTable is " + JSON.stringify($scope.timetable));
+                console.log("Sample period is : " + $scope.timetable[0].periods[0].subject);
+                $scope.courses = result.courses;
 
                 //Which curriculum was selected?
                 var curriculums = Curriculums.get();
@@ -60,8 +40,6 @@ angular.module('timetables').controller('TimetableController', ['$scope', '$stat
                         $scope.curriculumSelected = curriculums[k];
                     }
                 }
-                //setup the courses for the curriculum
-                $scope.courses = result.courses;
             });
         };
     }
