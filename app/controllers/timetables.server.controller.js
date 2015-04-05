@@ -52,9 +52,34 @@ exports.timetableByCurriculumID = function (req, res, next, id) {
                     });
                 }else{
                     console.log("Extracted timetable " + timetable);
+                    //Surely an anti-pattern. This is not the purpose of app.param
                     res.json({courses: courses, timetable: timetable});
                 }
             });
         }
     });
 };
+
+exports.validateDrop = function(req, res){
+    console.log("period : " + JSON.stringify(req.body.currentPeriod));
+    console.log("course : " + JSON.stringify(req.body.allocatedCourse));
+    console.log("day : " + JSON.stringify(req.body.currentDay));
+
+    //Look for course._teacher.code in the complete timetable and see if it matches any of the
+    var dayToMatch = req.body.currentDay,
+        periodIndex = req.body.currentPeriod.index,
+        teacher = req.body.allocatedCourse._teacher.code;
+
+    timetable.aggregate({$unwind: "$timetable"},{$unwind: "$timetable.periods"},
+        {$match:{"timetable.dayIndex": dayToMatch}}, {$match:{"timetable.periods.index": parseInt(periodIndex)}},
+        {$match:{"timetable.periods.teacher": teacher}}, function (err, o){
+            if(err){
+                return res.status(400).send({
+                    message : errorHandler.getErrorMessage(err)
+                });
+            }else{
+                console.log('output returned is ' + JSON.stringify(o));
+                return res.status(200).send({clashIn : o})
+            }
+        });
+}

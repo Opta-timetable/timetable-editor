@@ -17,4 +17,10 @@ module.exports = function(app) {
 
     // Finish by binding the course middleware
     app.param('curriculumId', timetables.timetableByCurriculumID);
+
+    app.route('/timetables/validateDrop')
+        .post(timetables.validateDrop);
+
+    app.route('/timetables/:curriculumId')
+
 };

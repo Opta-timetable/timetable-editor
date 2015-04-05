@@ -2,7 +2,7 @@
 
 var mongoose = require('mongoose');
 
-var periodSchema = mongoose.Schema({"index" : Number, "subject" : String, "teacher" : String});
+var periodSchema = mongoose.Schema({"index" : Number, "subject" : String, "teacher" : String, "clash" : Boolean});
 
 var daySchema = mongoose.Schema({
     "dayOfWeek" : String,

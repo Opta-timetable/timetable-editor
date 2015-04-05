@@ -14,13 +14,29 @@ angular.module('timetables').controller('TimetablesController', ['$scope', '$sta
   }
 ]);
 
-angular.module('timetables').controller('TimetableController', ['$scope', '$stateParams', '$location', 'Authentication', 'Timetables', 'Curriculums',
-    function ($scope, $stateParams, $location, Authentication, Timetables, Curriculums) {
+angular.module('timetables').controller('TimetableController', ['$http', '$scope', '$stateParams', '$location', 'Authentication',
+    'Timetables', 'Curriculums',
+    function ($http, $scope, $stateParams, $location, Authentication, Timetables, Curriculums) {
         $scope.authentication = Authentication;
 
         $scope.onDropComplete=function(data, evt, dayIndex, period){
+            $http.post('/timetables/validateDrop', {currentDay : dayIndex,
+                                                    currentPeriod : $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)],
+                                                    allocatedCourse : data })
+                .success(function(data, status, headers, config) {
+                    if (data.clashIn.length >= 1){
+                        $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash = true;
+                    }
+            })
+                .error(function(data, status, headers, config) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                    console.log("Error during validation");
+                });
+            console.log("dropping in: " + dayIndex + " Period: " + period);
             $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
             $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
+
         };
 
         $scope.findOne = function () {

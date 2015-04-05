@@ -16,11 +16,9 @@
             <tr data-ng-repeat="day in timetable">
                 <td>{{day.dayOfWeek}}</td>
                 <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
-                <td data-ng-repeat="period in day.periods" ng-drop="true" ng-drop-success="onDropComplete($data,$event,
-                day.dayIndex, period.index)">
-                    <!--Using dayIndex and Key to locate the timetable entry to update-->
-                    <!--Changed 'value' to 'value1' because the ng-drop directive seems to be using 'value' as a boolean -->
-                    {{period.subject}}
+                <td data-ng-repeat="period in day.periods" ng-drop="true"
+                    ng-drop-success="onDropComplete($data,$event, day.dayIndex, period.index)"
+                    ng-bind="period.subject" ng-class="{'bg-danger' : period.clash}">
                 </td>
             </tr>
         </table>
