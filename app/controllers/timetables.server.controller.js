@@ -14,8 +14,9 @@ var mongoose = require('mongoose'),
 /**
  * Show the current course
  */
-exports.read = function (req, res) {
-    res.json(req.course);
+exports.read = function (req, res, next, id) {
+    req.id = id;
+    next();
 };
 
 
@@ -37,15 +38,15 @@ exports.list = function (req, res) {
 /**
  * Course middleware
  */
-exports.timetableByCurriculumID = function (req, res, next, id) {
+exports.timetableByCurriculumID = function (req, res) {
     //Associations now. Will have to live with this now
-    course.find({curriculumReference: id}).populate('_teacher').exec(function(err, courses){
+    course.find({curriculumReference: req.id}).populate('_teacher').exec(function(err, courses){
         if (err) {
             return res.status(400).send({
                 message : errorHandler.getErrorMessage(err)
             });
         } else {
-            timetable.findOne({curriculumReference : id}, function(err, timetable){
+            timetable.findOne({curriculumReference : req.id}, function(err, timetable){
                 if (err) {
                     return res.status(400).send({
                         message : errorHandler.getErrorMessage(err)
@@ -70,6 +71,7 @@ exports.validateDrop = function(req, res){
         periodIndex = req.body.currentPeriod.index,
         teacher = req.body.allocatedCourse._teacher.code;
 
+
     timetable.aggregate({$unwind: "$timetable"},{$unwind: "$timetable.periods"},
         {$match:{"timetable.dayIndex": dayToMatch}}, {$match:{"timetable.periods.index": parseInt(periodIndex)}},
         {$match:{"timetable.periods.teacher": teacher}}, function (err, o){
@@ -79,7 +81,12 @@ exports.validateDrop = function(req, res){
                 });
             }else{
                 console.log('output returned is ' + JSON.stringify(o));
-                return res.status(200).send({clashIn : o})
+                return res.status(200).send({clashIn : o});
             }
         });
-}
+};
+
+exports.update = function(req, res){
+    console.log("timetable to update : " + JSON.stringify(req.body.timetable.timetable));
+    res.status(200).send('OK');
+};

@@ -10,10 +10,10 @@
             <tr>
                 <th>Day</th>
                 <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
-                <th data-ng-repeat="period in timetable[0].periods">{{ "Period-" + period.index }}</th>
+                <th data-ng-repeat="period in timetableForCurriculum.timetable.timetable[0].periods">{{ "Period-" + period.index }}</th>
             </tr>
             </thead>
-            <tr data-ng-repeat="day in timetable">
+            <tr data-ng-repeat="day in timetableForCurriculum.timetable.timetable">
                 <td>{{day.dayOfWeek}}</td>
                 <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
                 <td data-ng-repeat="period in day.periods" ng-drop="true"
@@ -22,9 +22,11 @@
                 </td>
             </tr>
         </table>
-
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" ng-click="save()">
+                <input type="button" value="Cancel" class="btn btn-default" onclick="location.href='#!/timetables'">
+            </div>
         </div>
-
         <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -32,7 +34,8 @@
                 </div>
                 <div class="panel-body">
                     <ul class="list-group">
-                       <li ng-drag="true" ng-drag-data="course" data-ng-repeat="course in courses" class="list-group-item">
+                       <li ng-drag="true" ng-drag-data="course"
+                           data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">
                         {{ course.code }} - {{ course._teacher.code }}
                        </li>
                     </ul>
@@ -41,10 +44,9 @@
 
         </div>
     </div>
-    <p>
-        <a class="btn btn-success" href="#!/timetables">Save Timetable</a>
-        <a class="btn btn-primary" href="#!/timetables">Cancel</a>
-    </p>
+    <div data-ng-show="error" class="text-danger">
+        <strong data-ng-bind="error"></strong>
+    </div>
 </div>
 
 </section>

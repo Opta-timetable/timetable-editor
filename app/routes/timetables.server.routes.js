@@ -11,16 +11,15 @@ module.exports = function(app) {
         //.post(users.requiresLogin, timetables.create); //Later
 
     app.route('/timetables/:curriculumId')
-        .get(timetables.read);
-        //.put(users.requiresLogin, timetables.hasAuthorization, timetables.update)
+        .get(timetables.timetableByCurriculumID)
+        .put(timetables.update);
         //.delete(users.requiresLogin, timetables.hasAuthorization, timetables.delete);
 
-    // Finish by binding the course middleware
-    app.param('curriculumId', timetables.timetableByCurriculumID);
+    app.param('curriculumId', timetables.read);
 
     app.route('/timetables/validateDrop')
         .post(timetables.validateDrop);
 
-    app.route('/timetables/:curriculumId')
+    //app.route('/timetables/:curriculumId');
 
 };

@@ -21,42 +21,57 @@ angular.module('timetables').controller('TimetableController', ['$http', '$scope
 
         $scope.onDropComplete=function(data, evt, dayIndex, period){
             $http.post('/timetables/validateDrop', {currentDay : dayIndex,
-                                                    currentPeriod : $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)],
-                                                    allocatedCourse : data })
+                currentPeriod : $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)],
+                allocatedCourse : data })
                 .success(function(data, status, headers, config) {
                     if (data.clashIn.length >= 1){
-                        $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash = true;
+                        $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash = true;
                     }
-            })
+                })
                 .error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
                     // or server returns response with an error status.
                     console.log("Error during validation");
                 });
             console.log("dropping in: " + dayIndex + " Period: " + period);
-            $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
-            $scope.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
+            $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
+            $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
 
         };
 
-        $scope.findOne = function () {
-            Timetables.get({
+        $scope.save = function(){
+            console.log("About to save: " + $stateParams.curriculumId);
+            $scope.timetableForCurriculum.$update({
                 curriculumId : $stateParams.curriculumId
-            }, function(result){
+            }, function() {
+                $location.path('timetables/' + $stateParams.curriculumId);
+            }, function (errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
+        };
 
-                $scope.timetable = result.timetable.timetable;
-                console.log("TimeTable is " + JSON.stringify($scope.timetable));
-                console.log("Sample period is : " + $scope.timetable[0].periods[0].subject);
-                $scope.courses = result.courses;
-
+        $scope.findOne = function () {
+            $scope.timetableForCurriculum = Timetables.get({
+                curriculumId : $stateParams.curriculumId
+            });
+            //console.log("Timetable is " + JSON.stringify($scope.timetableForCurriculum));
+            //Timetables.get({
+            //    curriculumId : $stateParams.curriculumId
+            //}, function(result){
+            //
+            //    $scope.timetable = result.timetable.timetable;
+            //    console.log("TimeTable is " + JSON.stringify($scope.timetable));
+            //    console.log("Sample period is : " + $scope.timetable[0].periods[0].subject);
+            //    $scope.courses = result.courses;
+            //
                 //Which curriculum was selected?
-                var curriculums = Curriculums.get();
-                for(var k=0; k<curriculums.length; k++){
-                    if (curriculums[k].id === $stateParams.curriculumId){
-                        $scope.curriculumSelected = curriculums[k];
+                var curricula = Curriculums.get();
+                for(var k=0; k<curricula.length; k++){
+                    if (curricula[k].id === $stateParams.curriculumId){
+                        $scope.curriculumSelected = curricula[k];
                     }
                 }
-            });
+            //});
         };
     }
 ]);
