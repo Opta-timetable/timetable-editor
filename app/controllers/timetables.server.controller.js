@@ -87,6 +87,16 @@ exports.validateDrop = function(req, res){
 };
 
 exports.update = function(req, res){
-    console.log("timetable to update : " + JSON.stringify(req.body.timetable.timetable));
-    res.status(200).send('OK');
+    var timetableToUpdate = req.body.timetable.timetable;
+    console.log("timetable to update : " + JSON.stringify(timetableToUpdate));
+    timetable.update({curriculumReference: req.id}, {$set: {timetable: timetableToUpdate}}, function(err, o){
+        if(err){
+            return res.status(400).send({
+                message : errorHandler.getErrorMessage(err)
+            });
+        }else{
+            console.log('Update is successful ' + JSON.stringify(o));
+            return res.status(200).send('OK');
+        }
+    });
 };

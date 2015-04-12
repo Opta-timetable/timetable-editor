@@ -8,19 +8,22 @@
                 <i class="glyphicon glyphicon-edit"></i>
             </a>
         </div>
-  <table class="table">
+    </div>
+  <table class="table table-bordered">
     <thead>
       <tr>
         <th>Day</th>
           <!--<th> {{ JSON.stringify( timetable[0].timetable[0].periods[0].subject) }} </th>-->
         <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
-        <th data-ng-repeat="period in timetableForCurriculum.timetable.timetable[0].periods">{{ "Period-" + period.index}}</th>
+        <th data-ng-repeat="period in timetableForCurriculum.timetable.timetable[0].periods">
+            {{ "Period-" + period.index}}</th>
       </tr>
     </thead>
     <tr data-ng-repeat="day in timetableForCurriculum.timetable.timetable">
       <td>{{day.dayOfWeek}}</td>
       <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
-      <td data-ng-repeat="period in day.periods" data-ng-class="key">{{period.subject}}</td>
+      <td data-ng-repeat="period in day.periods" ng-bind="period.subject" ng-class="{'bg-danger': period.clash}">
+      </td>
     </tr>
   </table>
 </section>

@@ -54,24 +54,13 @@ angular.module('timetables').controller('TimetableController', ['$http', '$scope
             $scope.timetableForCurriculum = Timetables.get({
                 curriculumId : $stateParams.curriculumId
             });
-            //console.log("Timetable is " + JSON.stringify($scope.timetableForCurriculum));
-            //Timetables.get({
-            //    curriculumId : $stateParams.curriculumId
-            //}, function(result){
-            //
-            //    $scope.timetable = result.timetable.timetable;
-            //    console.log("TimeTable is " + JSON.stringify($scope.timetable));
-            //    console.log("Sample period is : " + $scope.timetable[0].periods[0].subject);
-            //    $scope.courses = result.courses;
-            //
-                //Which curriculum was selected?
-                var curricula = Curriculums.get();
-                for(var k=0; k<curricula.length; k++){
-                    if (curricula[k].id === $stateParams.curriculumId){
-                        $scope.curriculumSelected = curricula[k];
-                    }
+            //Which curriculum was selected?
+            var curricula = Curriculums.get();
+            for(var k=0; k<curricula.length; k++){
+                if (curricula[k].id === $stateParams.curriculumId){
+                    $scope.curriculumSelected = curricula[k];
                 }
-            //});
+            }
         };
     }
 ]);
