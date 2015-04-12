@@ -26,7 +26,9 @@ module.exports = {
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
-                'public/lib/ngDraggable/ngDraggable.js'
+                'public/lib/ngDraggable/ngDraggable.js',
+                'public/lib/ng-table/dist/ng-table.min.js',
+                'public/lib/ng-table-export/ng-table-export.js'
 			]
 		},
 		css: [
