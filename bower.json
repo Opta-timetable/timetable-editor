@@ -16,6 +16,6 @@
 		"angular-ui-router": "~0.2.11",
         "ngDraggable": "~0.1.3",
 	    "ng-table": "~0.5.4",
-        "ng-table-export": "~0.1.0"
+        "ng-table-export": "*"
 	}
 }
