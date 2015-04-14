@@ -31,16 +31,13 @@ angular.module('timetables').controller('TimetableController', ['$http', '$scope
                 .error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
                     // or server returns response with an error status.
-                    console.log("Error during validation");
                 });
-            console.log("dropping in: " + dayIndex + " Period: " + period);
             $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
             $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
 
         };
 
         $scope.save = function(){
-            console.log("About to save: " + $stateParams.curriculumId);
             $scope.timetableForCurriculum.$update({
                 curriculumId : $stateParams.curriculumId
             }, function() {

@@ -19,6 +19,6 @@ angular.module('timetables').factory('Curriculums', function() {
         return {
             set: set,
             get: get
-        }
+        };
     }
 );
