@@ -53,7 +53,6 @@ exports.timetableByCurriculumID = function (req, res) {
                     });
                 }else{
                     console.log('Extracted timetable ' + timetable);
-                    //Surely an anti-pattern. This is not the purpose of app.param
                     res.json({courses: courses, timetable: timetable});
                 }
             });
@@ -65,16 +64,18 @@ exports.validateDrop = function(req, res){
     console.log('period : ' + JSON.stringify(req.body.currentPeriod));
     console.log('course : ' + JSON.stringify(req.body.allocatedCourse));
     console.log('day : ' + JSON.stringify(req.body.currentDay));
-
+    console.log('curriculum : ' + JSON.stringify(req.body.allocatedCourse.curriculumReference));
     //Look for course._teacher.code in the complete timetable and see if it matches any of the
     var dayToMatch = req.body.currentDay,
         periodIndex = req.body.currentPeriod.index,
-        teacher = req.body.allocatedCourse._teacher.code;
-
+        teacher = req.body.allocatedCourse._teacher.code,
+        curriculum = req.body.allocatedCourse.curriculumReference;
 
     timetable.aggregate({$unwind: '$timetable'},{$unwind: '$timetable.periods'},
-        {$match:{'timetable.dayIndex': dayToMatch}}, {$match:{'timetable.periods.index': parseInt(periodIndex)}},
-        {$match:{'timetable.periods.teacher': teacher}}, function (err, o){
+        {$match:{'timetable.dayIndex': dayToMatch}},
+        {$match:{'timetable.periods.index': parseInt(periodIndex)}},
+        {$match:{'timetable.periods.teacher': teacher}},
+        {$match:{'curriculumReference':{ $ne: curriculum}}}, function (err, o){
             if(err){
                 return res.status(400).send({
                     message : errorHandler.getErrorMessage(err)
@@ -88,6 +89,7 @@ exports.validateDrop = function(req, res){
 
 exports.update = function(req, res){
     var timetableToUpdate = req.body.timetable.timetable;
+    var clashes = req.body.clashes;
     console.log('timetable to update : ' + JSON.stringify(timetableToUpdate));
     timetable.update({curriculumReference: req.id}, {$set: {timetable: timetableToUpdate}}, function(err, o){
         if(err){
