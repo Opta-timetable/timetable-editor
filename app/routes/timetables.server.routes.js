@@ -17,8 +17,13 @@ module.exports = function(app) {
 
     app.param('curriculumId', timetables.read);
 
-    app.route('/timetables/validateDrop')
-        .post(timetables.validateDrop);
+    app.route('/timetables/performDrop')
+        .post(timetables.performDrop);
+
+    app.route('/timetables/discoverClashes')
+        .post(timetables.discoverClashes);
+
+
 
     //app.route('/timetables/:curriculumId');
 

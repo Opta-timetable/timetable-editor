@@ -19,7 +19,6 @@ exports.read = function (req, res, next, id) {
     next();
 };
 
-
 /**
  * Get all curriculums for work with timetable
  */
@@ -60,7 +59,7 @@ exports.timetableByCurriculumID = function (req, res) {
     });
 };
 
-exports.validateDrop = function(req, res){
+exports.performDrop = function(req, res){
     console.log('period : ' + JSON.stringify(req.body.currentPeriod));
     console.log('course : ' + JSON.stringify(req.body.allocatedCourse));
     console.log('day : ' + JSON.stringify(req.body.currentDay));
@@ -69,27 +68,75 @@ exports.validateDrop = function(req, res){
     var dayToMatch = req.body.currentDay,
         periodIndex = req.body.currentPeriod.index,
         teacher = req.body.allocatedCourse._teacher.code,
-        curriculum = req.body.allocatedCourse.curriculumReference;
+        curriculum = req.body.allocatedCourse.curriculumReference,
+        subject = req.body.allocatedCourse.code;
 
-    timetable.aggregate({$unwind: '$timetable'},{$unwind: '$timetable.periods'},
-        {$match:{'timetable.dayIndex': dayToMatch}},
-        {$match:{'timetable.periods.index': parseInt(periodIndex)}},
-        {$match:{'timetable.periods.teacher': teacher}},
-        {$match:{'curriculumReference':{ $ne: curriculum}}}, function (err, o){
-            if(err){
-                return res.status(400).send({
-                    message : errorHandler.getErrorMessage(err)
+    //Extract the timetable document to update
+    timetable.findOne({curriculumReference : curriculum}, function(err, timetableToUpdate){
+        if (err){
+            return res.status(400).send({
+                message : errorHandler.getErrorMessage(err)
+            });
+        }else{
+            var newTimetable = timetableToUpdate.timetable;
+            newTimetable[parseInt(dayToMatch)].periods[periodIndex].subject = subject;
+            newTimetable[parseInt(dayToMatch)].periods[periodIndex].teacher = teacher;
+            console.log('Updated timetable is: ' + JSON.stringify(newTimetable));
+            //Look for clashes
+            timetable.aggregate({$unwind: '$timetable'},{$unwind: '$timetable.periods'},
+                {$match:{'timetable.dayIndex': dayToMatch}},
+                {$match:{'timetable.periods.index': parseInt(periodIndex)}},
+                {$match:{'timetable.periods.teacher': teacher}},
+                {$match:{'curriculumReference':{ $ne: curriculum}}}, function (err, clashes){
+                    if(err){
+                        console.log('error in aggregate');
+                        return res.status(400).send({
+                            message : errorHandler.getErrorMessage(err)
+                        });
+                    }else{
+                        console.log('output returned is ' + JSON.stringify(clashes));
+                        if (clashes.length > 0){
+                            newTimetable[parseInt(dayToMatch)].periods[periodIndex].clash = true;
+                        }
+                        //update timetable document
+                        timetable.update({curriculumReference : curriculum}, {$set: {timetable: newTimetable}}, function(err, o){
+                            if(err){
+                                return res.status(400).send({
+                                    message : errorHandler.getErrorMessage(err)
+                                });
+                            }else{
+                                console.log('Update is successful ' + JSON.stringify(o));
+                                if (clashes.length > 0){
+                                    var clashesUpdateTracker = clashes.length;
+                                    clashes.forEach(function(clash){
+                                        timetable.findOne({curriculumReference: clash.curriculumReference},
+                                            function(err, timetableToUpdateForClash){
+                                                timetableToUpdateForClash.timetable[parseInt(dayToMatch)].periods[periodIndex].clash = true;
+                                                timetable.update({curriculumReference: clash.curriculumReference},
+                                                    {$set:{timetable: timetableToUpdateForClash.timetable}}, function(err, o){
+                                                        clashesUpdateTracker--;
+                                                        if (clashesUpdateTracker === 0){
+                                                            //clashes updated.
+                                                            return res.status(200).send({clashIn : clashes});
+                                                        }
+                                                    });
+                                            });
+                                    });
+                                }else{
+                                    return res.status(200).send({clashIn : clashes});
+                                }
+                            }
+                        });
+                    }
                 });
-            }else{
-                console.log('output returned is ' + JSON.stringify(o));
-                return res.status(200).send({clashIn : o});
-            }
-        });
+
+        }
+
+    });
 };
 
 exports.update = function(req, res){
     var timetableToUpdate = req.body.timetable.timetable;
-    var clashes = req.body.clashes;
     console.log('timetable to update : ' + JSON.stringify(timetableToUpdate));
     timetable.update({curriculumReference: req.id}, {$set: {timetable: timetableToUpdate}}, function(err, o){
         if(err){
@@ -101,4 +148,26 @@ exports.update = function(req, res){
             return res.status(200).send('OK');
         }
     });
+};
+
+exports.discoverClashes = function(req, res){
+    var dayToMatch = req.body.currentDay,
+        period = req.body.currentPeriod,
+        curriculum = req.body.curriculumId;
+
+    timetable.aggregate({$unwind: '$timetable'},{$unwind: '$timetable.periods'},
+        {$match:{'timetable.dayIndex': dayToMatch}},
+        {$match:{'timetable.periods.index': period.index}},
+        {$match:{'timetable.periods.teacher': period.teacher}},
+        {$match:{'curriculumReference':{ $ne: curriculum}}}, function (err, clashes) {
+            if (err) {
+                console.log('error in aggregate');
+                return res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
+                });
+            } else {
+                console.log('output returned is ' + JSON.stringify(clashes));
+                return res.status(200).send({clashIn : clashes});
+            }
+        });
 };
