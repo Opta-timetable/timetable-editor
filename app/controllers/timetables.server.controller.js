@@ -69,7 +69,10 @@ exports.performDrop = function(req, res){
         periodIndex = req.body.currentPeriod.index,
         teacher = req.body.allocatedCourse._teacher.code,
         curriculum = req.body.allocatedCourse.curriculumReference,
-        subject = req.body.allocatedCourse.code;
+        subject = req.body.allocatedCourse.code,
+        clashToUpdate = req.body.clashToUpdate;
+
+    console.log('clashToUpdate ' + JSON.stringify(clashToUpdate));
 
     //Extract the timetable document to update
     timetable.findOne({curriculumReference : curriculum}, function(err, timetableToUpdate){
@@ -116,8 +119,35 @@ exports.performDrop = function(req, res){
                                                     {$set:{timetable: timetableToUpdateForClash.timetable}}, function(err, o){
                                                         clashesUpdateTracker--;
                                                         if (clashesUpdateTracker === 0){
-                                                            //clashes updated.
-                                                            return res.status(200).send({clashIn : clashes});
+                                                            //new clashes updated. Clear old clash if any
+                                                            if (JSON.stringify(clashToUpdate) !== '{}'){
+                                                                timetable.findOne({curriculumReference: clashToUpdate.curriculumReference},
+                                                                    function(err, timetableToClearClash) {
+                                                                        if (err){
+                                                                            console.log('error while finding existing clash');
+                                                                            return res.status(400).send({
+                                                                                message : errorHandler.getErrorMessage(err)
+                                                                            });
+                                                                        }else{
+                                                                            timetableToClearClash.timetable[parseInt(clashToUpdate.timetable.dayIndex)].
+                                                                                periods[clashToUpdate.timetable.periods.index].clash = false;
+                                                                            timetable.update({curriculumReference: clashToUpdate.curriculumReference},
+                                                                                {$set: {timetable: timetableToClearClash.timetable}}, function (err, o) {
+                                                                                    if(err){
+                                                                                        return res.status(400).send({
+                                                                                            message : errorHandler.getErrorMessage(err)
+                                                                                        });
+                                                                                    }else{
+                                                                                        return res.status(200).send({clashIn : clashes});
+                                                                                    }
+                                                                                });
+                                                                        }
+                                                                    });
+                                                            }else{
+                                                                return res.status(200).send({clashIn : clashes});
+                                                            }
+
+
                                                         }
                                                     });
                                             });

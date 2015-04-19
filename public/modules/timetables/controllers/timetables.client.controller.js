@@ -14,18 +14,37 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         };
 
         $scope.onDropComplete=function(data, evt, dayIndex, period){
+            //Code to check if there is a clash in the existing assignment
+            //If yes, send clash as well to the server
+            //if new allocation removes clash, set clash to false
+            //in any case remove existing clash controller array
+            var clashToUpdate = {};
+            if($scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash === true){
+                $scope.clashes.forEach(function(clash){
+                    if ((clash.timetable.dayIndex === dayIndex) && (clash.timetable.periods.index === parseInt(period))){
+                        clashToUpdate = clash;
+                    }
+                });
+            }
+
             $http.post('/timetables/performDrop', {currentDay : dayIndex,
                 currentPeriod : $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)],
-                allocatedCourse : data})
+                allocatedCourse : data,
+                clashToUpdate : clashToUpdate})
                 .success(function(data, status, headers, config) {
                     if (data.clashIn.length >= 1){
                         $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash = true;
                         $scope.clashes = $scope.clashes.concat(data.clashIn);
+                    }else{
+                        $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash = false;
                     }
+                    //remove clash in controller
+                    $scope.clashes.splice($scope.clashes.indexOf(clashToUpdate), 1);
                 })
                 .error(function(data, status, headers, config) {
                     // called asynchronously if an error occurs
                     // or server returns response with an error status.
+                    $scope.error = data.message;
                 });
             $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
             $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;

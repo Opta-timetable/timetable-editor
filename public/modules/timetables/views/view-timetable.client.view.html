@@ -19,7 +19,7 @@
           <!--<th> {{ JSON.stringify( timetable[0].timetable[0].periods[0].subject) }} </th>-->
         <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
         <th data-ng-repeat="period in timetableForCurriculum.timetable.timetable[0].periods">
-            {{ "Period-" + period.index}}</th>
+            {{ "Period-" + (period.index+1)}}</th>
       </tr>
     </thead>
     <tr data-ng-repeat="day in timetableForCurriculum.timetable.timetable">
