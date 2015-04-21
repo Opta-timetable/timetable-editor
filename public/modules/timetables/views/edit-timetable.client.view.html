@@ -17,14 +17,16 @@
                 <td>{{day.dayOfWeek}}</td>
                 <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
                 <td data-ng-repeat="period in day.periods" ng-drop="true"
-                    ng-drop-success="onDropComplete($data,$event, day.dayIndex, period.index)"
+                    ng-drop-success="onDropComplete($data,$event, day.dayIndex, period.index, false)"
                     ng-bind="period.subject" ng-class="{'bg-danger' : period.clash}"
                     ng-init="findClashes(period.clash, day.dayIndex, period.index)">
                 </td>
             </tr>
         </table>
             <div class="form-group">
-                <input type="submit" value="Finish" class="btn btn-default" ng-click="done()">
+                <input type="button" ng-disabled="undoStack.length == 0" value="Undo" class="btn btn-default" ng-click="undoEdit()">
+                <input type="button" ng-disabled="redoStack.length == 0" value="Redo" class="btn btn-default" ng-click="redoEdit()">
+                <input type="button" value="Finish" class="btn btn-default" ng-click="done()">
                 <input type="button" value="Cancel" class="btn btn-default" onclick="location.href='#!/timetables'">
             </div>
             <div class="row">
