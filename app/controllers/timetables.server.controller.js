@@ -123,7 +123,7 @@ exports.performDrop = function(req, res){
                                                         if (clashesUpdateTracker === 0){
                                                             //new clashes updated. Clear old clash if any
                                                             if (JSON.stringify(clashToUpdate) !== '{}'){
-                                                                console.log("Entered Clash to update");
+                                                                console.log('Entered Clash to update');
                                                                 timetable.findOne({curriculumReference: clashToUpdate.curriculumReference},
                                                                     function(err, timetableToClearClash) {
                                                                         if (err){
@@ -132,7 +132,7 @@ exports.performDrop = function(req, res){
                                                                                 message : errorHandler.getErrorMessage(err)
                                                                             });
                                                                         }else{
-                                                                            console.log("Found clash to update");
+                                                                            console.log('Found clash to update');
                                                                             timetableToClearClash.timetable[parseInt(clashToUpdate.timetable.dayIndex)].
                                                                                 periods[clashToUpdate.timetable.periods.index].clash = false;
                                                                             timetable.update({curriculumReference: clashToUpdate.curriculumReference},
@@ -158,7 +158,7 @@ exports.performDrop = function(req, res){
                                     });
                                 }else{
                                     if (JSON.stringify(clashToUpdate) !== '{}'){
-                                        console.log("Entered Clash to update");
+                                        console.log('Entered Clash to update');
                                         timetable.findOne({curriculumReference: clashToUpdate.curriculumReference},
                                             function(err, timetableToClearClash) {
                                                 if (err){
@@ -167,7 +167,7 @@ exports.performDrop = function(req, res){
                                                         message : errorHandler.getErrorMessage(err)
                                                     });
                                                 }else{
-                                                    console.log("Found clash to update");
+                                                    console.log('Found clash to update');
                                                     timetableToClearClash.timetable[parseInt(clashToUpdate.timetable.dayIndex)].
                                                         periods[clashToUpdate.timetable.periods.index].clash = false;
                                                     timetable.update({curriculumReference: clashToUpdate.curriculumReference},

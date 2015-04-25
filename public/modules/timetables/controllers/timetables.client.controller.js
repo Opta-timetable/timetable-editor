@@ -20,7 +20,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
             var periodFromUndoStack = $scope.undoStack.shift();
 
-            console.log("Value for Undo from stack " + JSON.stringify(periodFromUndoStack));
+            console.log('Value for Undo from stack ' + JSON.stringify(periodFromUndoStack));
 
             var redoData = {};
             redoData.dayIndex = periodFromUndoStack.dayIndex;
@@ -29,7 +29,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
                 .periods[parseInt(periodFromUndoStack.periodIndex)].teacher;
             redoData.subject = $scope.timetableForCurriculum.timetable.timetable[parseInt(periodFromUndoStack.dayIndex)]
                 .periods[parseInt(periodFromUndoStack.periodIndex)].subject;
-            console.log("saving for redo " + JSON.stringify(redoData));
+            console.log('saving for redo ' + JSON.stringify(redoData));
             $scope.redoStack.push(redoData);
 
             //For Reference: var dayToMatch = req.body.currentDay,
@@ -43,7 +43,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
             undoData._teacher.code = periodFromUndoStack.teacher;
             undoData.code = periodFromUndoStack.subject;
             undoData.curriculumReference = $stateParams.curriculumId;
-            console.log("About to drop: " + JSON.stringify(undoData));
+            console.log('About to drop: ' + JSON.stringify(undoData));
 
             $scope.onDropComplete(undoData, null, periodFromUndoStack.dayIndex, periodFromUndoStack.periodIndex, true);
 
@@ -59,7 +59,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
             redoData.code = periodFromRedoStack.subject;
             redoData.curriculumReference = $stateParams.curriculumId;
 
-            console.log("About to drop: " + JSON.stringify(redoData));
+            console.log('About to drop: ' + JSON.stringify(redoData));
             $scope.onDropComplete(redoData, null, periodFromRedoStack.dayIndex, periodFromRedoStack.periodIndex, false);
         };
 
@@ -89,7 +89,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
                 $scope.undoStack.unshift(periodInfo);
 
-                console.log("saving following for undo operation " + JSON.stringify(periodInfo));
+                console.log('saving following for undo operation ' + JSON.stringify(periodInfo));
             }
 
             $http.post('/timetables/performDrop', {currentDay : dayIndex,
