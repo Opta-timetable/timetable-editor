@@ -78,7 +78,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
                 //remove clash in controller. It will get updated with the new one if any
                 $scope.clashes.splice($scope.clashes.indexOf(clashToUpdate), 1);
             }
-
+            console.log('clash to update is ' + JSON.stringify(clashToUpdate));
             if (undoRedo === false){
                 //Backup current period
                 var periodInfo = {};

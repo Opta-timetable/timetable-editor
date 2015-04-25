@@ -84,6 +84,8 @@ exports.performDrop = function(req, res){
             var newTimetable = timetableToUpdate.timetable;
             newTimetable[parseInt(dayToMatch)].periods[periodIndex].subject = subject;
             newTimetable[parseInt(dayToMatch)].periods[periodIndex].teacher = teacher;
+            newTimetable[parseInt(dayToMatch)].periods[periodIndex].clash = false;
+
             console.log('Updated timetable is: ' + JSON.stringify(newTimetable));
             //Look for clashes
             timetable.aggregate({$unwind: '$timetable'},{$unwind: '$timetable.periods'},
@@ -121,6 +123,7 @@ exports.performDrop = function(req, res){
                                                         if (clashesUpdateTracker === 0){
                                                             //new clashes updated. Clear old clash if any
                                                             if (JSON.stringify(clashToUpdate) !== '{}'){
+                                                                console.log("Entered Clash to update");
                                                                 timetable.findOne({curriculumReference: clashToUpdate.curriculumReference},
                                                                     function(err, timetableToClearClash) {
                                                                         if (err){
@@ -129,6 +132,7 @@ exports.performDrop = function(req, res){
                                                                                 message : errorHandler.getErrorMessage(err)
                                                                             });
                                                                         }else{
+                                                                            console.log("Found clash to update");
                                                                             timetableToClearClash.timetable[parseInt(clashToUpdate.timetable.dayIndex)].
                                                                                 periods[clashToUpdate.timetable.periods.index].clash = false;
                                                                             timetable.update({curriculumReference: clashToUpdate.curriculumReference},
@@ -153,7 +157,34 @@ exports.performDrop = function(req, res){
                                             });
                                     });
                                 }else{
-                                    return res.status(200).send({clashIn : clashes});
+                                    if (JSON.stringify(clashToUpdate) !== '{}'){
+                                        console.log("Entered Clash to update");
+                                        timetable.findOne({curriculumReference: clashToUpdate.curriculumReference},
+                                            function(err, timetableToClearClash) {
+                                                if (err){
+                                                    console.log('error while finding existing clash');
+                                                    return res.status(400).send({
+                                                        message : errorHandler.getErrorMessage(err)
+                                                    });
+                                                }else{
+                                                    console.log("Found clash to update");
+                                                    timetableToClearClash.timetable[parseInt(clashToUpdate.timetable.dayIndex)].
+                                                        periods[clashToUpdate.timetable.periods.index].clash = false;
+                                                    timetable.update({curriculumReference: clashToUpdate.curriculumReference},
+                                                        {$set: {timetable: timetableToClearClash.timetable}}, function (err, o) {
+                                                            if(err){
+                                                                return res.status(400).send({
+                                                                    message : errorHandler.getErrorMessage(err)
+                                                                });
+                                                            }else{
+                                                                return res.status(200).send({clashIn : clashes});
+                                                            }
+                                                        });
+                                                }
+                                            });
+                                    }else{
+                                        return res.status(200).send({clashIn : clashes});
+                                    }
                                 }
                             }
                         });
