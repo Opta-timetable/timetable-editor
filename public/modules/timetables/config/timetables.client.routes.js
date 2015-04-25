@@ -14,11 +14,8 @@ angular.module('timetables').config(['$stateProvider',
         templateUrl : 'modules/timetables/views/view-timetable.client.view.html'
       }).
       state('editTimetable', {
-            url: '/timetables/edit/:curriculumId',
-            views: {
-                '': {templateUrl: 'modules/timetables/views/edit-timetable.client.view.html'},
-                'reportsView@editTimetable': {templateUrl: '/modules/timetables/views/view-reports.client.view.html'}
-            }
-        });
+        url         : '/timetables/edit/:curriculumId',
+        templateUrl : 'modules/timetables/views/edit-timetable.client.view.html'
+      });
   }
 ]);
