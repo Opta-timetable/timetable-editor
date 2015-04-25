@@ -1,0 +1,14 @@
+.timetable td.drag-enter {
+  border     : 0.1em dotted #00ff00 !important;
+  background : #aaffaa !important;
+}
+
+.subjects li.dragging {
+  display     : inline-block;
+  margin-left : 100px;
+  font-size   : smaller;
+  font-weight : bold;
+  color       : #999;
+  border      : 0.1em dotted #0000ff !important;
+  background  : rgba(100, 100, 255, 0.2) !important;
+}

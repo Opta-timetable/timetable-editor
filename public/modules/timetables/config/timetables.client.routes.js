@@ -3,7 +3,7 @@
 // Setting up route
 angular.module('timetables').config(['$stateProvider',
   function ($stateProvider) {
-    // Courses state routing
+    // Timetables state routing
     $stateProvider.
       state('listTimetables', {
         url         : '/timetables',

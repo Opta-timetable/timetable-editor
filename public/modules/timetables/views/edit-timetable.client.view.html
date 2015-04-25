@@ -1,73 +1,72 @@
 <section data-ng-controller="TimetablesController" data-ng-init="findOne()">
   <div class="page-header">
-    <h1> Edit {{ timetableForCurriculum.timetable.curriculumCode }}'s timetable</h1>
+    <h1> Edit timetable for {{ timetableForCurriculum.timetable.curriculumCode }}</h1>
   </div>
-<div class="container-fluid">
+  <div class="container-fluid">
     <div class="row">
-        <div class="col-md-9">
-            <table class="table table-bordered">
-            <thead>
+      <div class="col-md-9">
+        <table class="timetable table table-bordered">
+          <thead>
             <tr>
-                <th>Day</th>
-                <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
-                <th data-ng-repeat="period in timetableForCurriculum.timetable.timetable[0].periods">{{ "Period-" + (period.index +1)}}</th>
+              <th>Day</th>
+              <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
+              <th data-ng-repeat="period in timetableForCurriculum.timetable.timetable[0].periods">{{ "Period-" + (period.index +1)}}</th>
             </tr>
-            </thead>
-            <tr data-ng-repeat="day in timetableForCurriculum.timetable.timetable">
-                <td>{{day.dayOfWeek}}</td>
-                <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
-                <td data-ng-repeat="period in day.periods" ng-drop="true"
-                    ng-drop-success="onDropComplete($data,$event, day.dayIndex, period.index, false)"
-                    ng-bind="period.subject" ng-class="{'bg-danger' : period.clash}"
-                    ng-init="findClashes(period.clash, day.dayIndex, period.index)">
-                </td>
-            </tr>
+          </thead>
+          <tr data-ng-repeat="day in timetableForCurriculum.timetable.timetable">
+            <td>{{day.dayOfWeek}}</td>
+            <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
+            <td data-ng-repeat="period in day.periods" ng-drop="true"
+                ng-drop-success="onDropComplete($data,$event, day.dayIndex, period.index, false)"
+                ng-bind="period.subject" ng-class="{'bg-danger' : period.clash}"
+                ng-init="findClashes(period.clash, day.dayIndex, period.index)">
+            </td>
+          </tr>
         </table>
-            <div class="form-group">
-                <input type="button" ng-disabled="undoStack.length == 0" value="Undo" class="btn btn-default" ng-click="undoEdit()">
-                <input type="button" ng-disabled="redoStack.length == 0" value="Redo" class="btn btn-default" ng-click="redoEdit()">
-                <input type="button" value="Finish" class="btn btn-default" ng-click="done()">
-                <input type="button" value="Cancel" class="btn btn-default" onclick="location.href='#!/timetables'">
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3> Clashes </h3>
-                    <div class="list-group">
-                        <a data-ng-repeat="clash in clashes" data-ng-href="#!/timetables/edit/{{clash.curriculumReference}}" class="list-group-item">
-                            <h5 class="list-group-item-heading">
-                                {{ clash.curriculumCode + ', ' + clash.timetable.periods.teacher + ', '+
-                                clash.timetable.dayOfWeek + ', Period-' + (clash.timetable.periods.index+1) }}
-                            </h5>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="col-sm-6">
-                    <div ui-view="reportsView"></div>
-                </div>
-
-            </div>
+        <div class="form-group">
+          <input type="button" ng-disabled="undoStack.length == 0" value="Undo" class="btn btn-default" ng-click="undoEdit()">
+          <input type="button" ng-disabled="redoStack.length == 0" value="Redo" class="btn btn-default" ng-click="redoEdit()">
+          <input type="button" value="Finish" class="btn btn-default" ng-click="done()">
+          <input type="button" value="Cancel" class="btn btn-default" onclick="location.href='#!/timetables'">
         </div>
-        <div class="col-md-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Subjects</h3>
-                </div>
-                <div class="panel-body">
-                    <ul class="list-group">
-                       <li ng-drag="true" ng-drag-data="course"
-                           data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">
-                        {{ course.code }} - {{ course._teacher.code }}
-                       </li>
-                    </ul>
-                </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h3> Clashes </h3>
+            <div class="list-group">
+              <a data-ng-repeat="clash in clashes" data-ng-href="#!/timetables/edit/{{clash.curriculumReference}}" class="list-group-item">
+                <h5 class="list-group-item-heading">
+                  {{ clash.curriculumCode + ', ' + clash.timetable.periods.teacher + ', '+
+                  clash.timetable.dayOfWeek + ', Period-' + (clash.timetable.periods.index+1) }}
+                </h5>
+              </a>
             </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div ui-view="reportsView"></div>
+          </div>
 
         </div>
+      </div>
+      <div class="col-md-3">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Subjects</h3>
+          </div>
+          <div class="panel-body subjects">
+            <ul class="list-group">
+              <li ng-drag="true" data-ng-drag-data="course" data-ng-center-anchor="true"
+                  data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">
+                {{ course.code }} - {{ course._teacher.code }}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
     </div>
     <div data-ng-show="error" class="text-danger">
-        <strong data-ng-bind="error"></strong>
+      <strong data-ng-bind="error"></strong>
     </div>
-</div>
-
+  </div>
 </section>
