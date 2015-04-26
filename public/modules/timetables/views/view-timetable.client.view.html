@@ -4,11 +4,12 @@
   </div>
   <div class="clearfix">
     <div class="pull-right">
-      <a class="btn btn-default" href="/#!/timetables">Back</a>
-      <a class="btn btn-default export-btn" ng-click='csv.generate()' ng-href="{{ csv.link() }}"
-         download="{{curriculumSelected.code+'-timetable.csv'}}">Export</a>
-      <a class="btn btn-primary" href="/#!/timetables/edit/{{timetableForCurriculum.timetable.curriculumReference}}">
-        <i class="glyphicon glyphicon-edit"></i>
+      <a class="btn btn-info" title="Export Timetable" ng-click='csv.generate()' ng-href="{{ csv.link() }}"
+         download="{{timetableForCurriculum.timetable.curriculumCode +'-timetable.csv'}}">
+        <i class="glyphicon glyphicon-new-window"></i> &#160;Export
+      </a>
+      <a class="btn btn-success" title="Edit Timetable" href="/#!/timetables/edit/{{timetableForCurriculum.timetable.curriculumReference}}">
+        <i class="glyphicon glyphicon-edit"></i> &#160;Edit
       </a>
     </div>
   </div>
@@ -31,4 +32,7 @@
       </td>
     </tr>
   </table>
+  <div class="row">
+    <div class="col-md-12"><a class="btn btn-default" href="/#!/timetables">Back</a></div>
+  </div>
 </section>
