@@ -17,17 +17,17 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
     $scope.undoEdit = function () {
 
-      var periodFromUndoStack = $scope.undoStack.shift();
+      var periodFromUndoStack = $scope.undoStack.pop();
 
       console.log('Value for Undo from stack ' + JSON.stringify(periodFromUndoStack));
 
       var redoData = {};
       redoData.dayIndex = periodFromUndoStack.dayIndex;
       redoData.periodIndex = periodFromUndoStack.periodIndex;
-      redoData.teacher = $scope.timetableForCurriculum.timetable.timetable[parseInt(periodFromUndoStack.dayIndex)]
-        .periods[parseInt(periodFromUndoStack.periodIndex)].teacher;
-      redoData.subject = $scope.timetableForCurriculum.timetable.timetable[parseInt(periodFromUndoStack.dayIndex)]
-        .periods[parseInt(periodFromUndoStack.periodIndex)].subject;
+      var period = $scope.timetableForCurriculum.timetable.days[parseInt(periodFromUndoStack.dayIndex)]
+        .periods[parseInt(periodFromUndoStack.periodIndex)];
+      redoData.teacher = period.teacher;
+      redoData.subject = period.subject;
       console.log('saving for redo ' + JSON.stringify(redoData));
       $scope.redoStack.push(redoData);
 
@@ -49,8 +49,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.redoEdit = function () {
-      var periodFromRedoStack = $scope.redoStack.shift();
-      $scope.undoStack.unshift(periodFromRedoStack);
+      var periodFromRedoStack = $scope.redoStack.pop();
+      $scope.undoStack.pop(periodFromRedoStack);
 
       var redoData = {};
       redoData._teacher = {};
@@ -68,9 +68,9 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       //if new allocation removes clash, set clash to false
       //in any case remove existing clash controller array
       var clashToUpdate = {};
-      if ($scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash === true) {
+      if ($scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].clash === true) {
         $scope.clashes.forEach(function (clash) {
-          if ((clash.timetable.dayIndex === dayIndex) && (clash.timetable.periods.index === parseInt(period))) {
+          if ((clash.days.dayIndex === dayIndex) && (clash.days.periods.index === parseInt(period))) {
             clashToUpdate = clash;
           }
         });
@@ -83,26 +83,26 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         var periodInfo = {};
         periodInfo.dayIndex = dayIndex;
         periodInfo.periodIndex = period;
-        periodInfo.subject = $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject;
-        periodInfo.teacher = $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher;
+        periodInfo.subject = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].subject;
+        periodInfo.teacher = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].teacher;
 
-        $scope.undoStack.unshift(periodInfo);
+        $scope.undoStack.push(periodInfo);
 
         console.log('saving following for undo operation ' + JSON.stringify(periodInfo));
       }
 
       $http.post('/timetables/performDrop', {
         currentDay      : dayIndex,
-        currentPeriod   : $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)],
+        currentPeriod   : $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)],
         allocatedCourse : data,
         clashToUpdate   : clashToUpdate
       })
         .success(function (data, status, headers, config) {
           if (data.clashIn.length >= 1) {
-            $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash = true;
+            $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].clash = true;
             $scope.clashes = $scope.clashes.concat(data.clashIn);
           } else {
-            $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].clash = false;
+            $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].clash = false;
           }
         })
         .error(function (data, status, headers, config) {
@@ -110,8 +110,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           // or server returns response with an error status.
           $scope.error = data.message;
         });
-      $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
-      $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
+      $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
+      $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
 
     };
 
@@ -133,7 +133,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         console.log('period for this element :' + period);
         $http.post('/timetables/discoverClashes', {
           currentDay    : dayIndex,
-          currentPeriod : $scope.timetableForCurriculum.timetable.timetable[parseInt(dayIndex)].periods[parseInt(period)],
+          currentPeriod : $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)],
           curriculumId  : $stateParams.curriculumId
         })
           .success(function (data, status, headers, config) {

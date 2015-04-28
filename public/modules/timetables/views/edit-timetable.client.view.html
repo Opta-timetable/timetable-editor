@@ -10,14 +10,14 @@
             <tr>
               <th>Day</th>
               <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
-              <th data-ng-repeat="period in timetableForCurriculum.timetable.timetable[0].periods">{{ "Period-" + (period.index +1)}}</th>
+              <th data-ng-repeat="period in timetableForCurriculum.timetable.days[0].periods">{{ "Period-" + (period.index +1)}}</th>
             </tr>
           </thead>
-          <tr data-ng-repeat="day in timetableForCurriculum.timetable.timetable">
+          <tr data-ng-repeat="day in timetableForCurriculum.timetable.days">
             <td>{{day.dayOfWeek}}</td>
             <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
-            <td data-ng-repeat="period in day.periods" ng-drop="true"
-                ng-drop-success="onDropComplete($data,$event, day.dayIndex, period.index, false)"
+            <td data-ng-repeat="period in day.periods" data-ng-drop="true"
+                data-ng-drop-success="onDropComplete($data, $event, day.dayIndex, period.index, false)"
                 ng-bind="period.subject" ng-class="{'bg-danger' : period.clash}"
                 ng-init="findClashes(period.clash, day.dayIndex, period.index)">
             </td>
@@ -35,8 +35,8 @@
             <div class="list-group">
               <a data-ng-repeat="clash in clashes" data-ng-href="#!/timetables/edit/{{clash.curriculumReference}}" class="list-group-item">
                 <h5 class="list-group-item-heading">
-                  {{ clash.curriculumCode + ', ' + clash.timetable.periods.teacher + ', '+
-                  clash.timetable.dayOfWeek + ', Period-' + (clash.timetable.periods.index+1) }}
+                  {{ clash.curriculumCode + ', ' + clash.days.periods.teacher + ', '+
+                  clash.days.dayOfWeek + ', Period-' + (clash.days.periods.index+1) }}
                 </h5>
               </a>
             </div>
