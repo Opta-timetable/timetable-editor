@@ -24,9 +24,9 @@
           </tr>
         </table>
         <div class="form-group">
-          <input type="button" ng-disabled="undoStack.length == 0" value="Undo" class="btn btn-default" ng-click="undoEdit()">
-          <input type="button" ng-disabled="redoStack.length == 0" value="Redo" class="btn btn-default" ng-click="redoEdit()">
-          <input type="button" value="Finish" class="btn btn-default" ng-click="done()">
+          <input type="button" ng-disabled="!undoStack.length" value="Undo" class="btn btn-default" ng-click="undo()">
+          <input type="button" ng-disabled="!redoStack.length" value="Redo" class="btn btn-default" ng-click="redo()">
+          <input type="button" value="Finish" class="btn btn-default" ng-click="finish()">
           <input type="button" value="Cancel" class="btn btn-default" onclick="location.href='#!/timetables'">
         </div>
         <div class="row">

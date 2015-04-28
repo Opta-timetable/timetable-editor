@@ -10,12 +10,51 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.undoStack = [];
     $scope.redoStack = [];
 
+    function popClashFromLocalList(currentPeriod, dayIndex, periodIndex) {
+      var clashToUpdate = {};
+      if (currentPeriod.clash) {
+        clashToUpdate = $scope.clashes.filter(function (clash) {
+          // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+          return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex);
+        });
+
+        // remove this clash from the local array (in the controller).
+        // It will get updated with the new one, if any
+        $scope.clashes.splice($scope.clashes.indexOf(clashToUpdate), 1);
+      }
+      console.log('clash to update is ' + JSON.stringify(clashToUpdate));
+      return clashToUpdate;
+    }
+
+    function updatePeriodAllocation(dayIndex, periodIndex, currentPeriod, allocatedCourse, currentClash) {
+      $http.post('/timetables/performDrop', {
+        currentDay      : dayIndex,
+        currentPeriod   : currentPeriod,
+        allocatedCourse : allocatedCourse,
+        clashToUpdate   : currentClash
+      })
+        .success(function (data, status, headers, config) {
+          var updatedPeriod = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(periodIndex)];
+          if (data.clashIn.length >= 1) {
+            updatedPeriod.clash = true;
+            $scope.clashes = $scope.clashes.concat(data.clashIn);
+          } else {
+            updatedPeriod.clash = false;
+          }
+        })
+        .error(function (data, status, headers, config) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+          $scope.error = data.message;
+        });
+    }
+
     $scope.find = function () {
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query();
     };
 
-    $scope.undoEdit = function () {
+    $scope.undo = function () {
 
       var periodFromUndoStack = $scope.undoStack.pop();
 
@@ -48,9 +87,9 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
     };
 
-    $scope.redoEdit = function () {
+    $scope.redo = function () {
       var periodFromRedoStack = $scope.redoStack.pop();
-      $scope.undoStack.pop(periodFromRedoStack);
+      $scope.undoStack.push(periodFromRedoStack);
 
       var redoData = {};
       redoData._teacher = {};
@@ -62,60 +101,38 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.onDropComplete(redoData, null, periodFromRedoStack.dayIndex, periodFromRedoStack.periodIndex, false);
     };
 
-    $scope.onDropComplete = function (data, evt, dayIndex, period, undoRedo) {
-      //Code to check if there is a clash in the existing assignment
-      //If yes, send clash as well to the server
-      //if new allocation removes clash, set clash to false
-      //in any case remove existing clash controller array
-      var clashToUpdate = {};
-      if ($scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].clash === true) {
-        $scope.clashes.forEach(function (clash) {
-          if ((clash.days.dayIndex === dayIndex) && (clash.days.periods.index === parseInt(period))) {
-            clashToUpdate = clash;
-          }
-        });
-        //remove clash in controller. It will get updated with the new one if any
-        $scope.clashes.splice($scope.clashes.indexOf(clashToUpdate), 1);
-      }
-      console.log('clash to update is ' + JSON.stringify(clashToUpdate));
-      if (undoRedo === false) {
-        //Backup current period
-        var periodInfo = {};
-        periodInfo.dayIndex = dayIndex;
-        periodInfo.periodIndex = period;
-        periodInfo.subject = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].subject;
-        periodInfo.teacher = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].teacher;
+    $scope.onDropComplete = function (allocatedCourse, evt, dayIndex, periodIndex, isUndo) {
+      // Code to check if there is a clash in the existing assignment
+      // If yes, send clash as well to the server
+      // if new allocation removes clash, set clash to false
+      // in any case remove existing clash controller array
+      var currentPeriod = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(periodIndex)];
 
+      // get the clash for the current period, if any after removing it from the local list
+      var clashToUpdate = popClashFromLocalList(currentPeriod, dayIndex, periodIndex);
+
+      if (!isUndo) {
+        //Backup current period
+        var periodInfo = {
+          dayIndex    : dayIndex,
+          periodIndex : periodIndex,
+          subject     : currentPeriod.subject,
+          teacher     : currentPeriod.teacher
+        };
         $scope.undoStack.push(periodInfo);
 
         console.log('saving following for undo operation ' + JSON.stringify(periodInfo));
       }
 
-      $http.post('/timetables/performDrop', {
-        currentDay      : dayIndex,
-        currentPeriod   : $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)],
-        allocatedCourse : data,
-        clashToUpdate   : clashToUpdate
-      })
-        .success(function (data, status, headers, config) {
-          if (data.clashIn.length >= 1) {
-            $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].clash = true;
-            $scope.clashes = $scope.clashes.concat(data.clashIn);
-          } else {
-            $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].clash = false;
-          }
-        })
-        .error(function (data, status, headers, config) {
-          // called asynchronously if an error occurs
-          // or server returns response with an error status.
-          $scope.error = data.message;
-        });
-      $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].subject = data.code;
-      $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)].teacher = data._teacher.code;
+      // call the API to update the period allocation setting up callbacks
+      updatePeriodAllocation(dayIndex, periodIndex, currentPeriod, allocatedCourse, clashToUpdate);
 
+      // Update the subject and teacher on the period within the scope to update the UI
+      currentPeriod.subject = allocatedCourse.code;
+      currentPeriod.teacher = allocatedCourse._teacher.code;
     };
 
-    $scope.done = function () {
+    $scope.finish = function () {
       $scope.timetableForCurriculum.$update({
         curriculumId : $stateParams.curriculumId,
         clashes      : $scope.clashes
