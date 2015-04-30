@@ -16,6 +16,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function popClashFromLocalList(dayIndex, periodIndex) {
+        debugger;
       var clashToUpdate = {};
       var currentPeriod = extractPeriod(dayIndex, periodIndex);
 
@@ -23,7 +24,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         clashToUpdate = $scope.clashes.filter(function (clash) {
           // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
           return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex);
-        });
+        })[0]; //Filter returns an array of matches
 
         // remove this clash from the local array (in the controller).
         // It will get updated with the new one, if any
@@ -59,6 +60,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function applyAllocation(allocation) {
+        debugger;
       // extract the indices
       var dayIndex = allocation.dayIndex;
       var periodIndex = allocation.periodIndex;
@@ -139,7 +141,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.onDropComplete = function (allocatedCourse, evt, dayIndex, periodIndex, isUndo) {
-      debugger;
       // Code to check if there is a clash in the existing assignment
       // If yes, send clash as well to the server
       // if new allocation removes clash, set clash to false
