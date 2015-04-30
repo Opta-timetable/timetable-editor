@@ -11,7 +11,37 @@ var mongoose = require('mongoose'),
   Curriculum = mongoose.model('Curriculum'),
   Course = mongoose.model('Course'),
   Timetable = mongoose.model('Timetable'),
+    Teacher = mongoose.model('Teacher'),
   _ = require('lodash');
+
+//For use by TimetableByTeacher
+//The timetable stored in the db won't do for this purpose. Initialising a placeholder
+var EmptyTimeTableDays = function () {
+
+    // new Array() is not recommended because of the ambiguity in the two types of parameters it takes
+    // read more here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
+    // var timeTableData = new Array();
+    var timeTableData = [];
+    var dayName = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+    //Initialise - Assuming hardcoded metadata (number of days, number of periods)
+    for (var i = 0; i < dayName.length; i++) {
+        var allocationsForDayOfWeek = {};
+        allocationsForDayOfWeek.dayOfWeek = dayName[i];
+        allocationsForDayOfWeek.dayIndex = i;
+        allocationsForDayOfWeek.periods = [];
+        for (var k = 0; k < 7; k++) {
+            var period = {};
+            period.index = k;
+            period.subject = "";
+            period.curriculum = "";
+            period.clash = false;
+            allocationsForDayOfWeek.periods.push(period);
+        }
+        timeTableData.push(allocationsForDayOfWeek);
+    }
+    return timeTableData;
+};
 
 // TODO: Remnants of a copy-paste ?
 exports.read = function (req, res, next, id) {
@@ -54,6 +84,45 @@ exports.timetableByCurriculumID = function (req, res) {
       });
     }
   });
+};
+
+exports.timetableByTeacherID = function (req, res) {
+    console.log('Searching for ' + req.params._id);
+    Teacher.findOne({_id: req.params._id}).exec(function (err, teacher){
+        if (err) {
+            return res.status(400).send({
+                message : errorHandler.getErrorMessage(err)
+            });
+        } else {
+            console.log('Teacher requested is ' + JSON.stringify(teacher));
+            Timetable.aggregate({$unwind: '$days'}, {$unwind: '$days.periods'},
+                {$match: {'days.periods.teacher': teacher.code}}, function (err, teacherAllocation) {
+                    if (err) {
+                        console.log('error in aggregate');
+                        return res.status(400).send({
+                            message: errorHandler.getErrorMessage(err)
+                        });
+                    } else {
+                        console.log('teacherAllocation is %j', teacherAllocation);
+                        var timetableForTeacher = new EmptyTimeTableDays();
+                        console.log('empty timetableForTeacher = %j', timetableForTeacher);
+                        var allocationCount = 0;
+                        teacherAllocation.forEach(function(allocation){
+                          allocationCount++;
+                          timetableForTeacher[parseInt(allocation.days.dayIndex)].periods[allocation.days.periods.index].subject =
+                              allocation.days.periods.subject;
+                            timetableForTeacher[parseInt(allocation.days.dayIndex)].periods[allocation.days.periods.index].curriculum =
+                                allocation.curriculumCode;
+                            if (allocationCount === teacherAllocation.length){
+                                res.json({teacherCode : teacher.code, teachersTimetable : timetableForTeacher});
+                            }
+                        });
+
+                    }
+
+                });
+        }
+    });
 };
 
 // TODO: Rename this into something more meaningful than `performDrop`

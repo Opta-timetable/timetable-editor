@@ -23,7 +23,8 @@ module.exports = function(app) {
     app.route('/timetables/discoverClashes')
         .post(timetables.discoverClashes);
 
-
+    app.route('/timetables/teachers/:_id')
+        .get(timetables.timetableByTeacherID);
 
     //app.route('/timetables/:curriculumId');
 

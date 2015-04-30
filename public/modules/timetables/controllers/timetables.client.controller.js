@@ -1,8 +1,8 @@
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Timetables',
-  function ($http, $scope, $stateParams, $location, Authentication, Timetables) {
+angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
+  function ($http, $scope, $stateParams, $location, Authentication, Timetables, Teachers) {
     $scope.authentication = Authentication;
     $scope.clashes = [];
     $scope.history = [];
@@ -107,6 +107,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.find = function () {
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query();
+        $scope.teachers = Teachers.query();
     };
 
     $scope.undo = function () {

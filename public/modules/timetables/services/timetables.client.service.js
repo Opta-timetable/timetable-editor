@@ -8,3 +8,10 @@ angular.module('timetables').factory('Timetables', ['$resource',
   }
 ]);
 
+angular.module('timetables').factory('Teachers', ['$resource',
+    function ($resource) {
+        return $resource('timetables/teachers/:_id', {
+            _id : '@_id'
+        }, {'update' : {method : 'PUT'}});
+    }
+]);
