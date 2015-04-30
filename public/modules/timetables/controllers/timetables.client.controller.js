@@ -5,13 +5,20 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
   function ($http, $scope, $stateParams, $location, Authentication, Timetables) {
     $scope.authentication = Authentication;
     $scope.clashes = [];
-    $scope.history = []; //ToDo For undo-redo feature
-    $scope.historyIndex = 0;
+    $scope.history = [];
     $scope.undoStack = [];
     $scope.redoStack = [];
 
-    function popClashFromLocalList(currentPeriod, dayIndex, periodIndex) {
+    function extractPeriod(dayIndex, periodIndex) {
+      var dayIndexAsInt = (typeof dayIndex === 'number') ? dayIndex : parseInt(dayIndex, 10);
+      var periodIndexAsInt = typeof periodIndex === 'number' ? periodIndex : parseInt(periodIndex, 10);
+      return $scope.timetableForCurriculum.timetable.days[dayIndexAsInt].periods[periodIndexAsInt];
+    }
+
+    function popClashFromLocalList(dayIndex, periodIndex) {
       var clashToUpdate = {};
+      var currentPeriod = extractPeriod(dayIndex, periodIndex);
+
       if (currentPeriod.clash) {
         clashToUpdate = $scope.clashes.filter(function (clash) {
           // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
@@ -22,19 +29,21 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         // It will get updated with the new one, if any
         $scope.clashes.splice($scope.clashes.indexOf(clashToUpdate), 1);
       }
+
       console.log('clash to update is ' + JSON.stringify(clashToUpdate));
+
       return clashToUpdate;
     }
 
-    function updatePeriodAllocation(dayIndex, periodIndex, currentPeriod, allocatedCourse, currentClash) {
+    function updateAllocation(dayIndex, periodIndex, allocatedCourse, currentClash) {
       $http.post('/timetables/performDrop', {
         currentDay      : dayIndex,
-        currentPeriod   : currentPeriod,
+        currentPeriod   : extractPeriod(dayIndex, periodIndex),
         allocatedCourse : allocatedCourse,
         clashToUpdate   : currentClash
       })
         .success(function (data, status, headers, config) {
-          var updatedPeriod = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(periodIndex)];
+          var updatedPeriod = extractPeriod(dayIndex, periodIndex);
           if (data.clashIn.length >= 1) {
             updatedPeriod.clash = true;
             $scope.clashes = $scope.clashes.concat(data.clashIn);
@@ -49,87 +58,124 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         });
     }
 
+    function applyAllocation(allocation) {
+      // extract the indices
+      var dayIndex = allocation.dayIndex;
+      var periodIndex = allocation.periodIndex;
+
+      // build an allocatedCourse from the after object of the allocation
+      var allocatedCourse = {
+        code                : allocation.after.subject,
+        _teacher            : {
+          code : allocation.after.teacher
+        },
+        curriculumReference : $stateParams.curriculumId
+      };
+
+      // get the clash for the current period, if any after removing it from the local list
+      var clashToUpdate = popClashFromLocalList(dayIndex, periodIndex);
+
+      // call the API to update the period allocation setting up callbacks
+      updateAllocation(dayIndex, periodIndex, allocatedCourse, clashToUpdate);
+
+      // Update the UI to reflect the after state of the allocation
+      var period = extractPeriod(dayIndex, periodIndex);
+      period.subject = allocation.after.subject;
+      period.teacher = allocation.after.teacher;
+
+      // Add allocation to history
+      $scope.history.unshift(allocation);
+    }
+
+    $scope.formatAllocation = function (allocation) {
+      var days = {
+        0 : 'Monday',
+        1 : 'Tuesday',
+        2 : 'Wednesday',
+        3 : 'Thursday',
+        4 : 'Friday',
+        5 : 'Saturday',
+        6 : 'Sunday'
+      };
+      return 'Period ' + (parseInt(allocation.periodIndex, 10) + 1) + ' - ' + days[allocation.dayIndex] +
+        ': Allocated ' + allocation.after.subject + ' (' + allocation.after.teacher + ') in place of ' +
+        allocation.before.subject + ' (' + allocation.before.teacher + ')';
+    };
+
     $scope.find = function () {
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query();
     };
 
     $scope.undo = function () {
-
-      var periodFromUndoStack = $scope.undoStack.pop();
-
-      console.log('Value for Undo from stack ' + JSON.stringify(periodFromUndoStack));
-
-      var redoData = {};
-      redoData.dayIndex = periodFromUndoStack.dayIndex;
-      redoData.periodIndex = periodFromUndoStack.periodIndex;
-      var period = $scope.timetableForCurriculum.timetable.days[parseInt(periodFromUndoStack.dayIndex)]
-        .periods[parseInt(periodFromUndoStack.periodIndex)];
-      redoData.teacher = period.teacher;
-      redoData.subject = period.subject;
-      console.log('saving for redo ' + JSON.stringify(redoData));
-      $scope.redoStack.push(redoData);
-
-      //For Reference: var dayToMatch = req.body.currentDay,
-      //    periodIndex = req.body.currentPeriod.index,
-      //    teacher = req.body.allocatedCourse._teacher.code,
-      //    curriculum = req.body.allocatedCourse.curriculumReference,
-      //    subject = req.body.allocatedCourse.code,
-      //    clashToUpdate = req.body.clashToUpdate;
-      var undoData = {};
-      undoData._teacher = {};
-      undoData._teacher.code = periodFromUndoStack.teacher;
-      undoData.code = periodFromUndoStack.subject;
-      undoData.curriculumReference = $stateParams.curriculumId;
-      console.log('About to drop: ' + JSON.stringify(undoData));
-
-      $scope.onDropComplete(undoData, null, periodFromUndoStack.dayIndex, periodFromUndoStack.periodIndex, true);
-
+      // Get the last allocation from undoStack
+      var allocation = $scope.undoStack.pop();
+      // Add it to the redoStack
+      $scope.redoStack.push(allocation);
+      // "Reverse" it to make it an allocationToUndo of the one pulled from history
+      var allocationToUndo = {
+        dayIndex    : allocation.dayIndex,
+        periodIndex : allocation.periodIndex,
+        before      : {
+          subject : allocation.after.subject,
+          teacher : allocation.after.teacher,
+        },
+        after       : {
+          subject : allocation.before.subject,
+          teacher : allocation.before.teacher,
+        }
+      };
+      // Apply the allocationToUndo
+      applyAllocation(allocationToUndo);
     };
 
     $scope.redo = function () {
-      var periodFromRedoStack = $scope.redoStack.pop();
-      $scope.undoStack.push(periodFromRedoStack);
-
-      var redoData = {};
-      redoData._teacher = {};
-      redoData._teacher.code = periodFromRedoStack.teacher;
-      redoData.code = periodFromRedoStack.subject;
-      redoData.curriculumReference = $stateParams.curriculumId;
-
-      console.log('About to drop: ' + JSON.stringify(redoData));
-      $scope.onDropComplete(redoData, null, periodFromRedoStack.dayIndex, periodFromRedoStack.periodIndex, false);
+      // Get the last allocation from redoStack
+      var allocationToRedo = $scope.redoStack.pop();
+      // Add it to the undoStack
+      $scope.undoStack.push(allocationToRedo);
+      // Apply this allocation
+      applyAllocation(allocationToRedo);
     };
 
     $scope.onDropComplete = function (allocatedCourse, evt, dayIndex, periodIndex, isUndo) {
+      debugger;
       // Code to check if there is a clash in the existing assignment
       // If yes, send clash as well to the server
       // if new allocation removes clash, set clash to false
       // in any case remove existing clash controller array
-      var currentPeriod = $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(periodIndex)];
+      var currentPeriod = extractPeriod(dayIndex, periodIndex);
 
-      // get the clash for the current period, if any after removing it from the local list
-      var clashToUpdate = popClashFromLocalList(currentPeriod, dayIndex, periodIndex);
+      var allocatedSubject = allocatedCourse.code;
+      var allocatedTeacher = allocatedCourse._teacher.code;
 
-      if (!isUndo) {
-        //Backup current period
-        var periodInfo = {
-          dayIndex    : dayIndex,
-          periodIndex : periodIndex,
-          subject     : currentPeriod.subject,
-          teacher     : currentPeriod.teacher
-        };
-        $scope.undoStack.push(periodInfo);
-
-        console.log('saving following for undo operation ' + JSON.stringify(periodInfo));
+      if (currentPeriod.subject === allocatedSubject && currentPeriod.teacher === allocatedTeacher) {
+        // No need to change anything
+        return;
       }
 
-      // call the API to update the period allocation setting up callbacks
-      updatePeriodAllocation(dayIndex, periodIndex, currentPeriod, allocatedCourse, clashToUpdate);
+      // Clear the redoStack now that we're adding a new operation to the history
+      $scope.redoStack = [];
 
-      // Update the subject and teacher on the period within the scope to update the UI
-      currentPeriod.subject = allocatedCourse.code;
-      currentPeriod.teacher = allocatedCourse._teacher.code;
+      // Create the allocation object
+      var allocation = {
+        dayIndex    : dayIndex,
+        periodIndex : periodIndex,
+        before      : {
+          subject : currentPeriod.subject,
+          teacher : currentPeriod.teacher,
+        },
+        after       : {
+          subject : allocatedSubject,
+          teacher : allocatedTeacher
+        }
+      };
+
+      // Add this allocation to undoStack
+      $scope.undoStack.push(allocation);
+
+      // Apply the allocation
+      applyAllocation(allocation);
     };
 
     $scope.finish = function () {
@@ -143,14 +189,14 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       });
     };
 
-    $scope.findClashes = function (clash, dayIndex, period) {
+    $scope.findClashes = function (clash, dayIndex, periodIndex) {
       if (clash === true) {
         console.log('clash for this element :' + clash);
         console.log('day for this element :' + dayIndex);
-        console.log('period for this element :' + period);
+        console.log('period for this element :' + periodIndex);
         $http.post('/timetables/discoverClashes', {
           currentDay    : dayIndex,
-          currentPeriod : $scope.timetableForCurriculum.timetable.days[parseInt(dayIndex)].periods[parseInt(period)],
+          currentPeriod : extractPeriod(dayIndex, periodIndex),
           curriculumId  : $stateParams.curriculumId
         })
           .success(function (data, status, headers, config) {

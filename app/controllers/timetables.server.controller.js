@@ -85,7 +85,7 @@ exports.performDrop = function (req, res) {
       currentPeriod.teacher = teacher;
       currentPeriod.clash = false;
 
-      console.log('Updated timetable is: ' + JSON.stringify(newTimetableDays));
+      // console.log('Updated timetable is: ' + JSON.stringify(newTimetableDays));
       //Look for clashes
       Timetable.aggregate({$unwind : '$days'}, {$unwind : '$days.periods'},
         {$match : {'days.dayIndex' : dayToMatch}},
@@ -122,9 +122,10 @@ exports.performDrop = function (req, res) {
                             if (clashesUpdateTracker === 0) {
                               //new clashes updated. Clear old clash if any
                               if (JSON.stringify(clashToUpdate) !== '{}') {
-                                console.log('Entered Clash to update');
+                                console.log('Entered Clash to update:  %j', clashToUpdate);
                                 Timetable.findOne({curriculumReference : clashToUpdate.curriculumReference},
                                   function (err, timetableToClearClash) {
+                                    console.log('timetableToClearClash: %j', timetableToClearClash);
                                     if (err) {
                                       console.log('error while finding existing clash');
                                       return res.status(400).send({
@@ -157,9 +158,10 @@ exports.performDrop = function (req, res) {
                   });
                 } else {
                   if (JSON.stringify(clashToUpdate) !== '{}') {
-                    console.log('Entered Clash to update');
+                    console.log('Entered Clash to update %j', clashToUpdate);
                     Timetable.findOne({curriculumReference : clashToUpdate.curriculumReference},
                       function (err, timetableToClearClash) {
+                        console.log('timetableToClearClash: %j', timetableToClearClash);
                         if (err) {
                           console.log('error while finding existing clash');
                           return res.status(400).send({

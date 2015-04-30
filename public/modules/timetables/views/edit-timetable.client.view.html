@@ -1,10 +1,24 @@
 <section data-ng-controller="TimetablesController" data-ng-init="findOne()">
   <div class="page-header">
-    <h1> Edit timetable for {{ timetableForCurriculum.timetable.curriculumCode }}</h1>
+    <h2> Edit timetable for {{ timetableForCurriculum.timetable.curriculumCode }}</h2>
   </div>
   <div class="container-fluid">
     <div class="row">
+      <h4>History</h4>
+      <div class="col-sm-12 history-viewer text-muted small">
+        <span data-ng-repeat="log in history">{{formatAllocation(log)}}</span>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-md-9">
+        <div class="clearfix">
+          <div class="form-group">
+            <input type="button" ng-disabled="!undoStack.length" value="Undo" class="btn btn-sm btn-default" ng-click="undo()">
+            <input type="button" ng-disabled="!redoStack.length" value="Redo" class="btn btn-sm btn-default" ng-click="redo()">
+            <input type="button" value="Finish" class="btn btn-sm btn-default" ng-click="finish()">
+            <input type="button" value="Cancel" class="btn btn-sm btn-default" onclick="location.href='#!/timetables'">
+          </div>
+        </div>
         <table class="timetable table table-bordered">
           <thead>
             <tr>
@@ -23,15 +37,9 @@
             </td>
           </tr>
         </table>
-        <div class="form-group">
-          <input type="button" ng-disabled="!undoStack.length" value="Undo" class="btn btn-default" ng-click="undo()">
-          <input type="button" ng-disabled="!redoStack.length" value="Redo" class="btn btn-default" ng-click="redo()">
-          <input type="button" value="Finish" class="btn btn-default" ng-click="finish()">
-          <input type="button" value="Cancel" class="btn btn-default" onclick="location.href='#!/timetables'">
-        </div>
         <div class="row">
-          <div class="col-sm-6">
-            <h3> Clashes </h3>
+          <h4> Clashes </h4>
+          <div class="col-sm-12">
             <div class="list-group">
               <a data-ng-repeat="clash in clashes" data-ng-href="#!/timetables/edit/{{clash.curriculumReference}}" class="list-group-item">
                 <h5 class="list-group-item-heading">
@@ -41,11 +49,6 @@
               </a>
             </div>
           </div>
-
-          <div class="col-sm-6">
-            <div ui-view="reportsView"></div>
-          </div>
-
         </div>
       </div>
       <div class="col-md-3">
@@ -62,7 +65,6 @@
             </ul>
           </div>
         </div>
-
       </div>
     </div>
     <div data-ng-show="error" class="text-danger">

@@ -13,3 +13,19 @@
   background  : rgb(100, 100, 255) !important;
   background  : rgba(100, 100, 255, 0.2) !important;
 }
+
+.history-viewer {
+  min-height : 10px;
+  max-height : 60px;
+  overflow   : scroll;
+  margin     : 10px 0;
+  border     : 0.1em dotted #999999;
+}
+
+.history-viewer > span {
+  white-space : nowrap !important;
+  font-family : Menlo, Monaco, Consolas, "Courier New", monospace;
+  line-height : 1.0;
+  display     : block;
+  padding     : 2px 5px;
+}
