@@ -67,17 +67,34 @@
         </div>
       </div>
       <div class="col-md-3">
-        <div class="panel panel-default">
+        <div class="panel panel-info">
           <div class="panel-heading">
             <h3 class="panel-title">Subjects</h3>
           </div>
-          <ul class="list-group panel-body subjects">
-            <li data-ng-drag="true" data-ng-drag-data="course"
-                data-ng-drag-scroll data-allow-transform="true"
-                data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">
-              {{ course.code }} - {{ course._teacher.code }}
-            </li>
-          </ul>
+            <div class="row panel-body">
+                <!--Looked at:http://plnkr.co/edit/AMWLvB045UJmNamp8vdz?p=preview-->
+                <ul data-ng-repeat="column in columns" class="list-group subjects col-md-6">
+                    <li data-ng-repeat="course in timetableForCurriculum.courses | slice:column.start:column.end"
+                        data-ng-drag="true" data-ng-drag-data="course"
+                        data-ng-drag-scroll data-allow-transform="true"
+                        class="list-group-item">
+                        {{ course.code }} - {{ course._teacher.code }}
+                    </li>
+                </ul>
+            </div>
+            <div class="panel-footer">
+                <p> <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                    Drag a subject to the desired cell to allocate</p>
+                <p> <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                    TODO: Click on a subject to view reports</p>
+            </div>
+          <!--<ul class="list-group panel-body subjects">-->
+            <!--<li data-ng-drag="true" data-ng-drag-data="course"-->
+                <!--data-ng-drag-scroll data-allow-transform="true"-->
+                <!--data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">-->
+              <!--{{ course.code }} - {{ course._teacher.code }}-->
+            <!--</li>-->
+          <!--</ul>-->
         </div>
       </div>
     </div>
