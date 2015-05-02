@@ -21,7 +21,7 @@
 }
 
 .history-viewer {
-  min-height : 10px;
+  min-height : 60px;
   max-height : 60px;
   overflow   : scroll;
   margin     : 10px 0;

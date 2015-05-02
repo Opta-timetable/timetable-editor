@@ -1,8 +1,8 @@
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $stateParams, $location, Authentication, Timetables, Teachers) {
+angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
+  function ($http, $scope, $filter, $stateParams, $location, Authentication, Timetables, Teachers) {
     $scope.authentication = Authentication;
     $scope.clashes = [];
     $scope.history = [];
@@ -16,10 +16,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function extractClash(dayIndex, periodIndex) {
+      // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+      // Filter returns an array of matches -
       return $scope.clashes.filter(function (clash) {
-        // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
         return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex);
-      })[0]; //Filter returns an array of matches
+      })[0];
     }
 
     function popClashFromLocalList(dayIndex, periodIndex) {
@@ -88,11 +89,25 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       period.subject = allocation.after.subject;
       period.teacher = allocation.after.teacher;
 
-      // Add allocation to history
+      // Add allocation to history along with a timestamp
+      allocation.timestamp = Date.now();
       $scope.history.unshift(allocation);
     }
 
-    $scope.formatAllocation = function (allocation) {
+    $scope.find = function () {
+      //one timetable each for one curriculum
+      $scope.curriculums = Timetables.query();
+      $scope.teachers = Teachers.query();
+    };
+
+    $scope.findOne = function () {
+      $scope.timetableForCurriculum = Timetables.get({
+        curriculumId : $stateParams.curriculumId
+      });
+
+    };
+
+    $scope.formatAllocationHistory = function (allocation) {
       var days = {
         0 : 'Monday',
         1 : 'Tuesday',
@@ -102,7 +117,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         5 : 'Saturday',
         6 : 'Sunday'
       };
-      return 'Period ' + (parseInt(allocation.periodIndex, 10) + 1) + ' - ' + days[allocation.dayIndex] +
+      return $filter('date')(allocation.timestamp, 'short') + ': Period ' + (parseInt(allocation.periodIndex, 10) + 1) + ' - ' + days[allocation.dayIndex] +
         ': Allocated ' + allocation.after.subject + ' (' + allocation.after.teacher + ') in place of ' +
         allocation.before.subject + ' (' + allocation.before.teacher + ')';
     };
@@ -110,12 +125,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.formatClash = function (clash) {
       return clash.curriculumCode + ', ' + clash.days.periods.teacher + ', ' +
         clash.days.dayOfWeek + ', Period-' + (clash.days.periods.index + 1);
-    };
-
-    $scope.find = function () {
-      //one timetable each for one curriculum
-      $scope.curriculums = Timetables.query();
-      $scope.teachers = Teachers.query();
     };
 
     $scope.undo = function () {
@@ -147,6 +156,17 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.undoStack.push(allocationToRedo);
       // Apply this allocation
       applyAllocation(allocationToRedo);
+    };
+
+    $scope.finish = function () {
+      $scope.timetableForCurriculum.$update({
+        curriculumId : $stateParams.curriculumId,
+        clashes      : $scope.clashes
+      }, function () {
+        $location.path('timetables/' + $stateParams.curriculumId);
+      }, function (errorResponse) {
+        $scope.error = errorResponse.data.message;
+      });
     };
 
     $scope.onDropComplete = function (allocatedCourse, evt, dayIndex, periodIndex, isUndo) {
@@ -188,17 +208,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       applyAllocation(allocation);
     };
 
-    $scope.finish = function () {
-      $scope.timetableForCurriculum.$update({
-        curriculumId : $stateParams.curriculumId,
-        clashes      : $scope.clashes
-      }, function () {
-        $location.path('timetables/' + $stateParams.curriculumId);
-      }, function (errorResponse) {
-        $scope.error = errorResponse.data.message;
-      });
-    };
-
     $scope.findClashes = function (clash, dayIndex, periodIndex) {
       if (clash === true) {
         console.log('clash for this element :' + clash);
@@ -221,19 +230,19 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     };
 
+    $scope.getClashLink = function (dayIndex, periodIndex) {
+      var clashInScope = extractClash(dayIndex, periodIndex);
+      if (clashInScope) {
+        return '#!/timetables/' + clashInScope.curriculumReference;
+      }
+      return undefined;
+    };
+
     $scope.hasHighlight = function (clash, dayIndex, periodIndex) {
       if (clash) {
         var clashInScope = extractClash(dayIndex, periodIndex);
         return clashInScope ? clashInScope.highlight : false;
       }
-    };
-
-    $scope.getClashLink = function (dayIndex, periodIndex) {
-      var clashInScope = extractClash(dayIndex, periodIndex);
-      if (clashInScope) {
-        return '#!/timetables/edit/' + clashInScope.curriculumReference;
-      }
-      return undefined;
     };
 
     $scope.highlightClash = function (clash, dayIndex, periodIndex) {
@@ -254,11 +263,5 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     };
 
-    $scope.findOne = function () {
-      $scope.timetableForCurriculum = Timetables.get({
-        curriculumId : $stateParams.curriculumId
-      });
-
-    };
   }
 ]);

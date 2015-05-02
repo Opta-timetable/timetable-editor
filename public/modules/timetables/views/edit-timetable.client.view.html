@@ -6,14 +6,14 @@
     <div class="row" data-ng-if="history.length">
       <h4>Change History</h4>
       <div class="col-sm-12 history-viewer text-muted small">
-        <span data-ng-repeat="log in history track by $index">{{formatAllocation(log)}}</span>
+        <span data-ng-repeat="log in history track by $index">{{formatAllocationHistory(log)}}</span>
       </div>
     </div>
     <div class="row">
       <div class="col-md-9">
         <div class="clearfix">
           <div class="form-group">
-            <a class="btn btn-group-sm btn-default" ng-href="#!/timetables">
+            <a class="btn btn-group-sm btn-default" ng-href="#!/timetables/{{timetableForCurriculum.timetable.curriculumReference}}">
               <i class="glyphicon glyphicon-backward"></i> &#160;Back
             </a>
             <a data-ng-disabled="!undoStack.length" ng-class="{'btn-danger' : undoStack.length}" class="btn btn-group-sm btn-default" ng-click="undo()">
@@ -54,7 +54,7 @@
           <div class="col-sm-12">
             <h4> Clashes </h4>
             <div class="list-group">
-              <a data-ng-repeat="clash in clashes" data-ng-href="#!/timetables/edit/{{clash.curriculumReference}}"
+              <a data-ng-repeat="clash in clashes" data-ng-href="{{getClashLink(clash.days.dayIndex, clash.days.periods.index)}}"
                  class="list-group-item" ng-class="{'list-group-item-danger': clash.highlight}"
                  data-ng-mouseenter="highlightClash(true, clash.days.dayIndex, clash.days.periods.index)"
                  data-ng-mouseleave="unHighlightClash(true, clash.days.dayIndex, clash.days.periods.index)">
