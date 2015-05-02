@@ -15,16 +15,20 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       return $scope.timetableForCurriculum.timetable.days[dayIndexAsInt].periods[periodIndexAsInt];
     }
 
+    function extractClash(dayIndex, periodIndex) {
+      return $scope.clashes.filter(function (clash) {
+        // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+        return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex);
+      })[0]; //Filter returns an array of matches
+    }
+
     function popClashFromLocalList(dayIndex, periodIndex) {
-        debugger;
       var clashToUpdate = {};
       var currentPeriod = extractPeriod(dayIndex, periodIndex);
 
       if (currentPeriod.clash) {
-        clashToUpdate = $scope.clashes.filter(function (clash) {
-          // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-          return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex);
-        })[0]; //Filter returns an array of matches
+
+        clashToUpdate = extractClash(dayIndex, periodIndex);
 
         // remove this clash from the local array (in the controller).
         // It will get updated with the new one, if any
@@ -60,7 +64,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function applyAllocation(allocation) {
-        debugger;
       // extract the indices
       var dayIndex = allocation.dayIndex;
       var periodIndex = allocation.periodIndex;
@@ -104,10 +107,15 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         allocation.before.subject + ' (' + allocation.before.teacher + ')';
     };
 
+    $scope.formatClash = function (clash) {
+      return clash.curriculumCode + ', ' + clash.days.periods.teacher + ', ' +
+        clash.days.dayOfWeek + ', Period-' + (clash.days.periods.index + 1);
+    };
+
     $scope.find = function () {
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query();
-        $scope.teachers = Teachers.query();
+      $scope.teachers = Teachers.query();
     };
 
     $scope.undo = function () {
@@ -210,6 +218,39 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
             // called asynchronously if an error occurs
             // or server returns response with an error status.
           });
+      }
+    };
+
+    $scope.hasHighlight = function (clash, dayIndex, periodIndex) {
+      if (clash) {
+        var clashInScope = extractClash(dayIndex, periodIndex);
+        return clashInScope ? clashInScope.highlight : false;
+      }
+    };
+
+    $scope.getClashLink = function (dayIndex, periodIndex) {
+      var clashInScope = extractClash(dayIndex, periodIndex);
+      if (clashInScope) {
+        return '#!/timetables/edit/' + clashInScope.curriculumReference;
+      }
+      return undefined;
+    };
+
+    $scope.highlightClash = function (clash, dayIndex, periodIndex) {
+      if (clash) {
+        var clashInScope = extractClash(dayIndex, periodIndex);
+        if (clashInScope) {
+          clashInScope.highlight = true;
+        }
+      }
+    };
+
+    $scope.unHighlightClash = function (clash, dayIndex, periodIndex) {
+      if (clash) {
+        var clashInScope = extractClash(dayIndex, periodIndex);
+        if (clashInScope) {
+          clashInScope.highlight = false;
+        }
       }
     };
 

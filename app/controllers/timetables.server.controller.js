@@ -22,7 +22,7 @@ var EmptyTimeTableDays = function () {
     // read more here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
     // var timeTableData = new Array();
     var timeTableData = [];
-    var dayName = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    var dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
     //Initialise - Assuming hardcoded metadata (number of days, number of periods)
     for (var i = 0; i < dayName.length; i++) {
@@ -33,8 +33,8 @@ var EmptyTimeTableDays = function () {
         for (var k = 0; k < 7; k++) {
             var period = {};
             period.index = k;
-            period.subject = "";
-            period.curriculum = "";
+            period.subject = '';
+            period.curriculum = '';
             period.clash = false;
             allocationsForDayOfWeek.periods.push(period);
         }

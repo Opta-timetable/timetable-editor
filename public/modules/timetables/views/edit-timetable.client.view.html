@@ -3,10 +3,10 @@
     <h2> Edit timetable for {{ timetableForCurriculum.timetable.curriculumCode }}</h2>
   </div>
   <div class="container-fluid">
-    <div class="row">
-      <h4>History</h4>
+    <div class="row" data-ng-if="history.length">
+      <h4>Change History</h4>
       <div class="col-sm-12 history-viewer text-muted small">
-        <span data-ng-repeat="log in history">{{formatAllocation(log)}}</span>
+        <span data-ng-repeat="log in history track by $index">{{formatAllocation(log)}}</span>
       </div>
     </div>
     <div class="row">
@@ -23,29 +23,36 @@
           <thead>
             <tr>
               <th>Day</th>
-              <!-- Skip items from ng-repeat: http://stackoverflow.com/a/19784026/218882 -->
               <th data-ng-repeat="period in timetableForCurriculum.timetable.days[0].periods">{{ "Period-" + (period.index +1)}}</th>
             </tr>
           </thead>
           <tr data-ng-repeat="day in timetableForCurriculum.timetable.days">
-            <td>{{day.dayOfWeek}}</td>
-            <!-- Bind to all properties in an object: http://stackoverflow.com/a/19012907/218882 -->
-            <td data-ng-repeat="period in day.periods" data-ng-drop="true"
+            <td><strong>{{day.dayOfWeek}}</strong></td>
+            <td data-ng-repeat="period in day.periods" data-ng-drop="true" class="period"
+                data-ng-mouseenter="highlightClash(period.clash, day.dayIndex, period.index)"
+                data-ng-mouseleave="unHighlightClash(period.clash, day.dayIndex, period.index)"
                 data-ng-drop-success="onDropComplete($data, $event, day.dayIndex, period.index, false)"
-                ng-bind="period.subject" ng-class="{'bg-danger' : period.clash}"
+                ng-class="{'bg-warning text-warning' : period.clash, 'bg-danger text-danger' : hasHighlight(period.clash, day.dayIndex, period.index)}"
                 ng-init="findClashes(period.clash, day.dayIndex, period.index)">
+              <!-- Conditional Links: http://stackoverflow.com/a/16579695/218882 -->
+              <div data-ng-switch="period.clash">
+                <a data-ng-href="{{getClashLink(day.dayIndex, period.index)}}" ng-switch-when="true">{{period.subject}}</a>
+                <span ng-switch-when="false">{{period.subject}}</span>
+              </div>
             </td>
           </tr>
         </table>
-        <div class="row">
-          <h4> Clashes </h4>
+        <div class="row" data-ng-if="clashes.length">
           <div class="col-sm-12">
+            <h4> Clashes </h4>
             <div class="list-group">
-              <a data-ng-repeat="clash in clashes" data-ng-href="#!/timetables/edit/{{clash.curriculumReference}}" class="list-group-item">
-                <h5 class="list-group-item-heading">
-                  {{ clash.curriculumCode + ', ' + clash.days.periods.teacher + ', '+
-                  clash.days.dayOfWeek + ', Period-' + (clash.days.periods.index+1) }}
-                </h5>
+              <a data-ng-repeat="clash in clashes" data-ng-href="#!/timetables/edit/{{clash.curriculumReference}}"
+                 class="list-group-item" ng-class="{'list-group-item-danger': clash.highlight}"
+                 data-ng-mouseenter="highlightClash(true, clash.days.dayIndex, clash.days.periods.index)"
+                 data-ng-mouseleave="unHighlightClash(true, clash.days.dayIndex, clash.days.periods.index)">
+                <span class="list-group-item-heading">
+                  {{formatClash(clash)}}
+                </span>
               </a>
             </div>
           </div>
@@ -56,14 +63,13 @@
           <div class="panel-heading">
             <h3 class="panel-title">Subjects</h3>
           </div>
-          <div class="panel-body subjects">
-            <ul class="list-group">
-              <li ng-drag="true" data-ng-drag-data="course" data-ng-center-anchor="true"
-                  data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">
-                {{ course.code }} - {{ course._teacher.code }}
-              </li>
-            </ul>
-          </div>
+          <ul class="list-group panel-body subjects">
+            <li data-ng-drag="true" data-ng-drag-data="course"
+                data-ng-drag-scroll data-allow-transform="true"
+                data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">
+              {{ course.code }} - {{ course._teacher.code }}
+            </li>
+          </ul>
         </div>
       </div>
     </div>
