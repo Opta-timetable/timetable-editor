@@ -13,10 +13,18 @@
       <div class="col-md-9">
         <div class="clearfix">
           <div class="form-group">
-            <input type="button" ng-disabled="!undoStack.length" value="Undo" class="btn btn-sm btn-default" ng-click="undo()">
-            <input type="button" ng-disabled="!redoStack.length" value="Redo" class="btn btn-sm btn-default" ng-click="redo()">
-            <input type="button" value="Finish" class="btn btn-sm btn-default" ng-click="finish()">
-            <input type="button" value="Cancel" class="btn btn-sm btn-default" onclick="location.href='#!/timetables'">
+            <a class="btn btn-group-sm btn-default" ng-href="#!/timetables">
+              <i class="glyphicon glyphicon-backward"></i> &#160;Back
+            </a>
+            <a data-ng-disabled="!undoStack.length" ng-class="{'btn-danger' : undoStack.length}" class="btn btn-group-sm btn-default" ng-click="undo()">
+              <i id="glyphicon-undo" class="glyphicon glyphicon-share-alt"></i> &#160;Undo
+            </a>
+            <a data-ng-disabled="!redoStack.length" ng-class="{'btn-success' : redoStack.length}" class="btn btn-group-sm btn-default" ng-click="redo()">
+              <i class="glyphicon glyphicon-share-alt"></i> &#160;Redo
+            </a>
+            <a class="btn btn-group-sm btn-info" ng-click="finish()">
+              <i class="glyphicon glyphicon-check"></i> &#160;Finish
+            </a>
           </div>
         </div>
         <table class="timetable table table-bordered">

@@ -1,3 +1,7 @@
+#glyphicon-undo {
+  transform : scaleX(-1);
+}
+
 .timetable td.drag-enter {
   border     : 0.1em dotted #00ff00 !important;
   background : #aaffaa !important;
