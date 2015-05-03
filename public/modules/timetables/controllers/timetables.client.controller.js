@@ -104,7 +104,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           $scope.timetableForCurriculum = Timetables.get({
               curriculumId: $stateParams.curriculumId
           }, function(){
-              $scope.formatSubjectColumns()
+              $scope.formatSubjectColumns();
           });
       };
 
@@ -199,6 +199,38 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
               after: {
                   subject: allocatedSubject,
                   teacher: allocatedTeacher
+              }
+          };
+
+          // Add this allocation to undoStack
+          $scope.undoStack.push(allocation);
+
+          // Apply the allocation
+          applyAllocation(allocation);
+      };
+
+      $scope.removeAllocation = function (dayIndex, periodIndex) {
+
+          var currentPeriod = extractPeriod(dayIndex, periodIndex);
+
+          if (currentPeriod.subject === '' && currentPeriod.teacher === '') {
+              // No need to change anything
+              return;
+          }
+          // Clear the redoStack now that we're adding a new operation to the history
+          $scope.redoStack = [];
+
+          // Create the allocation object
+          var allocation = {
+              dayIndex: dayIndex,
+              periodIndex: periodIndex,
+              before: {
+                  subject: currentPeriod.subject,
+                  teacher: currentPeriod.teacher,
+              },
+              after: {
+                  subject: '',
+                  teacher: ''
               }
           };
 

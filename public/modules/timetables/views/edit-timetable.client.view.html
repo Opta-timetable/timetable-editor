@@ -37,8 +37,8 @@
           <tr data-ng-repeat="day in timetableForCurriculum.timetable.days">
             <td><strong>{{day.dayOfWeek}}</strong></td>
             <td data-ng-repeat="period in day.periods" data-ng-drop="true" class="period"
-                data-ng-mouseenter="highlightClash(period.clash, day.dayIndex, period.index)"
-                data-ng-mouseleave="unHighlightClash(period.clash, day.dayIndex, period.index)"
+                data-ng-mouseenter="highlightClash(period.clash, day.dayIndex, period.index);displayDelete=true;"
+                data-ng-mouseleave="unHighlightClash(period.clash, day.dayIndex, period.index);displayDelete=false"
                 data-ng-drop-success="onDropComplete($data, $event, day.dayIndex, period.index, false)"
                 ng-class="{'bg-warning text-warning' : period.clash, 'bg-danger text-danger' : hasHighlight(period.clash, day.dayIndex, period.index)}"
                 ng-init="findClashes(period.clash, day.dayIndex, period.index)">
@@ -46,6 +46,8 @@
               <div data-ng-switch="period.clash">
                 <a data-ng-href="{{getClashLink(day.dayIndex, period.index)}}" ng-switch-when="true">{{period.subject}}</a>
                 <span ng-switch-when="false">{{period.subject}}</span>
+                  <span ng-show="displayDelete" ng-click="removeAllocation(day.dayIndex, period.index)"
+                        class="pull-right glyphicon glyphicon-remove-circle"></span>
               </div>
             </td>
           </tr>
@@ -88,13 +90,6 @@
                 <p> <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                     TODO: Click on a subject to view reports</p>
             </div>
-          <!--<ul class="list-group panel-body subjects">-->
-            <!--<li data-ng-drag="true" data-ng-drag-data="course"-->
-                <!--data-ng-drag-scroll data-allow-transform="true"-->
-                <!--data-ng-repeat="course in timetableForCurriculum.courses" class="list-group-item">-->
-              <!--{{ course.code }} - {{ course._teacher.code }}-->
-            <!--</li>-->
-          <!--</ul>-->
         </div>
       </div>
     </div>
