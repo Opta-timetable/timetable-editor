@@ -38,11 +38,18 @@
 }
 
 .subjects li {
-  font-size : smaller;
+  font-size  : smaller;
+  transition : all .2s ease-in-out;
+}
+
+.subjects li:hover {
+  transform   : scale(1.1);
+  z-index     : 10;
+  font-weight : bold;
 }
 
 .subjects li.dragging {
-  font-size   : smaller;
+  transition  : none;
   font-weight : bold;
   color       : #999;
   border      : 0.1em dotted #0000ff !important;
@@ -50,8 +57,13 @@
   background  : rgba(100, 100, 255, 0.1) !important;
 }
 
-.period a {
-  display : block;
+.period {
+  transition : all .2s ease-in-out;
+}
+
+.period.drag-enter, .period.bg-danger {
+  z-index     : 15;
+  transform : scale(1.2);
 }
 
 .history-viewer {
