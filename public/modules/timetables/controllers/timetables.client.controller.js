@@ -3,7 +3,7 @@
 
 angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
   function ($http, $scope, $filter, $stateParams, $location, Authentication, Timetables, Teachers) {
-    var SUBJECT_ROWS_PER_COLUMN = 6;
+    var SUBJECT_ROWS_PER_COLUMN = 8;
 
     $scope.authentication = Authentication;
     $scope.clashes = [];
@@ -273,10 +273,9 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
     $scope.formatSubjectColumns = function () {
       // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
-      $scope.columnCount = Math.floor($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
-      var itemsPerColumn = Math.ceil($scope.timetableForCurriculum.courses.length / $scope.columnCount);
-      for (var i = 0; i < $scope.timetableForCurriculum.courses.length; i += itemsPerColumn) {
-        var column = {start : i, end : Math.min(i + itemsPerColumn, $scope.timetableForCurriculum.courses.length)};
+      $scope.columnCount = Math.ceil($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
+      for (var i = 0; i < $scope.timetableForCurriculum.courses.length; i += SUBJECT_ROWS_PER_COLUMN) {
+        var column = {start : i, end : Math.min(i + SUBJECT_ROWS_PER_COLUMN, $scope.timetableForCurriculum.courses.length)};
         $scope.subjectColumns.push(column);
       }
     };
