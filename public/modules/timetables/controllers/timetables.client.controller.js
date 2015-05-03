@@ -126,6 +126,19 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     }
 
+    $scope.$watch('timetableForCurriculum.courses', function () {
+      // Thanks to the great SO answer that explains Angular's digest cycle, $watch and $apply
+      // http://stackoverflow.com/a/15113029/218882
+      if ($scope.timetableForCurriculum.courses) {
+      // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
+        $scope.columnCount = Math.ceil($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
+        for (var i = 0; i < $scope.timetableForCurriculum.courses.length; i += SUBJECT_ROWS_PER_COLUMN) {
+          var column = {start : i, end : Math.min(i + SUBJECT_ROWS_PER_COLUMN, $scope.timetableForCurriculum.courses.length)};
+          $scope.subjectColumns.push(column);
+        }
+      }
+    });
+
     $scope.find = function () {
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query();
@@ -135,8 +148,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.findOne = function () {
       $scope.timetableForCurriculum = Timetables.get({
         curriculumId : $stateParams.curriculumId
-      }, function () {
-        $scope.formatSubjectColumns();
       });
     };
 
@@ -268,15 +279,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         if (clashInScope) {
           clashInScope.highlight = false;
         }
-      }
-    };
-
-    $scope.formatSubjectColumns = function () {
-      // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
-      $scope.columnCount = Math.ceil($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
-      for (var i = 0; i < $scope.timetableForCurriculum.courses.length; i += SUBJECT_ROWS_PER_COLUMN) {
-        var column = {start : i, end : Math.min(i + SUBJECT_ROWS_PER_COLUMN, $scope.timetableForCurriculum.courses.length)};
-        $scope.subjectColumns.push(column);
       }
     };
   }
