@@ -311,9 +311,3 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       };
   }
 ]);
-
-angular.module('timetables').filter('slice', function() {
-    return function(arr, start, end) {
-        return arr.slice(start, end);
-    };
-});
