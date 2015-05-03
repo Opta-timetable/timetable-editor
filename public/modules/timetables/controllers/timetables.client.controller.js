@@ -3,11 +3,14 @@
 
 angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
   function ($http, $scope, $filter, $stateParams, $location, Authentication, Timetables, Teachers) {
+    var SUBJECT_ROWS_PER_COLUMN = 6;
+
     $scope.authentication = Authentication;
     $scope.clashes = [];
     $scope.history = [];
     $scope.undoStack = [];
     $scope.redoStack = [];
+    $scope.subjectColumns = [];
 
     function extractPeriod(dayIndex, periodIndex) {
       var dayIndexAsInt = (typeof dayIndex === 'number') ? dayIndex : parseInt(dayIndex, 10);
@@ -296,18 +299,13 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     };
 
-    //Split subjects into multiple columns if more than 6
     $scope.formatSubjectColumns = function () {
-      $scope.columns = [];
-      if ($scope.timetableForCurriculum.courses.length > 6) {
-        $scope.columnCount = 2;
-      } else {
-        $scope.columnCount = 1;
-      }
+    // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
+      $scope.columnCount = Math.floor($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
       var itemsPerColumn = Math.ceil($scope.timetableForCurriculum.courses.length / $scope.columnCount);
       for (var i = 0; i < $scope.timetableForCurriculum.courses.length; i += itemsPerColumn) {
-        var col = {start : i, end : Math.min(i + itemsPerColumn, $scope.timetableForCurriculum.courses.length)};
-        $scope.columns.push(col);
+        var column = {start : i, end : Math.min(i + itemsPerColumn, $scope.timetableForCurriculum.courses.length)};
+        $scope.subjectColumns.push(column);
       }
     };
   }

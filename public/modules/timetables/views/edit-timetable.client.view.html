@@ -17,7 +17,7 @@
               <i class="glyphicon glyphicon-backward"></i> &#160;Back
             </a>
             <a data-ng-disabled="!undoStack.length" ng-class="{'btn-danger' : undoStack.length}" class="btn btn-group-sm btn-default" ng-click="undo()">
-              <i id="glyphicon-undo" class="glyphicon glyphicon-share-alt"></i> &#160;Undo
+              <i class="glyphicon glyphicon-share-alt glyphicon-flipped"></i> &#160;Undo
             </a>
             <a data-ng-disabled="!redoStack.length" ng-class="{'btn-success' : redoStack.length}" class="btn btn-group-sm btn-default" ng-click="redo()">
               <i class="glyphicon glyphicon-share-alt"></i> &#160;Redo
@@ -69,13 +69,13 @@
         </div>
       </div>
       <div class="col-md-3">
-        <div class="panel panel-info">
+        <div class="panel panel-info subjects-container">
           <div class="panel-heading">
             <h3 class="panel-title">Subjects</h3>
           </div>
           <div class="row panel-body">
             <!-- Looked at: http://plnkr.co/edit/AMWLvB045UJmNamp8vdz?p=preview -->
-            <ul data-ng-repeat="column in columns" class="list-group subjects col-md-6">
+            <ul data-ng-repeat="column in subjectColumns" class="list-group subjects col-md-6">
               <li data-ng-repeat="course in timetableForCurriculum.courses | slice:column.start:column.end"
                   data-ng-drag="true" data-ng-drag-data="course"
                   data-ng-drag-scroll data-allow-transform="true"

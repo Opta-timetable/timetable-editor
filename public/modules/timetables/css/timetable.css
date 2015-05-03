@@ -1,10 +1,23 @@
-#glyphicon-undo {
+.glyphicon-flipped {
   transform : scaleX(-1);
 }
 
 .timetable td.drag-enter {
   border     : 0.1em dotted #00ff00 !important;
   background : #aaffaa !important;
+}
+
+.subjects-container .panel-body {
+  padding : 6px 15px;
+}
+
+.subjects {
+  padding    : 5px !important;
+  box-shadow : none !important;
+}
+
+.subjects li {
+  font-size : smaller;
 }
 
 .subjects li.dragging {
