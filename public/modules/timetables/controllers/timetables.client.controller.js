@@ -97,6 +97,35 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.history.unshift(allocation);
     }
 
+    function createAndApplyAllocation(dayIndex, periodIndex, allocatedSubject, allocatedTeacher) {
+      var currentPeriod = extractPeriod(dayIndex, periodIndex);
+
+      if (!(currentPeriod.subject === allocatedSubject && currentPeriod.teacher === allocatedTeacher)) {
+        // Clear the redoStack now that we're adding a new operation to the history
+        $scope.redoStack = [];
+
+        // Create the allocation object
+        var allocation = {
+          dayIndex    : dayIndex,
+          periodIndex : periodIndex,
+          before      : {
+            subject : currentPeriod.subject,
+            teacher : currentPeriod.teacher,
+          },
+          after       : {
+            subject : allocatedSubject,
+            teacher : allocatedTeacher
+          }
+        };
+
+        // Add this allocation to undoStack
+        $scope.undoStack.push(allocation);
+
+        // Apply the allocation
+        applyAllocation(allocation);
+      }
+    }
+
     $scope.find = function () {
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query();
@@ -178,70 +207,13 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       // If yes, send clash as well to the server
       // if new allocation removes clash, set clash to false
       // in any case remove existing clash controller array
-      var currentPeriod = extractPeriod(dayIndex, periodIndex);
-
       var allocatedSubject = allocatedCourse.code;
       var allocatedTeacher = allocatedCourse._teacher.code;
-
-      if (currentPeriod.subject === allocatedSubject && currentPeriod.teacher === allocatedTeacher) {
-        // No need to change anything
-        return;
-      }
-
-      // Clear the redoStack now that we're adding a new operation to the history
-      $scope.redoStack = [];
-
-      // Create the allocation object
-      var allocation = {
-        dayIndex    : dayIndex,
-        periodIndex : periodIndex,
-        before      : {
-          subject : currentPeriod.subject,
-          teacher : currentPeriod.teacher,
-        },
-        after       : {
-          subject : allocatedSubject,
-          teacher : allocatedTeacher
-        }
-      };
-
-      // Add this allocation to undoStack
-      $scope.undoStack.push(allocation);
-
-      // Apply the allocation
-      applyAllocation(allocation);
+      createAndApplyAllocation(dayIndex, periodIndex, allocatedSubject, allocatedTeacher);
     };
 
     $scope.removeAllocation = function (dayIndex, periodIndex) {
-
-      var currentPeriod = extractPeriod(dayIndex, periodIndex);
-
-      if (currentPeriod.subject === '' && currentPeriod.teacher === '') {
-        // No need to change anything
-        return;
-      }
-      // Clear the redoStack now that we're adding a new operation to the history
-      $scope.redoStack = [];
-
-      // Create the allocation object
-      var allocation = {
-        dayIndex    : dayIndex,
-        periodIndex : periodIndex,
-        before      : {
-          subject : currentPeriod.subject,
-          teacher : currentPeriod.teacher,
-        },
-        after       : {
-          subject : '',
-          teacher : ''
-        }
-      };
-
-      // Add this allocation to undoStack
-      $scope.undoStack.push(allocation);
-
-      // Apply the allocation
-      applyAllocation(allocation);
+      createAndApplyAllocation(dayIndex, periodIndex, '', '');
     };
 
     $scope.findClashes = function (clash, dayIndex, periodIndex) {
@@ -300,7 +272,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.formatSubjectColumns = function () {
-    // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
+      // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
       $scope.columnCount = Math.floor($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
       var itemsPerColumn = Math.ceil($scope.timetableForCurriculum.courses.length / $scope.columnCount);
       for (var i = 0; i < $scope.timetableForCurriculum.courses.length; i += itemsPerColumn) {
