@@ -47,7 +47,7 @@
                 <a data-ng-href="{{getClashLink(day.dayIndex, period.index)}}" ng-switch-when="true">{{period.subject}}</a>
                 <span ng-switch-when="false">{{period.subject}}</span>
               </div>
-              <span ng-click="removeAllocation(day.dayIndex, period.index)"
+              <span ng-show="period.subject" ng-click="removeAllocation(day.dayIndex, period.index)"
                     class="glyphicon glyphicon-remove-circle delete-allocation"></span>
             </td>
           </tr>
