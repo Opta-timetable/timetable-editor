@@ -7,6 +7,27 @@
   background : #aaffaa !important;
 }
 
+.period {
+  position : relative;
+}
+
+.delete-allocation {
+  display    : none;
+  position   : absolute;
+  top        : 5px;
+  right      : 5px;
+  cursor     : pointer;
+  transition : all .2s ease-in-out;
+}
+
+.period:hover .delete-allocation {
+  display : block;
+}
+
+.delete-allocation:hover {
+  transform : scale(1.5);
+}
+
 .subjects-container .panel-body {
   padding : 6px 15px;
 }
