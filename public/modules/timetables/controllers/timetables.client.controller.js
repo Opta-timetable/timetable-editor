@@ -26,6 +26,13 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       })[0];
     }
 
+    function extractCourse(dayIndex, periodIndex) {
+      var period = extractPeriod(dayIndex, periodIndex);
+      return $scope.timetableForCurriculum.courses.filter(function (course) {
+        return course._teacher.code === period.teacher && course.code === period.subject;
+      })[0];
+    }
+
     function popClashFromLocalList(dayIndex, periodIndex) {
       var clashToUpdate = {};
       var currentPeriod = extractPeriod(dayIndex, periodIndex);
@@ -129,8 +136,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.$watch('timetableForCurriculum.courses', function () {
       // Thanks to the great SO answer that explains Angular's digest cycle, $watch and $apply
       // http://stackoverflow.com/a/15113029/218882
-      if ($scope.timetableForCurriculum.courses) {
-      // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
+      if ($scope.timetableForCurriculum && $scope.timetableForCurriculum.courses) {
+        // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
         $scope.columnCount = Math.ceil($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
         for (var i = 0; i < $scope.timetableForCurriculum.courses.length; i += SUBJECT_ROWS_PER_COLUMN) {
           var column = {start : i, end : Math.min(i + SUBJECT_ROWS_PER_COLUMN, $scope.timetableForCurriculum.courses.length)};
@@ -264,20 +271,30 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     };
 
-    $scope.highlightClash = function (clash, dayIndex, periodIndex) {
-      if (clash) {
-        var clashInScope = extractClash(dayIndex, periodIndex);
-        if (clashInScope) {
-          clashInScope.highlight = true;
+    $scope.highlight = function (clash, dayIndex, periodIndex) {
+      var course = extractCourse(dayIndex, periodIndex);
+      if (course) {
+        course.highlight = true;
+        if (clash) {
+          var clashInScope = extractClash(dayIndex, periodIndex);
+          if (clashInScope) {
+            clashInScope.highlight = true;
+            course.clashHighlight = true;
+          }
         }
       }
     };
 
-    $scope.unHighlightClash = function (clash, dayIndex, periodIndex) {
-      if (clash) {
-        var clashInScope = extractClash(dayIndex, periodIndex);
-        if (clashInScope) {
-          clashInScope.highlight = false;
+    $scope.unHighlight = function (clash, dayIndex, periodIndex) {
+      var course = extractCourse(dayIndex, periodIndex);
+      if (course) {
+        course.highlight = false;
+        if (clash) {
+          var clashInScope = extractClash(dayIndex, periodIndex);
+          if (clashInScope) {
+            clashInScope.highlight = false;
+            course.clashHighlight = false;
+          }
         }
       }
     };

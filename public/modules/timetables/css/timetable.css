@@ -8,7 +8,24 @@
 }
 
 .period {
-  position : relative;
+  position   : relative;
+  transition : all .2s ease-in-out;
+}
+
+.period a {
+  display : block;
+}
+
+.period:hover, .period.drag-enter, .period.bg-danger {
+  z-index : 15;
+}
+
+.period:hover {
+  transform : scale(1.1);
+}
+
+.period.drag-enter, .period.bg-danger {
+  transform : scale(1.2);
 }
 
 .delete-allocation {
@@ -42,10 +59,27 @@
   transition : all .2s ease-in-out;
 }
 
-.subjects li:hover {
+.subjects li:hover, .subjects li.dragging {
+  cursor : pointer;
+}
+
+.subjects li:hover, .subjects li.highlight {
   transform   : scale(1.1);
   z-index     : 10;
   font-weight : bold;
+}
+
+.subjects li.highlight {
+  background : rgba(200, 200, 200, 0.2) !important;
+}
+
+.subjects li:hover {
+  background : rgba(100, 100, 225, 0.2) !important;
+}
+
+.subjects li.clash-highlight {
+  transform  : scale(1.2);
+  background : rgba(220, 100, 100, 0.2) !important;
 }
 
 .subjects li.dragging {
@@ -55,15 +89,6 @@
   border      : 0.1em dotted #0000ff !important;
   background  : rgb(255, 255, 255) !important;
   background  : rgba(100, 100, 255, 0.1) !important;
-}
-
-.period {
-  transition : all .2s ease-in-out;
-}
-
-.period.drag-enter, .period.bg-danger {
-  z-index     : 15;
-  transform : scale(1.2);
 }
 
 .history-viewer {
