@@ -52,8 +52,8 @@
             </td>
           </tr>
         </table>
-        <div class="row" data-ng-if="clashes.length">
-          <div class="col-sm-12">
+        <div class="row">
+          <div class="col-sm-7" data-ng-if="clashes.length">
             <h4> Clashes </h4>
             <div class="list-group">
               <a data-ng-repeat="clash in clashes" data-ng-href="{{getClashLink(clash.days.dayIndex, clash.days.periods.index)}}"
@@ -66,6 +66,17 @@
               </a>
             </div>
           </div>
+            <div class="col-sm-5" data-ng-if="stats">
+                <h4>
+                    Stats
+                </h4>
+                <h5>Total allocations in a week for {{stats.teacher.code}}
+                    <span class="label label-info">{{stats.teacher.totalAllocationCount}}</span></h5>
+                <h5>allocations in a week for {{stats.teacher.code}} in this class
+                    <span class="label label-info">{{stats.teacher.classAllocationCount}}</span></h5>
+                <h5>Number of {{stats.subject.code}} periods in a week
+                    <span class="label label-info">{{stats.subject.allocationCount}}</span></h5>
+            </div>
         </div>
       </div>
       <div class="col-md-3">
@@ -81,6 +92,7 @@
                   data-ng-drag="true" data-ng-drag-data="course"
                   data-ng-class="{'highlight' : course.highlight, 'clash-highlight' : course.clashHighlight}"
                   data-ng-drag-scroll data-allow-transform="true"
+                  data-ng-click="collectStats(course)"
                   class="list-group-item">
                 {{ course.code }} - {{ course._teacher.code }}
               </li>
@@ -90,7 +102,7 @@
             <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
               Drag a subject to the desired cell to allocate</p>
             <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              TODO: Click on a subject to view reports</p>
+              Click on a subject to view Stats for the course</p>
           </div>
         </div>
       </div>

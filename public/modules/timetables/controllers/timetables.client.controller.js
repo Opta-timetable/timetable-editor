@@ -130,6 +130,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
         // Apply the allocation
         applyAllocation(allocation);
+
+          //If stats were being displayed for any class
+          if ($scope.selectedCourseForStats){
+              $scope.collectStats($scope.selectedCourseForStats);
+          }
       }
     }
 
@@ -298,5 +303,27 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         }
       }
     };
+
+      $scope.collectStats = function(course){
+          var subjectCode = course.code;
+          var teacherCode = course._teacher.code;
+          var subjectAllocationCount = 0;
+          var teacherAllocationInClassCount = 0;
+          //Calculate subject allocation count using timetable
+          $scope.timetableForCurriculum.timetable.days.forEach(function(day){
+              day.periods.forEach(function(period){
+                  if (period.subject === subjectCode){
+                      subjectAllocationCount++;
+                  }
+                  if (period.teacher === teacherCode){
+                      teacherAllocationInClassCount++;
+                  }
+              });
+          });
+          $scope.stats = {teacher:{code:teacherCode, totalAllocationCount:'TODO', classAllocationCount: teacherAllocationInClassCount},
+              subject:{code:subjectCode, allocationCount:subjectAllocationCount}};
+          $scope.selectedCourseForStats = course;
+      };
+
   }
 ]);
