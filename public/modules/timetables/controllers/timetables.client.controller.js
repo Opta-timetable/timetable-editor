@@ -236,6 +236,9 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.removeAllocation = function (dayIndex, periodIndex) {
+        //Fix issue #10
+        var period = extractPeriod(dayIndex, periodIndex);
+        $scope.unHighlight(period.clash, dayIndex, periodIndex);
       createAndApplyAllocation(dayIndex, periodIndex, '', '');
     };
 
@@ -296,7 +299,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         course.highlight = false;
         if (clash) {
           var clashInScope = extractClash(dayIndex, periodIndex);
-          if (clashInScope) {
+            if (clashInScope) {
             clashInScope.highlight = false;
             course.clashHighlight = false;
           }
