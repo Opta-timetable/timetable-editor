@@ -2,7 +2,10 @@
   <div class="page-header">
     <h1>{{ "Timetable for " + timetableForCurriculum.timetable.curriculumCode}}</h1>
   </div>
+
   <div ncy-breadcrumb></div>
+
+  <!-- Toolbar -->
   <div class="clearfix">
     <div class="pull-right">
       <a class="btn btn-group-sm btn-info" title="Export Timetable" ng-click='csv.generate()' ng-href="{{ csv.link() }}"
@@ -14,9 +17,15 @@
       </a>
     </div>
   </div>
-  <br>
+  <!-- Toolbar -->
+
+  <br/>
+
+  <!-- Timetable and Clashes -->
   <div class="row">
     <div ng-class="clashes.length ? 'col-md-8' : 'col-md-12'">
+
+      <!-- Timetable -->
       <table class="table table-bordered" ng-table="" export-csv="csv">
         <thead>
           <tr>
@@ -44,7 +53,11 @@
           </td>
         </tr>
       </table>
+      <!-- Timetable -->
+
     </div>
+
+    <!-- Clashes -->
     <div class="col-md-4" data-ng-if="clashes.length">
       <h5> Clashes </h5>
       <div class="list-group">
@@ -58,7 +71,12 @@
         </a>
       </div>
     </div>
+    <!-- Clashes -->
+
   </div>
+  <!-- Timetable and Clashes -->
+
+  <!-- Back Button -->
   <div class="row">
     <div class="col-md-12">
       <a class="btn btn-group-sm btn-default" href="/#!/timetables">
@@ -66,4 +84,6 @@
       </a>
     </div>
   </div>
+  <!-- Back Button -->
+
 </section>
