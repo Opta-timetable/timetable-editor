@@ -97,7 +97,7 @@
 .history-viewer {
   min-height : 60px;
   max-height : 60px;
-  overflow   : scroll;
+  overflow   : auto;
   margin     : 10px 0;
   border     : 0.1em dotted #999999;
 }

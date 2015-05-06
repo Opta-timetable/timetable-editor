@@ -3,14 +3,22 @@
     <h2> Edit timetable for {{ timetableForCurriculum.timetable.curriculumCode }}</h2>
   </div>
   <div class="container-fluid">
+
+    <!-- Edit History -->
     <div class="row" data-ng-if="history.length">
       <h4>Change History</h4>
       <div class="col-sm-12 history-viewer text-muted small">
         <span data-ng-repeat="log in history track by $index">{{formatAllocationHistory(log)}}</span>
       </div>
     </div>
+    <!-- Edit History -->
+
     <div class="row">
+
+      <!-- Timetable, Toolbar, Clashes and Stats -->
       <div class="col-md-9">
+
+        <!-- Edit Toolbar -->
         <div class="clearfix">
           <div class="form-group">
             <a class="btn btn-group-sm btn-default" ng-href="#!/timetables/{{timetableForCurriculum.timetable.curriculumReference}}">
@@ -27,6 +35,9 @@
             </a>
           </div>
         </div>
+        <!-- Edit Toolbar -->
+
+        <!-- Editable Timetable -->
         <table class="timetable table table-bordered">
           <thead>
             <tr>
@@ -42,7 +53,7 @@
                 data-ng-drop-success="onDropComplete($data, $event, day.dayIndex, period.index, false)"
                 ng-class="{'bg-warning text-warning' : period.clash, 'bg-danger text-danger' : hasHighlight(period.clash, day.dayIndex, period.index)}"
                 ng-init="findClashes(period.clash, day.dayIndex, period.index)">
-              <!-- Conditional Links: http://stackoverflow.com/a/16579695/218882 -->
+              <!-- NOTE: Conditional Links: http://stackoverflow.com/a/16579695/218882 -->
               <div data-ng-switch="period.clash">
                 <a data-ng-href="{{getClashLink(day.dayIndex, period.index)}}" ng-switch-when="true">{{period.subject}}</a>
                 <span ng-switch-when="false">{{period.subject}}</span>
@@ -52,8 +63,13 @@
             </td>
           </tr>
         </table>
+        <!-- Editable Timetable -->
+
+        <!-- Clashes and Stats -->
         <div class="row">
-          <div class="col-sm-7" data-ng-if="clashes.length">
+
+          <!-- Clashes -->
+          <div class="col-sm-5" data-ng-if="clashes.length">
             <h4> Clashes </h4>
             <div class="list-group">
               <a data-ng-repeat="clash in clashes" data-ng-href="{{getClashLink(clash.days.dayIndex, clash.days.periods.index)}}"
@@ -66,26 +82,33 @@
               </a>
             </div>
           </div>
-            <div class="col-sm-5" data-ng-if="stats">
-                <h4>
-                    Stats
-                </h4>
-                <h5>Total allocations in a week for {{stats.teacher.code}}
-                    <span class="label label-info">{{stats.teacher.totalAllocationCount}}</span></h5>
-                <h5>Allocations in a week for {{stats.teacher.code}} in this class
-                    <span class="label label-info">{{stats.teacher.classAllocationCount}}</span></h5>
-                <h5>Number of {{stats.subject.code}} periods in a week
-                    <span class="label label-info">{{stats.subject.allocationCount}}</span></h5>
-            </div>
+          <!-- Clashes -->
+
+          <!-- Stats -->
+          <div class="col-sm-7" data-ng-if="stats">
+            <h4>
+              {{stats.header}}
+            </h4>
+            <table class="table">
+              <tr data-ng-repeat="stat in stats.data"><td>{{stat.name}}</td><td>{{stat.value}}</td></tr>
+            </table>
+          </div>
+          <!-- Stats -->
+
         </div>
+        <!-- Clashes and Stats -->
+
       </div>
+      <!-- Timetable, Toolbar, Clashes and Stats -->
+
+      <!-- Subjects -->
       <div class="col-md-3">
         <div class="panel panel-info subjects-container">
           <div class="panel-heading">
             <h3 class="panel-title">Subjects</h3>
           </div>
           <div class="row panel-body">
-            <!-- Looked at: http://plnkr.co/edit/AMWLvB045UJmNamp8vdz?p=preview -->
+            <!-- NOTE: Looked at: http://plnkr.co/edit/AMWLvB045UJmNamp8vdz?p=preview -->
             <ul data-ng-repeat="column in subjectColumns" class="list-group subjects"
                 data-ng-class="subjectColumns.length === 1 ? 'col-md-12' : 'col-md-6'">
               <li data-ng-repeat="course in timetableForCurriculum.courses | slice:column.start:column.end"
@@ -106,9 +129,15 @@
           </div>
         </div>
       </div>
+      <!-- Subjects -->
+
     </div>
+
+    <!-- Error Messages -->
     <div data-ng-show="error" class="text-danger">
       <strong data-ng-bind="error"></strong>
     </div>
+    <!-- Error Messages -->
+
   </div>
 </section>

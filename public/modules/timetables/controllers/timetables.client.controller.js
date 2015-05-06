@@ -131,10 +131,10 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         // Apply the allocation
         applyAllocation(allocation);
 
-          //If stats were being displayed for any class
-          if ($scope.selectedCourseForStats){
-              $scope.collectStats($scope.selectedCourseForStats);
-          }
+        //If stats were being displayed for any class
+        if ($scope.selectedCourseForStats) {
+          $scope.collectStats($scope.selectedCourseForStats);
+        }
       }
     }
 
@@ -236,9 +236,9 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.removeAllocation = function (dayIndex, periodIndex) {
-        //Fix issue #10
-        var period = extractPeriod(dayIndex, periodIndex);
-        $scope.unHighlight(period.clash, dayIndex, periodIndex);
+      //Fix issue #10
+      var period = extractPeriod(dayIndex, periodIndex);
+      $scope.unHighlight(period.clash, dayIndex, periodIndex);
       createAndApplyAllocation(dayIndex, periodIndex, '', '');
     };
 
@@ -299,7 +299,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         course.highlight = false;
         if (clash) {
           var clashInScope = extractClash(dayIndex, periodIndex);
-            if (clashInScope) {
+          if (clashInScope) {
             clashInScope.highlight = false;
             course.clashHighlight = false;
           }
@@ -307,26 +307,32 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     };
 
-      $scope.collectStats = function(course){
-          var subjectCode = course.code;
-          var teacherCode = course._teacher.code;
-          var subjectAllocationCount = 0;
-          var teacherAllocationInClassCount = 0;
-          //Calculate subject allocation count using timetable
-          $scope.timetableForCurriculum.timetable.days.forEach(function(day){
-              day.periods.forEach(function(period){
-                  if (period.subject === subjectCode){
-                      subjectAllocationCount++;
-                  }
-                  if (period.teacher === teacherCode){
-                      teacherAllocationInClassCount++;
-                  }
-              });
-          });
-          $scope.stats = {teacher:{code:teacherCode, totalAllocationCount:'TODO', classAllocationCount: teacherAllocationInClassCount},
-              subject:{code:subjectCode, allocationCount:subjectAllocationCount}};
-          $scope.selectedCourseForStats = course;
+    $scope.collectStats = function (course) {
+      var subjectCode = course.code;
+      var teacherCode = course._teacher.code;
+      var subjectAllocationCount = 0;
+      var teacherAllocationInClassCount = 0;
+      //Calculate subject allocation count using timetable
+      $scope.timetableForCurriculum.timetable.days.forEach(function (day) {
+        day.periods.forEach(function (period) {
+          if (period.subject === subjectCode) {
+            subjectAllocationCount++;
+          }
+          if (period.teacher === teacherCode) {
+            teacherAllocationInClassCount++;
+          }
+        });
+      });
+      $scope.stats = {
+        header : 'Stats for ' + teacherCode + ' and ' + subjectCode,
+        data   : [
+          {name : 'Periods in a week for ' + teacherCode, value : teacherAllocationInClassCount},
+          {name : 'Number of ' + subjectCode + ' periods in a week', value : subjectAllocationCount},
+          {name : 'Total period in a week for ' + teacherCode, value : 'TODO'}
+        ]
       };
+      $scope.selectedCourseForStats = course;
+    };
 
   }
 ]);
