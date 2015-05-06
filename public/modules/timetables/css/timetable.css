@@ -70,15 +70,18 @@
 }
 
 .subjects li.highlight {
+  background : rgb(200, 200, 200) !important;
   background : rgba(200, 200, 200, 0.2) !important;
 }
 
 .subjects li:hover {
+  background : rgb(100, 100, 225) !important;
   background : rgba(100, 100, 225, 0.2) !important;
 }
 
 .subjects li.clash-highlight {
   transform  : scale(1.2);
+  background : rgb(220, 100, 100) !important;
   background : rgba(220, 100, 100, 0.2) !important;
 }
 
