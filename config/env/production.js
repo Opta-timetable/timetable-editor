@@ -17,7 +17,11 @@ module.exports = {
 				'public/lib/angular-sanitize/angular-sanitize.js', 
 				'public/lib/angular-ui-router/release/angular-ui-router.min.js',
 				'public/lib/angular-ui-utils/ui-utils.min.js',
-				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js'
+				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
+        'public/lib/ngDraggable/ngDraggable.js',
+        'public/lib/ng-table/dist/ng-table.min.js',
+        'public/lib/ng-table-export/ng-table-export.js',
+        'public/lib/angular-breadcrumb/release/angular-breadcrumb.min.js'
 			]
 		},
 		css: 'public/dist/application.min.css',
