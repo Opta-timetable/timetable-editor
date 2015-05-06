@@ -2,11 +2,6 @@
   transform : scaleX(-1);
 }
 
-.timetable td.drag-enter {
-  border     : 0.1em dotted #00ff00 !important;
-  background : #aaffaa !important;
-}
-
 .period {
   position   : relative;
   transition : all .2s ease-in-out;
@@ -16,16 +11,26 @@
   display : block;
 }
 
-.period:hover, .period.drag-enter, .period.bg-danger {
+.period:hover, .period.drag-enter, .period.bg-danger, .period.period-highlight {
   z-index : 15;
 }
 
-.period:hover {
+.period:hover, .period.period-highlight {
   transform : scale(1.1);
 }
 
 .period.drag-enter, .period.bg-danger {
   transform : scale(1.2);
+}
+
+.period.drag-enter {
+  border     : 0.1em dotted #00ff00 !important;
+  background : #aaffaa !important;
+}
+
+.period.period-highlight {
+  background : rgb(163, 200, 159) !important;
+  background : rgba(163, 200, 159, 0.64) !important;
 }
 
 .delete-allocation {

@@ -307,6 +307,24 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     };
 
+    $scope.highlightPeriods = function (subject) {
+      $scope.timetableForCurriculum.timetable.days.forEach(function (day) {
+        day.periods.forEach(function (period) {
+          if (period.subject === subject) {
+            extractPeriod(day.dayIndex, period.index).highlightPeriod = true;
+          }
+        });
+      });
+    };
+
+    $scope.unHighlightPeriods = function (course) {
+      $scope.timetableForCurriculum.timetable.days.forEach(function (day) {
+        day.periods.forEach(function (period) {
+          extractPeriod(day.dayIndex, period.index).highlightPeriod = false;
+        });
+      });
+    };
+
     $scope.collectStats = function (course) {
       var subjectCode = course.code;
       var teacherCode = course._teacher.code;
