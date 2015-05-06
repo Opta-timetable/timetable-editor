@@ -160,6 +160,7 @@ exports.performDrop = function (req, res) {
         {$match : {'days.dayIndex' : dayToMatch}},
         {$match : {'days.periods.index' : parseInt(periodIndex)}},
         {$match : {'days.periods.teacher' : teacher}},
+          {$match : {'days.periods.teacher' : {$ne : ""}}},
         {$match : {'curriculumReference' : {$ne : curriculum}}}, function (err, clashes) {
           if (err) {
             console.log('error in aggregate');
