@@ -303,3 +303,20 @@ exports.discoverClashes = function (req, res) {
       }
     });
 };
+
+exports.collectStats = function (req, res) {
+    var teacherCode = req.body.teacherCode;
+    console.log("Teacher code is " + teacherCode);
+    Timetable.aggregate({$unwind : '$days'}, {$unwind : '$days.periods'},
+        {$match : {'days.periods.teacher' : teacherCode}}, function (err, periodsForTeacher) {
+            if (err) {
+                console.log('error in aggregate');
+                return res.status(400).send({
+                    message : errorHandler.getErrorMessage(err)
+                });
+            } else {
+                console.log('periodsForTeacher returned is ' + JSON.stringify(periodsForTeacher));
+                return res.status(200).send({teacherStats : {totalAllocation : periodsForTeacher.length}});
+            }
+        });
+};

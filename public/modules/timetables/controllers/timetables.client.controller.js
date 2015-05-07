@@ -346,9 +346,19 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         data   : [
           {name : 'Periods in a week for ' + teacherCode, value : teacherAllocationInClassCount},
           {name : 'Number of ' + subjectCode + ' periods in a week', value : subjectAllocationCount},
-          {name : 'Total period in a week for ' + teacherCode, value : 'TODO'}
+          {name : 'Total periods in a week for ' + teacherCode, value : 'Not Available'}
         ]
       };
+        //Collect Teacher totals from server
+        $http.post('/timetables/collectStats', {
+            teacherCode      : teacherCode
+        })
+            .success(function (data, status, headers, config) {
+               $scope.stats.data[2].value = data.teacherStats.totalAllocation;
+            })
+            .error(function (data, status, headers, config) {
+
+            });
       $scope.selectedCourseForStats = course;
     };
 

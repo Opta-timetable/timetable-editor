@@ -26,6 +26,9 @@ module.exports = function(app) {
     app.route('/timetables/teachers/:_id')
         .get(timetables.timetableByTeacherID);
 
+    app.route('/timetables/collectStats')
+        .post(timetables.collectStats);
+
     //app.route('/timetables/:curriculumId');
 
 };
