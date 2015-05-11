@@ -17,8 +17,8 @@ module.exports = function(app) {
 
     app.param('curriculumId', timetables.read);
 
-    app.route('/timetables/performDrop')
-        .post(timetables.performDrop);
+    app.route('/timetables/modifyPeriodAllocation')
+        .post(timetables.modifyPeriodAllocation);
 
     app.route('/timetables/discoverClashes')
         .post(timetables.discoverClashes);

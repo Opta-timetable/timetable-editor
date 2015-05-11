@@ -125,8 +125,7 @@ exports.timetableByTeacherID = function (req, res) {
   });
 };
 
-// TODO: Rename this into something more meaningful than `performDrop`
-exports.performDrop = function (req, res) {
+exports.modifyPeriodAllocation = function (req, res) {
   console.log('period : ' + JSON.stringify(req.body.currentPeriod));
   console.log('course : ' + JSON.stringify(req.body.allocatedCourse));
   console.log('day : ' + JSON.stringify(req.body.currentDay));
