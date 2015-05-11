@@ -52,7 +52,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function updateAllocation(dayIndex, periodIndex, allocatedCourse, currentClash) {
-      $http.post('/timetables/performDrop', {
+      $http.post('/timetables/modifyPeriodAllocation', {
         currentDay      : dayIndex,
         currentPeriod   : extractPeriod(dayIndex, periodIndex),
         allocatedCourse : allocatedCourse,

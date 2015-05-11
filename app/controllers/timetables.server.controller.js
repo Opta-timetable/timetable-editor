@@ -126,19 +126,22 @@ exports.timetableByTeacherID = function (req, res) {
 };
 
 exports.modifyPeriodAllocation = function (req, res) {
-  console.log('period : ' + JSON.stringify(req.body.currentPeriod));
-  console.log('course : ' + JSON.stringify(req.body.allocatedCourse));
-  console.log('day : ' + JSON.stringify(req.body.currentDay));
-  console.log('curriculum : ' + JSON.stringify(req.body.allocatedCourse.curriculumReference));
-  //Look for course._teacher.code in the complete timetable and see if it matches any of the
-  var dayToMatch = req.body.currentDay,
+
+    //Coordinates for the allocation
+    var dayToMatch = req.body.currentDay,
     periodIndex = req.body.currentPeriod.index,
-    teacher = req.body.allocatedCourse._teacher.code,
     curriculum = req.body.allocatedCourse.curriculumReference,
+
+    //New Allocation Details
     subject = req.body.allocatedCourse.code,
+    teacher = req.body.allocatedCourse._teacher.code,
+
+    //Clash because of the current allocation
     clashToUpdate = req.body.clashToUpdate;
 
-  console.log('clashToUpdate ' + JSON.stringify(clashToUpdate));
+    console.log('Modifying allocation for Class %j on day %j, periodIndex %j with subject %j and teacher %j ',
+        curriculum, dayToMatch, periodIndex, subject, teacher);
+    console.log('Existing Clash for this period ' + JSON.stringify(clashToUpdate));
 
   //Extract the timetable document to update
   Timetable.findOne({curriculumReference : curriculum}, function (err, timetableToUpdate) {
