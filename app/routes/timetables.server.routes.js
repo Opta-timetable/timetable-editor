@@ -11,7 +11,7 @@ module.exports = function(app) {
         //.post(users.requiresLogin, timetables.create); //Later
 
     app.route('/timetables/:curriculumId')
-        .get(timetables.timetableByCurriculumID)
+        .get(timetables.timetableByCurriculum)
         .put(timetables.update);
         //.delete(users.requiresLogin, timetables.hasAuthorization, timetables.delete);
 
