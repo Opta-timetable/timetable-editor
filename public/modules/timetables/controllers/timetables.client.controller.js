@@ -349,16 +349,16 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           {name : 'Total periods in a week for ' + teacherCode, value : 'Not Available'}
         ]
       };
-        //Collect Teacher totals from server
-        $http.post('/timetables/collectStats', {
-            teacherCode      : teacherCode
+      //Collect Teacher totals from server
+      $http.post('/timetables/collectStats', {
+        teacherCode : teacherCode
+      })
+        .success(function (data, status, headers, config) {
+          $scope.stats.data[2].value = data.teacherStats.totalAllocation;
         })
-            .success(function (data, status, headers, config) {
-               $scope.stats.data[2].value = data.teacherStats.totalAllocation;
-            })
-            .error(function (data, status, headers, config) {
+        .error(function (data, status, headers, config) {
 
-            });
+        });
       $scope.selectedCourseForStats = course;
     };
 

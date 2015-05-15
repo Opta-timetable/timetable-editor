@@ -3,7 +3,7 @@
 var users = require('../../app/controllers/users.server.controller'),
   courses = require('../../app/controllers/courses.server.controller');
 
-module.exports = function(app) {
+module.exports = function (app) {
   // Course Routes
   app.route('/courses')
     .get(courses.list)

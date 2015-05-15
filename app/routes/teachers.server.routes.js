@@ -1,23 +1,23 @@
 'use strict';
 
-module.exports = function(app) {
-	var users = require('../../app/controllers/users.server.controller');
-	var teachers = require('../../app/controllers/teachers.server.controller');
+module.exports = function (app) {
+  var users = require('../../app/controllers/users.server.controller');
+  var teachers = require('../../app/controllers/teachers.server.controller');
 
-	// Teachers Routes
-	app.route('/teachers')
-		.get(teachers.list)
-		.post(users.requiresLogin, teachers.create);
+  // Teachers Routes
+  app.route('/teachers')
+    .get(teachers.list)
+    .post(users.requiresLogin, teachers.create);
 
-    //HACK Alert!!!
-    app.route('/timetables/teachers')
-        .get(teachers.list);
+  //HACK Alert!!!
+  app.route('/timetables/teachers')
+    .get(teachers.list);
 
-	app.route('/teachers/:teacherId')
-		.get(teachers.read)
-		.put(users.requiresLogin, teachers.hasAuthorization, teachers.update)
-		.delete(users.requiresLogin, teachers.hasAuthorization, teachers.delete);
+  app.route('/teachers/:teacherId')
+    .get(teachers.read)
+    .put(users.requiresLogin, teachers.hasAuthorization, teachers.update)
+    .delete(users.requiresLogin, teachers.hasAuthorization, teachers.delete);
 
-	// Finish by binding the Teacher middleware
-	app.param('teacherId', teachers.teacherByID);
+  // Finish by binding the Teacher middleware
+  app.param('teacherId', teachers.teacherByID);
 };

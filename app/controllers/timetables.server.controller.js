@@ -129,14 +129,14 @@ function SetClashInOtherClassTimetable(clashes) {
   if (clashes.length > 0) {
     var clashesUpdateTracker = clashes.length;
     clashes.forEach(function (clash) {
-      Timetable.findOne({curriculumReference: clash.curriculumReference}).exec()
+      Timetable.findOne({curriculumReference : clash.curriculumReference}).exec()
         .then(function (timetableToUpdate) {
           console.log('Found clash to set');
           timetableToUpdate.days[parseInt(clash.days.dayIndex)].periods[clash.days.periods.index].clash = true;
-          return Timetable.update({curriculumReference: clash.curriculumReference},
-                        {$set: {days: timetableToUpdate.days}}).exec();
+          return Timetable.update({curriculumReference : clash.curriculumReference},
+            {$set : {days : timetableToUpdate.days}}).exec();
         }).then(null, function (err) {
-          if (err instanceof Error){
+          if (err instanceof Error) {
             console.log('Error while updating new clashes');
             throw err;
           }
@@ -148,36 +148,36 @@ function SetClashInOtherClassTimetable(clashes) {
             console.log('All Clashes set successfully');
           }
         });
-      });
-    } else {
-      console.log('no new clashes to set');
-    }
+    });
+  } else {
+    console.log('no new clashes to set');
+  }
 }
 
 function UnsetClashInOtherClassTimetable(clash) {
 //new clashes updated. Clear old clash if any
- if (JSON.stringify(clash) !== '{}') {
-   console.log('Entered Clash to clear:  %j', clash);
-   Timetable.findOne({curriculumReference : clash.curriculumReference}).exec()
-     .then(function (timetable) {
-       console.log('timetableToClearClash: %j', timetable);
-       console.log('Found clash to clear');
-       timetable.days[parseInt(clash.days.dayIndex)].
-         periods[clash.days.periods.index].clash = false;
-       Timetable.update({curriculumReference : clash.curriculumReference},
-                        {$set : {days : timetable.days}}).exec().then(null, function(err){
-           if (err instanceof Error){
-             console.log('Error while clearing clash');
-             throw err;
-           }
-         });
-     })
-     .then(function (){
-       console.log('clash cleared successfully');
-     });
-    }else{
-      console.log('No clashes to clear');
-    }
+  if (JSON.stringify(clash) !== '{}') {
+    console.log('Entered Clash to clear:  %j', clash);
+    Timetable.findOne({curriculumReference : clash.curriculumReference}).exec()
+      .then(function (timetable) {
+        console.log('timetableToClearClash: %j', timetable);
+        console.log('Found clash to clear');
+        timetable.days[parseInt(clash.days.dayIndex)].
+          periods[clash.days.periods.index].clash = false;
+        Timetable.update({curriculumReference : clash.curriculumReference},
+          {$set : {days : timetable.days}}).exec().then(null, function (err) {
+            if (err instanceof Error) {
+              console.log('Error while clearing clash');
+              throw err;
+            }
+          });
+      })
+      .then(function () {
+        console.log('clash cleared successfully');
+      });
+  } else {
+    console.log('No clashes to clear');
+  }
 }
 
 exports.modifyPeriodAllocation = function (req, res) {
@@ -185,18 +185,18 @@ exports.modifyPeriodAllocation = function (req, res) {
   var dayToMatch = req.body.currentDay,
     periodIndex = req.body.currentPeriod.index,
     curriculum = req.body.allocatedCourse.curriculumReference,
-    //Details for the new Allocation
+  //Details for the new Allocation
     subject = req.body.allocatedCourse.code,
     teacher = req.body.allocatedCourse._teacher.code,
 
-    //Clash because of the current allocation aka 'Existing Clash'
+  //Clash because of the current allocation aka 'Existing Clash'
     clashToUpdate = req.body.clashToUpdate;
 
-    console.log('Modifying allocation for Class %j on day %j, periodIndex %j with subject %j and teacher %j ',
-      curriculum, dayToMatch, periodIndex, subject, teacher);
-    console.log('Clash due to existing allocation ' + JSON.stringify(clashToUpdate));
+  console.log('Modifying allocation for Class %j on day %j, periodIndex %j with subject %j and teacher %j ',
+    curriculum, dayToMatch, periodIndex, subject, teacher);
+  console.log('Clash due to existing allocation ' + JSON.stringify(clashToUpdate));
 
-    var newTimetableDays, currentPeriod, clashesToSend;
+  var newTimetableDays, currentPeriod, clashesToSend;
 
   //Extract the timetable document to update
   Timetable.findOne({curriculumReference : curriculum}).exec()
@@ -214,38 +214,38 @@ exports.modifyPeriodAllocation = function (req, res) {
         {$match : {'days.periods.teacher' : teacher}},
         {$match : {'days.periods.teacher' : {$ne : ''}}},
         {$match : {'curriculumReference' : {$ne : curriculum}}}).exec();
-      })
-      .then(function (clashes){
-        clashesToSend = clashes;
-        console.log('clashes output returned is ' + JSON.stringify(clashes));
-        if (clashes.length > 0) {
-          currentPeriod.clash = true;
-        }
-        return new SetClashInOtherClassTimetable(clashes);
-      })
-      .then(function(){
-        //Clash due to new allocation is discovered and updated in the 'other' class
-        //Now update the new allocation into this class's timetable
-        return Timetable.update({curriculumReference : curriculum}, {$set : {days : newTimetableDays}}).exec();
-      })
-      .then(function (o){
-        console.log('timetable for current class updated');
-        console.log('Clearing existing clashes if any');
-        return new UnsetClashInOtherClassTimetable(clashToUpdate);
-      })
-      .then(null, function(err){
-        if (err instanceof Error){
-          console.log('Error during update' + errorHandler.getErrorMessage(err));
-            return res.status(400).send({
-              message : errorHandler.getErrorMessage(err)
-            });
-          }
-      })
-      .then(function(){
-        console.log('Timetable and Clashes updated successfully ');
-        return res.status(200).send({clashIn : clashesToSend});
-      });
-    };
+    })
+    .then(function (clashes) {
+      clashesToSend = clashes;
+      console.log('clashes output returned is ' + JSON.stringify(clashes));
+      if (clashes.length > 0) {
+        currentPeriod.clash = true;
+      }
+      return new SetClashInOtherClassTimetable(clashes);
+    })
+    .then(function () {
+      //Clash due to new allocation is discovered and updated in the 'other' class
+      //Now update the new allocation into this class's timetable
+      return Timetable.update({curriculumReference : curriculum}, {$set : {days : newTimetableDays}}).exec();
+    })
+    .then(function (o) {
+      console.log('timetable for current class updated');
+      console.log('Clearing existing clashes if any');
+      return new UnsetClashInOtherClassTimetable(clashToUpdate);
+    })
+    .then(null, function (err) {
+      if (err instanceof Error) {
+        console.log('Error during update' + errorHandler.getErrorMessage(err));
+        return res.status(400).send({
+          message : errorHandler.getErrorMessage(err)
+        });
+      }
+    })
+    .then(function () {
+      console.log('Timetable and Clashes updated successfully ');
+      return res.status(200).send({clashIn : clashesToSend});
+    });
+};
 
 exports.update = function (req, res) {
   var timetableToUpdate = req.body.timetable.days;
@@ -285,18 +285,18 @@ exports.discoverClashes = function (req, res) {
 };
 
 exports.collectStats = function (req, res) {
-    var teacherCode = req.body.teacherCode;
-    console.log('Teacher code is ' + teacherCode);
-    Timetable.aggregate({$unwind : '$days'}, {$unwind : '$days.periods'},
-        {$match : {'days.periods.teacher' : teacherCode}}, function (err, periodsForTeacher) {
-            if (err) {
-                console.log('error in aggregate');
-                return res.status(400).send({
-                    message : errorHandler.getErrorMessage(err)
-                });
-            } else {
-                //console.log('periodsForTeacher returned is ' + JSON.stringify(periodsForTeacher));
-                return res.status(200).send({teacherStats : {totalAllocation : periodsForTeacher.length}});
-            }
+  var teacherCode = req.body.teacherCode;
+  console.log('Teacher code is ' + teacherCode);
+  Timetable.aggregate({$unwind : '$days'}, {$unwind : '$days.periods'},
+    {$match : {'days.periods.teacher' : teacherCode}}, function (err, periodsForTeacher) {
+      if (err) {
+        console.log('error in aggregate');
+        return res.status(400).send({
+          message : errorHandler.getErrorMessage(err)
         });
+      } else {
+        //console.log('periodsForTeacher returned is ' + JSON.stringify(periodsForTeacher));
+        return res.status(200).send({teacherStats : {totalAllocation : periodsForTeacher.length}});
+      }
+    });
 };

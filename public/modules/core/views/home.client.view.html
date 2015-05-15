@@ -14,7 +14,13 @@
         Timetable Editor for timetables set with OptaPlanner
       </p>
     </div>
-    <div class="row">
+    <div class="row" data-ng-hide="authentication.user">
+      <p class="lead">&#160;</p>
+      <p>
+        <a class="btn btn-success btn-lg" href="/#!/signin">Sign In</a>
+      </p>
+    </div>
+    <div class="row" data-ng-show="authentication.user">
       <p class="lead">&#160;</p>
       <p>
         <a class="btn btn-success btn-lg" href="#!/timetables">Go to Timetables!</a>
