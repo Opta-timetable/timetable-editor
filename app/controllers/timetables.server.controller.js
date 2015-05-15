@@ -12,7 +12,6 @@ var mongoose = require('mongoose'),
   Course = mongoose.model('Course'),
   Timetable = mongoose.model('Timetable'),
   Teacher = mongoose.model('Teacher'),
-    Clash = mongoose.model('Clash'),
   _ = require('lodash');
 
 //For use by TimetableByTeacher
