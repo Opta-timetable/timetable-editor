@@ -4,7 +4,7 @@
   </div>
   <div ncy-breadcrumb></div>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <h3>Select a class (Curriculum)</h3>
       <div class="list-group">
         <a data-ng-repeat="curriculum in curriculums" data-ng-href="#!/timetables/{{curriculum.id}}" class="list-group-item">
@@ -27,7 +27,7 @@
         No curricula yet, initialise using the command line?
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <h3>Select a Teacher</h3>
       <div class="list-group">
         <a data-ng-repeat="teacher in teachers" data-ng-href="#!/timetables/teachers/{{teacher._id}}" class="list-group-item">
@@ -47,6 +47,14 @@
         </a>
       </div>
     </div>
+    <div class="col-md-4">
+          <h3>Select a Day</h3>
+          <div class="list-group">
+            <a data-ng-repeat="day in workingDays" data-ng-href="#!/timetables/days/{{day.dayIndex}}" class="list-group-item">
+              <h4 class="list-group-item-heading" data-ng-bind="day.dayName"></h4>
+            </a>
+          </div>
+        </div>
   </div>
 
 </section>

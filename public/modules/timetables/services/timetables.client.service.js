@@ -15,3 +15,11 @@ angular.module('timetables').factory('Teachers', ['$resource',
     }, {'update' : {method : 'PUT'}});
   }
 ]);
+
+angular.module('timetables').factory('Days', ['$resource',
+  function ($resource) {
+    return $resource('timetables/days/:dayIndex', {
+      dayIndex : '@dayIndex'
+    }, {'update' : {method : 'PUT'}});
+  }
+]);

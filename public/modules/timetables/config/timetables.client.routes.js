@@ -29,6 +29,14 @@ angular.module('timetables').config(['$stateProvider',
           parent : 'listTimetables'
         }
       }).
+      state('viewDayTimetable', {
+        url           : '/timetables/days/:dayIndex',
+        templateUrl   : 'modules/timetables/views/view-day-timetable.client.view.html',
+        ncyBreadcrumb : {
+          label  : 'Timetable for Day',
+          parent : 'listTimetables'
+        }
+      }).
       state('editTimetable', {
         url           : '/timetables/edit/:curriculumId',
         templateUrl   : 'modules/timetables/views/edit-timetable.client.view.html',

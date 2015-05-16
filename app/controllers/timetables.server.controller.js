@@ -125,6 +125,23 @@ exports.timetableByTeacherID = function (req, res) {
   });
 };
 
+exports.timetableByDayIndex = function (req, res) {
+  var dayIndex = req.params.dayIndex;
+  console.log('Searching timetables for Day' + dayIndex);
+    Timetable.aggregate({$unwind : '$days'},
+    {$match : {'days.dayIndex' : dayIndex}}, function (err, timetableForDay) {
+      if (err) {
+        console.log('error in aggregate');
+        return res.status(400).send({
+          message : errorHandler.getErrorMessage(err)
+        });
+      } else {
+        console.log('timeTableForDay is %j', timetableForDay);
+        res.json({timetableForDay: timetableForDay});
+      }
+    });
+};
+
 function SetClashInOtherClassTimetable(clashes) {
   if (clashes.length > 0) {
     var clashesUpdateTracker = clashes.length;

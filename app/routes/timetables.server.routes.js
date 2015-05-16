@@ -29,6 +29,9 @@ module.exports = function (app) {
   app.route('/timetables/collectStats')
     .post(timetables.collectStats);
 
+  app.route('/timetables/days/:dayIndex')
+    .get(timetables.timetableByDayIndex);
+
   //app.route('/timetables/:curriculumId');
 
 };

@@ -1,0 +1,44 @@
+<section data-ng-controller="DayTimetableController" data-ng-init="findOne()">
+  <div class="page-header">
+    <h1>{{ "Timetable for " + timetable.timetableForDay[0].days.dayOfWeek}}</h1>
+  </div>
+  <div ncy-breadcrumb></div>
+  <div class="clearfix">
+    <div class="pull-right">
+      <a class="btn btn-info" title="Export Timetable" ng-click='csv.generate()' ng-href="{{ csv.link() }}"
+         download="{{ +'-timetable.csv'}}">
+        <i class="glyphicon glyphicon-new-window"></i> &#160;Export
+      </a>
+    </div>
+  </div>
+  <br>
+  <table class="table table-bordered" ng-table="" export-csv="csv">
+    <thead>
+      <tr>
+        <th>Day</th>
+        <th data-ng-repeat="period in timetable.timetableForDay[0].days.periods">
+          {{ "Period-" + (period.index+1)}}
+        </th>
+      </tr>
+    </thead>
+    <tr data-ng-repeat="classes in timetable.timetableForDay">
+      <td>{{classes.curriculumCode}}</td>
+      <td data-ng-repeat="period in classes.days.periods" ng-class="{'bg-danger': period.clash}">
+        {{ formatSubjectTeacher(period.subject, period.teacher) }}
+      </td>
+    </tr>
+    <tr>
+      <td>Unassigned Teachers</td>
+      <td data-ng-repeat="period in timetable.timetableForDay[0].days.periods">
+       {{ formatUnassignedTeachers(period.index) }}
+      </td>
+    </tr>
+  </table>
+  <div class="row">
+    <div class="col-md-12">
+      <a class="btn btn-group-sm btn-default" href="/#!/timetables">
+        <i class="glyphicon glyphicon-backward"></i> &#160;Back
+      </a>
+    </div>
+  </div>
+</section>

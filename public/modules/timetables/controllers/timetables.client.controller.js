@@ -155,6 +155,12 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query();
       $scope.teachers = Teachers.query();
+      //The following should eventually come from a configuration tied to the user and school
+      $scope.workingDays = [{dayName:'Monday', dayIndex:0},
+        {dayName:'Tuesday', dayIndex:1},
+        {dayName:'Wednesday', dayIndex:2},
+        {dayName:'Thursday', dayIndex:3},
+        {dayName:'Friday', dayIndex:4}];
     };
 
     $scope.findOne = function () {
