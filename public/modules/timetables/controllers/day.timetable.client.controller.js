@@ -12,7 +12,7 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
       return '';
     };
 
-    var unassignedTeachersForPeriod = [];
+    $scope.unassignedTeachersForPeriod = [];
 
     function getAllTeachers(){
       var allTeachers = [];
@@ -42,18 +42,14 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
           for (var j = 0; j < timetableForDay.length; j++){
             findAndRemoveFromArray(unassignedTeachers, timetableForDay[j].days.periods[i].teacher);
           }
-          unassignedTeachersForPeriod.push(unassignedTeachers);
+          $scope.unassignedTeachersForPeriod.push(unassignedTeachers);
         }
       }
     }
 
     $scope.formatUnassignedTeachers = function(period){
-      return unassignedTeachersForPeriod[period].join(', ');
+        return $scope.unassignedTeachersForPeriod[period].join(', ');
     };
-
-    //Due to the checks there, only one of the below will trigger the prepareUnassignedTeachersForPeriods Functionality.
-    $scope.$watch('timetable.timetableForDay', prepareUnassignedTeachersForPeriods);
-    $scope.$watch('teachers', prepareUnassignedTeachersForPeriods);
 
     $scope.findOne = function () {
       $scope.timetable = Days.get({
@@ -61,5 +57,9 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
       });
       $scope.teachers = Teachers.query();
     };
+
+    //Due to the checks there, only one of the below will trigger the prepareUnassignedTeachersForPeriods Functionality.
+    $scope.$watch('timetable.timetableForDay.length > 0', prepareUnassignedTeachersForPeriods);
+    $scope.$watch('teachers.length > 0', prepareUnassignedTeachersForPeriods);
   }
 ]);
