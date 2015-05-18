@@ -27,8 +27,7 @@ module.exports = {
         'public/lib/angular-ui-utils/ui-utils.js',
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
         'public/lib/ngDraggable/ngDraggable.js',
-        'public/lib/ng-table/dist/ng-table.js',
-        'public/lib/ng-table-export/ng-table-export.src.js',
+        'public/lib/ng-table-to-csv/dist/ng-table-to-csv.js',
         'public/lib/angular-breadcrumb/release/angular-breadcrumb.js'
       ]
     },
