@@ -6,15 +6,15 @@ module.exports = function (app) {
 
   // Teachers Routes
   app.route('/teachers')
-    .get(teachers.list)
+    .get(users.requiresLogin, teachers.list)
     .post(users.requiresLogin, teachers.create);
 
   //HACK Alert!!!
   app.route('/timetables/teachers')
-    .get(teachers.list);
+    .get(users.requiresLogin, teachers.list);
 
   app.route('/teachers/:teacherId')
-    .get(teachers.read)
+    .get(users.requiresLogin, teachers.read)
     .put(users.requiresLogin, teachers.hasAuthorization, teachers.update)
     .delete(users.requiresLogin, teachers.hasAuthorization, teachers.delete);
 

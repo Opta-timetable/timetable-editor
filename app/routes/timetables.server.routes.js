@@ -7,31 +7,29 @@ var users = require('../../app/controllers/users.server.controller'),
 module.exports = function (app) {
   // Course Routes
   app.route('/timetables')
-    .get(timetables.list);
+    .get(users.requiresLogin, timetables.list);
   //.post(users.requiresLogin, timetables.create); //Later
 
   app.route('/timetables/:curriculumId')
-    .get(timetables.timetableByCurriculum)
-    .put(timetables.update);
+    .get(users.requiresLogin, timetables.timetableByCurriculum)
+    .put(users.requiresLogin, timetables.update);
   //.delete(users.requiresLogin, timetables.hasAuthorization, timetables.delete);
 
-  app.param('curriculumId', timetables.read);
-
   app.route('/timetables/modifyPeriodAllocation')
-    .post(timetables.modifyPeriodAllocation);
+    .post(users.requiresLogin, timetables.modifyPeriodAllocation);
 
   app.route('/timetables/discoverClashes')
-    .post(timetables.discoverClashes);
+    .post(users.requiresLogin, timetables.discoverClashes);
 
   app.route('/timetables/teachers/:_id')
-    .get(timetables.timetableByTeacherID);
+    .get(users.requiresLogin, timetables.timetableByTeacherID);
 
   app.route('/timetables/collectStats')
-    .post(timetables.collectStats);
+    .post(users.requiresLogin, timetables.collectStats);
 
   app.route('/timetables/days/:dayIndex')
-    .get(timetables.timetableByDayIndex);
+    .get(users.requiresLogin, timetables.timetableByDayIndex);
 
-  //app.route('/timetables/:curriculumId');
+  app.param('curriculumId', timetables.read);
 
 };

@@ -6,11 +6,11 @@ var users = require('../../app/controllers/users.server.controller'),
 module.exports = function (app) {
   // Course Routes
   app.route('/courses')
-    .get(courses.list)
+    .get(users.requiresLogin, courses.list)
     .post(users.requiresLogin, courses.create);
 
   app.route('/courses/:courseId')
-    .get(courses.read)
+    .get(users.requiresLogin, courses.read)
     .put(users.requiresLogin, courses.hasAuthorization, courses.update)
     .delete(users.requiresLogin, courses.hasAuthorization, courses.delete);
 
