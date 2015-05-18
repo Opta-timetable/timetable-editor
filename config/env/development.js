@@ -3,7 +3,8 @@
 module.exports = {
   db       : 'mongodb://localhost/timetable-dev',
   app      : {
-    title : 'timetable - Development Environment'
+    title : 'timetable - Development Environment',
+    description: 'An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.'
   },
   facebook : {
     clientID     : process.env.FACEBOOK_ID || 'APP_ID',

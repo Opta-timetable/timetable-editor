@@ -1,7 +1,7 @@
 {
   "name": "timetable",
   "version": "0.0.1",
-  "description": "timetable editor",
+  "description": "An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.",
   "dependencies": {
     "bootstrap": "~3",
     "angular": "~1.2",

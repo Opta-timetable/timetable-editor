@@ -1,7 +1,7 @@
 Timetable Editor
 ================
 
-A MEAN.JS based web-app for editing timetables set with OptaPlanner.
+An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.
 
 
 ### HipChat
