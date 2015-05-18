@@ -6,7 +6,7 @@ var ApplicationConfiguration = (function () {
   var applicationModuleName = 'timetable';
   var applicationModuleVendorDependencies = [
     'ngResource', 'ngCookies', 'ngAnimate', 'ngTouch', 'ngSanitize', 'ui.router', 'ui.bootstrap', 'ui.utils',
-    'ngDraggable', 'ngTable', 'ngTableExport', 'ncy-angular-breadcrumb'
+    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb'
   ];
 
   // Add a new vertical module
@@ -279,17 +279,17 @@ angular.module('core').service('Menus', [
   }
 ]);
 
-'use strict';
-
-// Courses module config
-angular.module('courses').run(['Menus',
-  function (Menus) {
-    // Set top bar menu items
-    Menus.addMenuItem('topbar', 'Courses', 'courses', 'dropdown', '/courses(/create)?');
-    Menus.addSubMenuItem('topbar', 'courses', 'List Courses', 'courses');
-    Menus.addSubMenuItem('topbar', 'courses', 'New Course', 'courses/create');
-  }
-]);
+//'use strict';
+//
+//// Courses module config
+//angular.module('courses').run(['Menus',
+//  function (Menus) {
+//    // Set top bar menu items
+//    Menus.addMenuItem('topbar', 'Courses', 'courses', 'dropdown', '/courses(/create)?');
+//    Menus.addSubMenuItem('topbar', 'courses', 'List Courses', 'courses');
+//    Menus.addSubMenuItem('topbar', 'courses', 'New Course', 'courses/create');
+//  }
+//]);
 
 'use strict';
 
@@ -416,9 +416,7 @@ angular.module('courses').factory('Courses', ['$resource',
 angular.module('timetables').run(['Menus',
   function (Menus) {
     // Set top bar menu items
-    Menus.addMenuItem('topbar', 'Timetables', 'timetables', 'dropdown', '/timetables(/create)?');
-    Menus.addSubMenuItem('topbar', 'timetables', 'List Timetables', 'timetables');
-    Menus.addSubMenuItem('topbar', 'timetables', 'New Course', 'timetables/create');
+    Menus.addMenuItem('topbar', 'Timetables', 'timetables', 'item', '/timetables');
   }
 ]);
 
