@@ -73,7 +73,7 @@ exports.delete = function (req, res) {
  * List of Teachers
  */
 exports.list = function (req, res) {
-  Teacher.find().sort('-created').populate('user', 'displayName').exec(function (err, teachers) {
+  Teacher.find().sort('code').exec(function (err, teachers) {
     if (err) {
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)

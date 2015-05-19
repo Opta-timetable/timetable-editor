@@ -53,7 +53,7 @@ exports.read = function (req, res, next, id) {
  * Get all curriculums for work with timetable
  */
 exports.list = function (req, res) {
-  Curriculum.find().sort('-created').exec(function (err, curriculums) {
+  Curriculum.find().sort('id').exec(function (err, curriculums) {
     if (err) {
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)
