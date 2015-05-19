@@ -88,7 +88,8 @@
           <!-- Stats -->
           <div class="col-sm-7" data-ng-if="stats">
             <h4>
-              {{stats.header}}
+              <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+                {{stats.header}}
             </h4>
             <table class="table">
               <tr data-ng-repeat="stat in stats.data"><td>{{stat.name}}</td><td>{{stat.value}}</td></tr>

@@ -350,8 +350,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.stats = {
         header : 'Stats for ' + teacherCode + ' and ' + subjectCode,
         data   : [
-          {name : 'Periods in a week for ' + teacherCode, value : teacherAllocationInClassCount},
-          {name : 'Number of ' + subjectCode + ' periods in a week', value : subjectAllocationCount},
+          {name : 'Periods in a week for ' + teacherCode + ' in this Class', value : teacherAllocationInClassCount},
+          {name : 'Number of ' + subjectCode + ' periods in a week for this Class', value : subjectAllocationCount},
           {name : 'Total periods in a week for ' + teacherCode, value : 'Not Available'}
         ]
       };

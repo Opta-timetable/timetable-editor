@@ -10,12 +10,16 @@
     </div>
     <br>
     <div class="row">
-      <p class="lead">
-        An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.
+      <p>
+        An awesome web-app for creating/editing Educational Timetables powered by OptaPlanner
       </p>
+      <br>
+      <a href="http://optaplanner.org">
+        <img class="img-responsive center-block" width="320" height="60" src="modules/core/img/brand/optaPlannerLogo.png"/>
+      </a>
     </div>
     <div class="row" data-ng-hide="authentication.user">
-      <p class="lead">&#160;</p>
+      <p class="lead">&#160;
       <p>
         <a class="btn btn-success btn-lg" href="/#!/signin">Sign In</a>
       </p>
@@ -23,7 +27,8 @@
     <div class="row" data-ng-show="authentication.user">
       <p class="lead">&#160;</p>
       <p>
-        <a class="btn btn-success btn-lg" href="#!/timetables">Go to Timetables!</a>
+        <a class="btn btn-success btn-lg" href="#!/timetables">Work with Timetables!</a>
+        <a class="btn btn-success btn-lg" href="#!/timetables">Modify Allocations</a>
       </p>
     </div>
   </div>
