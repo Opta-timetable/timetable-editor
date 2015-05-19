@@ -94,6 +94,7 @@
             <table class="table">
               <tr data-ng-repeat="stat in stats.data"><td>{{stat.name}}</td><td>{{stat.value}}</td></tr>
             </table>
+            <a class="btn btn-info center-block" href="#!/timetables">Assign a different Teacher for {{stats.subjectCode}}</a>
           </div>
           <!-- Stats -->
 
@@ -125,11 +126,12 @@
               </li>
             </ul>
           </div>
-          <div class="panel-footer">
-            <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              Drag a subject to the desired cell to allocate</p>
-            <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              Click on a subject to view Stats for the course</p>
+        <div class="panel-footer">
+          <p><a class="btn btn-info center-block" href="#!/timetables">Modify Allocations</a></p>
+          <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+            Drag a subject to the desired cell to allocate</p>
+          <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+            Click on a subject to <b> View </b> Stats or <b> Assign </b> a different teacher</p>
           </div>
         </div>
       </div>

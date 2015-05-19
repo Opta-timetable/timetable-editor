@@ -352,8 +352,10 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         data   : [
           {name : 'Periods in a week for ' + teacherCode + ' in this Class', value : teacherAllocationInClassCount},
           {name : 'Number of ' + subjectCode + ' periods in a week for this Class', value : subjectAllocationCount},
-          {name : 'Total periods in a week for ' + teacherCode, value : 'Not Available'}
-        ]
+          {name : 'Total periods in a week for ' + teacherCode, value : '-'}
+        ],
+        teacherCode : teacherCode,
+        subjectCode : subjectCode
       };
       //Collect Teacher totals from server
       $http.post('/timetables/collectStats', {
