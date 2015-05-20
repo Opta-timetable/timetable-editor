@@ -32,19 +32,27 @@ angular.module(ApplicationConfiguration.applicationModuleName, ApplicationConfig
 
 // Setting HTML5 Location Mode
 angular.module(ApplicationConfiguration.applicationModuleName).config(['$locationProvider',
-	function($locationProvider) {
-		$locationProvider.hashPrefix('!');
-	}
+  function ($locationProvider) {
+    $locationProvider.hashPrefix('!');
+  }
 ]);
 
 //Then define the init function for starting up the application
-angular.element(document).ready(function() {
-	//Fixing facebook bug with redirect
-	if (window.location.hash === '#_=_') window.location.hash = '#!';
+angular.element(document).ready(function () {
+  //Fixing facebook bug with redirect
+  if (window.location.hash === '#_=_') window.location.hash = '#!';
 
-	//Then init the app
-	angular.bootstrap(document, [ApplicationConfiguration.applicationModuleName]);
+  // Fixing google bug with redirect
+  if (window.location.href[window.location.href.length - 1] === '#' &&
+      // for just the error url (origin + /#)
+    (window.location.href.length - window.location.origin.length) === 2) {
+    window.location.href = window.location.origin + '/#!';
+  }
+
+  //Then init the app
+  angular.bootstrap(document, [ApplicationConfiguration.applicationModuleName]);
 });
+
 'use strict';
 
 // Use Applicaion configuration module to register a new module
@@ -911,10 +919,12 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.stats = {
         header : 'Stats for ' + teacherCode + ' and ' + subjectCode,
         data   : [
-          {name : 'Periods in a week for ' + teacherCode, value : teacherAllocationInClassCount},
-          {name : 'Number of ' + subjectCode + ' periods in a week', value : subjectAllocationCount},
-          {name : 'Total periods in a week for ' + teacherCode, value : 'Not Available'}
-        ]
+          {name : 'Periods in a week for ' + teacherCode + ' in this Class', value : teacherAllocationInClassCount},
+          {name : 'Number of ' + subjectCode + ' periods in a week for this Class', value : subjectAllocationCount},
+          {name : 'Total periods in a week for ' + teacherCode, value : '-'}
+        ],
+        teacherCode : teacherCode,
+        subjectCode : subjectCode
       };
       //Collect Teacher totals from server
       $http.post('/timetables/collectStats', {
