@@ -95,33 +95,10 @@
               <table class="table">
                 <tr data-ng-repeat="stat in stats.data"><td>{{stat.name}}</td><td>{{stat.value}}</td></tr>
               </table>
-              <a class="btn btn-info center-block" data-ng-click="displayTeacherAssignmentPanel(selectedCourseForStats)">
+              <a class="btn btn-info center-block" data-ng-click="displayTeacherAssignmentModal(selectedCourseForStats)">
                 Assign a different Teacher for {{stats.subjectCode}}</a>
             </div>
             <!-- Stats -->
-
-            <!-- Change Teacher Assignment -->
-            <div data-ng-if="changeTeacher">
-              <div class="panel panel-info">
-                <div class="panel-heading">
-                  <h3 class="panel-title"> Assign a different Teacher for {{subjectCode}}</h3>
-                </div>
-                <div class="panel-body">
-                  <select class="form-control" placeholder="Select a Teacher" ng-model="selectedTeacher"
-                          ng-options="teacher as teacher.code for teacher in teachers"></select>
-                  <div data-ng-if="selectedTeacher">
-                    <h4> You have selected: <span class="label label-default">{{selectedTeacher.code}}</span></h4>
-                  </div>
-                </div>
-                <div class="panel-footer">
-                  <div class="form-group" role="group">
-                    <a class="btn btn-group-sm btn-success" data-ng-if="selectedTeacher">Submit -ToDo</a>
-                    <a class="btn btn-group-sm btn-warning" data-ng-click="collectStats(selectedCourseForStats)">Cancel</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Change Teacher Assignment -->
 
           </div>
 
@@ -170,6 +147,32 @@
       <strong data-ng-bind="error"></strong>
     </div>
     <!-- Error Messages -->
-
   </div>
+
+  <!-- Change Teacher Assignment Modal Dialog-->
+  <script type="text/ng-template" id="modal.client.view.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Assign a different Teacher for {{subjectCode}}</h3>
+    </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <div class="input-group-btn" dropdown is-open="status.isopen">
+          <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle ng-disabled="disabled" aria-expanded="false">
+            Select From List <span class="caret"></span></button>
+          <ul class="dropdown-menu" role="menu">
+            <li data-ng-repeat="teacher in teachers"><a data-ng-click="selectTeacher(teacher)">{{teacher.code}}</a></li>
+          </ul>
+        </div><!-- /btn-group -->
+        <input type="text" placeholder="Or Search..." typeahead-editable="false"
+               typeahead="teacher as teacher.code for teacher in teachers | filter:$viewValue | limitTo:8"
+               ng-model="selectedTeacher" class="form-control" aria-label="...">
+          </div><!-- /input-group -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" ng-click="ok()">Submit</button>
+      <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+  </script>
+  <!-- Change Teacher Assignment Modal Dialog-->
+
 </section>

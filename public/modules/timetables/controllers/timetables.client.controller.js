@@ -1,8 +1,8 @@
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $filter, $stateParams, $location, Authentication, Timetables, Teachers) {
+angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers',
+  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers) {
     var SUBJECT_ROWS_PER_COLUMN = 8;
 
     $scope.authentication = Authentication;
@@ -374,13 +374,33 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.selectedCourseForStats = course;
     };
 
-    $scope.displayTeacherAssignmentPanel = function(course){
-      $scope.stats = null; //Re-use the screen space for teacher assignment
-      $scope.changeTeacher = true;
+    $scope.displayTeacherAssignmentModal = function(course, size){
       $scope.subjectCode = course.code;
       $scope.teacherCode = course._teacher.code;
       $scope.teachers = Teachers.query();
       $scope.selectedTeacher = null;
+      var modalInstance = $modal.open({
+        animation: true,
+        templateUrl: 'modal.client.view.html',
+        controller: 'ModalInstanceCtrl',
+        size: size,
+        resolve: {
+          teachers: function () {
+            return $scope.teachers;
+          },
+          subjectCode: function () {
+            return $scope.subjectCode;
+          }
+        }
+      });
+
+      modalInstance.result.then(function (selectedTeacher) {
+        $scope.selectedTeacher = selectedTeacher;
+        console.info('The user has selected %j', $scope.selectedTeacher);
+      }, function () {
+        console.info('Modal dismissed at: ' + new Date());
+        //TODO submit here
+      });
     };
 
   }
