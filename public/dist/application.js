@@ -93,6 +93,14 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 
 'use strict';
 
+angular.module('core').controller('FooterController', ['$scope', 'Version',
+  function ($scope, Version) {
+    $scope.version = Version.get();
+  }
+]);
+
+'use strict';
+
 angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus',
   function ($scope, Authentication, Menus) {
     $scope.authentication = Authentication;
@@ -113,10 +121,12 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 'use strict';
 
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-  function ($scope, Authentication) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Version',
+  function ($scope, Authentication, Version) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
+
+    $scope.version = Version.get();
   }
 ]);
 
@@ -286,6 +296,15 @@ angular.module('core').service('Menus', [
     this.addMenu('topbar');
   }
 ]);
+
+'use strict';
+
+angular.module('core').factory('Version', ['$resource',
+  function ($resource) {
+    return $resource('version');
+  }
+]);
+
 
 //'use strict';
 //
@@ -905,6 +924,10 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       var teacherCode = course._teacher.code;
       var subjectAllocationCount = 0;
       var teacherAllocationInClassCount = 0;
+
+      //reclaim screen space
+      $scope.changeTeacher = false;
+
       //Calculate subject allocation count using timetable
       $scope.timetableForCurriculum.timetable.days.forEach(function (day) {
         day.periods.forEach(function (period) {
@@ -937,6 +960,15 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
         });
       $scope.selectedCourseForStats = course;
+    };
+
+    $scope.displayTeacherAssignmentPanel = function(course){
+      $scope.stats = null; //Re-use the screen space for teacher assignment
+      $scope.changeTeacher = true;
+      $scope.subjectCode = course.code;
+      $scope.teacherCode = course._teacher.code;
+      $scope.teachers = Teachers.query();
+      $scope.selectedTeacher = null;
     };
 
   }
