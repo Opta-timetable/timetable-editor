@@ -145,7 +145,7 @@ module.exports = function (grunt) {
       options : {
         files         : ['bower.json', 'package.json'],
         updateConfigs : ['bower', 'pkg'],
-        commitFiles   : ['bower.json', 'package.json'],
+        commitFiles   : ['-a'],
         pushTo        : 'origin'
       }
     },
