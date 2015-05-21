@@ -152,8 +152,9 @@ module.exports = function (grunt) {
     gitpush          : {
       heroku : {
         options : {
-          remote : 'heroku',
-          branch : 'master'
+          remote  : 'heroku',
+          branch  : 'master',
+          verbose : true
         }
       }
     }
