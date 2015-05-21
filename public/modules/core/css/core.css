@@ -29,3 +29,18 @@ footer {
   color            : #aaa;
   background-color : #fff;
 }
+
+.copyright {
+  background-color : #fff;
+  box-shadow       : 5px 0 10px rgba(255, 255, 255, .5);
+  position         : relative;
+  padding          : 2px 20px;
+  z-index          : 10;
+}
+
+.version {
+  position : absolute;
+  right    : 15px;
+  top      : 10px;
+  z-index  : 5;
+}
