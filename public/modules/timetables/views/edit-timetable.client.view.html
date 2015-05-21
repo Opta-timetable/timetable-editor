@@ -66,7 +66,7 @@
         </table>
         <!-- Editable Timetable -->
 
-        <!-- Clashes and Stats -->
+        <!-- Clashes and Stats/Teacher Assignment -->
         <div class="row">
 
           <!-- Clashes -->
@@ -85,21 +85,48 @@
           </div>
           <!-- Clashes -->
 
-          <!-- Stats -->
-          <div class="col-sm-7" data-ng-if="stats">
-            <h4>
-              <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-                {{stats.header}}
-            </h4>
-            <table class="table">
-              <tr data-ng-repeat="stat in stats.data"><td>{{stat.name}}</td><td>{{stat.value}}</td></tr>
-            </table>
-            <a class="btn btn-info center-block" href="#!/timetables">Assign a different Teacher for {{stats.subjectCode}}</a>
+          <div class="col-sm-7">
+            <!-- Stats -->
+            <div data-ng-if="stats">
+              <h4>
+                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+                  {{stats.header}}
+              </h4>
+              <table class="table">
+                <tr data-ng-repeat="stat in stats.data"><td>{{stat.name}}</td><td>{{stat.value}}</td></tr>
+              </table>
+              <a class="btn btn-info center-block" data-ng-click="displayTeacherAssignmentPanel(selectedCourseForStats)">
+                Assign a different Teacher for {{stats.subjectCode}}</a>
+            </div>
+            <!-- Stats -->
+
+            <!-- Change Teacher Assignment -->
+            <div data-ng-if="changeTeacher">
+              <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h3 class="panel-title"> Assign a different Teacher for {{subjectCode}}</h3>
+                </div>
+                <div class="panel-body">
+                  <select class="form-control" placeholder="Select a Teacher" ng-model="selectedTeacher"
+                          ng-options="teacher as teacher.code for teacher in teachers"></select>
+                  <div data-ng-if="selectedTeacher">
+                    <h4> You have selected: <span class="label label-default">{{selectedTeacher.code}}</span></h4>
+                  </div>
+                </div>
+                <div class="panel-footer">
+                  <div class="form-group" role="group">
+                    <a class="btn btn-group-sm btn-success" data-ng-if="selectedTeacher">Submit -ToDo</a>
+                    <a class="btn btn-group-sm btn-warning" data-ng-click="collectStats(selectedCourseForStats)">Cancel</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Change Teacher Assignment -->
+
           </div>
-          <!-- Stats -->
 
         </div>
-        <!-- Clashes and Stats -->
+        <!-- Clashes and Stats/Teacher Assignment -->
 
       </div>
       <!-- Timetable, Toolbar, Clashes and Stats -->
@@ -127,11 +154,10 @@
             </ul>
           </div>
         <div class="panel-footer">
-          <p><a class="btn btn-info center-block" href="#!/timetables">Modify Allocations</a></p>
           <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-            Drag a subject to the desired cell to allocate</p>
+            <b>Drag</b> a subject to the desired cell to allocate</p>
           <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-            Click on a subject to <b> View </b> Stats or <b> Assign </b> a different teacher</p>
+            Click on a subject to <b>View</b> Stats or <b>Assign</b> a different teacher</p>
           </div>
         </div>
       </div>

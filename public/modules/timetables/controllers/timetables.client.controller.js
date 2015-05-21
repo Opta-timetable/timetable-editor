@@ -336,6 +336,10 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       var teacherCode = course._teacher.code;
       var subjectAllocationCount = 0;
       var teacherAllocationInClassCount = 0;
+
+      //reclaim screen space
+      $scope.changeTeacher = false;
+
       //Calculate subject allocation count using timetable
       $scope.timetableForCurriculum.timetable.days.forEach(function (day) {
         day.periods.forEach(function (period) {
@@ -368,6 +372,15 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
         });
       $scope.selectedCourseForStats = course;
+    };
+
+    $scope.displayTeacherAssignmentPanel = function(course){
+      $scope.stats = null; //Re-use the screen space for teacher assignment
+      $scope.changeTeacher = true;
+      $scope.subjectCode = course.code;
+      $scope.teacherCode = course._teacher.code;
+      $scope.teachers = Teachers.query();
+      $scope.selectedTeacher = null;
     };
 
   }
