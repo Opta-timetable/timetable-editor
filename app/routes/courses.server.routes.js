@@ -16,4 +16,5 @@ module.exports = function (app) {
 
   // Finish by binding the course middleware
   app.param('courseId', courses.courseByID);
-};
+
+  };

@@ -30,6 +30,9 @@ module.exports = function (app) {
   app.route('/timetables/days/:dayIndex')
     .get(users.requiresLogin, timetables.timetableByDayIndex);
 
+  app.route('/timetables/changeTeacherAssignment')
+    .post(users.requiresLogin, timetables.changeTeacherAssignment);
+  
   app.param('curriculumId', timetables.read);
 
 };
