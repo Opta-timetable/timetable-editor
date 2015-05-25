@@ -141,6 +141,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.$watch('timetableForCurriculum.courses', function () {
       // Thanks to the great SO answer that explains Angular's digest cycle, $watch and $apply
       // http://stackoverflow.com/a/15113029/218882
+      $scope.subjectColumns = []; //Reset when there is a change. For now, change means a teacher allocation change for a subject
       if ($scope.timetableForCurriculum && $scope.timetableForCurriculum.courses) {
         // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
         $scope.columnCount = Math.ceil($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
