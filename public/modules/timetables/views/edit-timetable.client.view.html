@@ -160,13 +160,19 @@
           <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle ng-disabled="disabled" aria-expanded="false">
             Select From List <span class="caret"></span></button>
           <ul class="dropdown-menu" role="menu">
+            <li><a data-ng-click="createNewTeacher()">Add a new Teacher</a></li></li>
             <li data-ng-repeat="teacher in teachers"><a data-ng-click="selectTeacher(teacher)">{{teacher.code}}</a></li>
           </ul>
         </div><!-- /btn-group -->
-        <input type="text" placeholder="Or Search..." typeahead-editable="false"
+        <input type="text" placeholder="Or Search..." typeahead-editable="true"
                typeahead="teacher as teacher.code for teacher in teachers | filter:$viewValue | limitTo:8"
-               ng-model="selectedTeacher" class="form-control" aria-label="...">
+               data-ng-model="selectedTeacher.code" class="form-control" aria-label="..."
+                              data-ng-if="newTeacher===false">
+
+
+        <input type="text" placeholder="Enter Unique Code for new Teacher" data-ng-model="selectedTeacher.code" class="form-control" aria-label="..." data-ng-if="newTeacher===true">
           </div><!-- /input-group -->
+        <p>The user has added {{selectedTeacher.code}}</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-primary" ng-click="ok()">Submit</button>

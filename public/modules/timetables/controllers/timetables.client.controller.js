@@ -389,11 +389,16 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       return clashesToUpdate;
     }
 
-     function updateTeacherForSubject(subjectCode, newTeacherCode){
+    function createNewTeacherAndUpdateSubject(subjectCode, newTeacherCode){
+      console.log('Inside CreateNewTeacherAndUpdateSubject');
+      //TO DO submit 2 posts to the backend
+    }
+
+    function updateTeacherForSubject(subjectCode, newTeacherID, newTeacherCode){
       // get the clashes for the current teacher, if any after removing it from the local list
       var clashesToUpdate = popAllClashesForTeacherFromLocalList($scope.teacherCode);
       $http.post('/timetables/changeTeacherAssignment', {
-        teacherReference : $scope.selectedTeacher._id,
+        teacherReference : newTeacherID,
         teacherCode : newTeacherCode,
         subjectCode : subjectCode,
         curriculumReference : $scope.timetableForCurriculum.timetable.curriculumReference,
@@ -432,12 +437,21 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         }
       });
 
-      modalInstance.result.then(function (selectedTeacher) {
-        $scope.selectedTeacher = selectedTeacher;
-        console.info('The user has selected %j', $scope.selectedTeacher);
-        if ($scope.selectedTeacher.code !== $scope.teacherCode){
-          updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher.code, $scope.teacherCode);
+      modalInstance.result.then(function (result) {
+        console.log('newTeacher flag is %j', result.isNew);
+        $scope.selectedTeacher = result.selectedTeacher;
+        if (result.isNew !== true){
+          //Assignment using an existing teacher
+          console.info('The user has selected %j', $scope.selectedTeacher);
+          if ($scope.selectedTeacher.code !== $scope.teacherCode){
+            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher._id, $scope.selectedTeacher.code);
+          }
+        }else{
+          //New teacher being created
+          console.info('The user wants to create a new teacher with code %j', $scope.selectedTeacher);
+          createNewTeacherAndUpdateSubject($scope.subjectCode, $scope.selectedTeacher);
         }
+
       }, function () {
         console.info('Modal dismissed at: ' + new Date());
       });
