@@ -499,6 +499,35 @@ angular.module('timetables').config(['$stateProvider',
 
 /*jshint unused: false */
 'use strict';
+angular.module('timetables').controller('ModalInstanceCtrl', ["$scope", "$modalInstance", "teachers", "subjectCode", function ($scope, $modalInstance, teachers, subjectCode) {
+
+  $scope.teachers = teachers;
+  $scope.subjectCode = subjectCode;
+  $scope.selectedTeacher = {};
+  $scope.newTeacher = false;
+
+  $scope.selectTeacher = function(teacher){
+    $scope.newTeacher = false;
+    $scope.selectedTeacher = teacher;
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close({selectedTeacher: $scope.selectedTeacher, isNew: $scope.newTeacher});
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+
+  $scope.createNewTeacher = function () {
+    $scope.newTeacher = true;
+
+  };
+
+}]);
+
+/*jshint unused: false */
+'use strict';
 
 angular.module('timetables').controller('DayTimetableController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Days', 'Teachers',
   function ($http, $scope, $stateParams, $location, Authentication, Days, Teachers) {
@@ -589,8 +618,8 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $filter, $stateParams, $location, Authentication, Timetables, Teachers) {
+angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers',
+  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers) {
     var SUBJECT_ROWS_PER_COLUMN = 8;
 
     $scope.authentication = Authentication;
@@ -729,6 +758,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.$watch('timetableForCurriculum.courses', function () {
       // Thanks to the great SO answer that explains Angular's digest cycle, $watch and $apply
       // http://stackoverflow.com/a/15113029/218882
+      $scope.subjectColumns = []; //Reset when there is a change. For now, change means a teacher allocation change for a subject
       if ($scope.timetableForCurriculum && $scope.timetableForCurriculum.courses) {
         // Split subjects into multiple columns with up to SUBJECT_ROWS_PER_COLUMN items in a row
         $scope.columnCount = Math.ceil($scope.timetableForCurriculum.courses.length / SUBJECT_ROWS_PER_COLUMN);
@@ -925,9 +955,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       var subjectAllocationCount = 0;
       var teacherAllocationInClassCount = 0;
 
-      //reclaim screen space
-      $scope.changeTeacher = false;
-
       //Calculate subject allocation count using timetable
       $scope.timetableForCurriculum.timetable.days.forEach(function (day) {
         day.periods.forEach(function (period) {
@@ -962,15 +989,91 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.selectedCourseForStats = course;
     };
 
-    $scope.displayTeacherAssignmentPanel = function(course){
-      $scope.stats = null; //Re-use the screen space for teacher assignment
-      $scope.changeTeacher = true;
+    function extractClashesForTeacher(teacher){
+      return $scope.clashes.filter(function (clash) {
+        return clash.days.periods.teacher === teacher;
+      });
+    }
+
+    function popAllClashesForTeacherFromLocalList(teacher) {
+      var clashesToUpdate = [];
+      clashesToUpdate = extractClashesForTeacher(teacher);
+      // remove all the clashes
+      clashesToUpdate.forEach(function (clash){
+        $scope.clashes.splice($scope.clashes.indexOf(clash), 1);
+      });
+      console.log('clashes to update is ' + JSON.stringify(clashesToUpdate));
+      return clashesToUpdate;
+    }
+
+    function createNewTeacherAndUpdateSubject(subjectCode, newTeacherCode){
+      console.log('Inside CreateNewTeacherAndUpdateSubject');
+      //TO DO submit 2 posts to the backend
+    }
+
+    function updateTeacherForSubject(subjectCode, newTeacherID, newTeacherCode){
+      // get the clashes for the current teacher, if any after removing it from the local list
+      var clashesToUpdate = popAllClashesForTeacherFromLocalList($scope.teacherCode);
+      $http.post('/timetables/changeTeacherAssignment', {
+        teacherReference : newTeacherID,
+        teacherCode : newTeacherCode,
+        subjectCode : subjectCode,
+        curriculumReference : $scope.timetableForCurriculum.timetable.curriculumReference,
+        clashesToUpdate : clashesToUpdate
+      })
+        .success(function (data, status, headers, config) {
+          console.log('Teacher Changed successfully');
+          //update courses and timetable by picking afresh from the server
+          $scope.timetableForCurriculum = null;
+          $scope.findOne();
+          //Collapse the stats viewer
+          $scope.stats = null;
+        })
+        .error(function (data, status, headers, config) {
+
+        });
+    }
+
+    $scope.displayTeacherAssignmentModal = function(course, size){
       $scope.subjectCode = course.code;
       $scope.teacherCode = course._teacher.code;
       $scope.teachers = Teachers.query();
       $scope.selectedTeacher = null;
-    };
+      var modalInstance = $modal.open({
+        animation: true,
+        templateUrl: 'modal.client.view.html',
+        controller: 'ModalInstanceCtrl',
+        size: size,
+        resolve: {
+          teachers: function () {
+            return $scope.teachers;
+          },
+          subjectCode: function () {
+            return $scope.subjectCode;
+          }
+        }
+      });
 
+      modalInstance.result.then(function (result) {
+        console.log('newTeacher flag is %j', result.isNew);
+        $scope.selectedTeacher = result.selectedTeacher;
+        if (result.isNew !== true){
+          //Assignment using an existing teacher
+          console.info('The user has selected %j', $scope.selectedTeacher);
+          if ($scope.selectedTeacher.code !== $scope.teacherCode){
+            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher._id, $scope.selectedTeacher.code);
+          }
+        }else{
+          //New teacher being created
+          console.info('The user wants to create a new teacher with code %j', $scope.selectedTeacher);
+          createNewTeacherAndUpdateSubject($scope.subjectCode, $scope.selectedTeacher);
+        }
+
+      }, function () {
+        console.info('Modal dismissed at: ' + new Date());
+      });
+
+    };
   }
 ]);
 
