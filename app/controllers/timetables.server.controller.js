@@ -113,6 +113,8 @@ exports.timetableByTeacherID = function (req, res) {
                 allocation.days.periods.subject;
               timetableForTeacher[parseInt(allocation.days.dayIndex)].periods[allocation.days.periods.index].curriculum =
                 allocation.curriculumCode;
+              timetableForTeacher[parseInt(allocation.days.dayIndex)].periods[allocation.days.periods.index].clash =
+                              allocation.days.periods.clash;
               if (allocationCount === teacherAllocation.length) {
                 res.json({teacherCode : teacher.code, teachersTimetable : timetableForTeacher});
               }
