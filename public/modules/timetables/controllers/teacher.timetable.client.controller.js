@@ -5,11 +5,15 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
   function ($http, $scope, $stateParams, $location, Authentication, Timetables, Teachers) {
     $scope.authentication = Authentication;
 
-    $scope.formatClassSubject = function (curriculum, subject) {
-      if (curriculum && subject) {
-        return curriculum + ', ' + subject;
+    $scope.formatClassSubject = function (period) {
+      var allocationStr = '';
+      if (period.curriculum && period.subject) {
+        allocationStr = period.curriculum + ', ' + period.subject;
       }
-      return '';
+      if (period.clash){
+        allocationStr = allocationStr + ' [' + period.clashInCurriculum + ', ' + period.clashInSubject + ']';
+      }
+      return allocationStr;
     };
 
     $scope.findOne = function () {

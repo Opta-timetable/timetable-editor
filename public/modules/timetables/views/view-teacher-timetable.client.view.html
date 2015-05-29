@@ -24,7 +24,7 @@
     <tr data-ng-repeat="day in timetableForTeacher.teachersTimetable">
       <td>{{day.dayOfWeek}}</td>
       <td data-ng-repeat="period in day.periods" ng-class="{'bg-danger': period.clash}">
-        {{ formatClassSubject(period.curriculum, period.subject) }}
+        {{ formatClassSubject(period) }}
       </td>
     </tr>
   </table>
