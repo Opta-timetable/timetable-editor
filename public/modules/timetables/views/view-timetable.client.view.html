@@ -61,7 +61,7 @@
     <div class="col-md-4" data-ng-if="clashes.length">
       <h5> Clashes </h5>
       <div class="list-group">
-        <a data-ng-repeat="clash in clashes" data-ng-href="{{getClashLink(clash.days.dayIndex, clash.days.periods.index)}}"
+        <a data-ng-repeat="clash in clashes" data-ng-href="{{getClashLink(clash.days.dayIndex, clash.days.periods.index, clash.curriculumReference)}}"
            class="list-group-item" ng-class="{'list-group-item-danger': clash.highlight}"
            data-ng-mouseenter="highlight(true, clash.days.dayIndex, clash.days.periods.index)"
            data-ng-mouseleave="unHighlight(true, clash.days.dayIndex, clash.days.periods.index)">

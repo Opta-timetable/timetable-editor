@@ -11,7 +11,9 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
         allocationStr = period.curriculum + ', ' + period.subject;
       }
       if (period.clash){
-        allocationStr = allocationStr + ' [' + period.clashInCurriculum + ', ' + period.clashInSubject + ']';
+        for (var i = 0; i < period.clashes.length; i++){
+          allocationStr = allocationStr + ', [' + period.clashes[i].clashInCurriculum + ', ' + period.clashes[i].clashInSubject + ']';
+        }
       }
       return allocationStr;
     };

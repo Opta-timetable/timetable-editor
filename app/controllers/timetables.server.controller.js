@@ -107,6 +107,9 @@ exports.timetableByTeacherID = function (req, res) {
             var allocationCount = 0;
             teacherAllocation.forEach(function (allocation) {
               var timetableCell = timetableForTeacher[parseInt(allocation.days.dayIndex)].periods[allocation.days.periods.index];
+              if (timetableCell.clashes === undefined) {
+                timetableCell.clashes = [];
+              }
               allocationCount++;
               if (timetableCell.subject === ''){
                 timetableCell.subject = allocation.days.periods.subject;
@@ -114,10 +117,8 @@ exports.timetableByTeacherID = function (req, res) {
                 timetableCell.clash = allocation.days.periods.clash;
               }else{
                 //This would happen only in case of a clash
-                timetableCell.clashInCurriculum = allocation.curriculumCode;
-                timetableCell.clashInSubject = allocation.days.periods.subject;
+                timetableCell.clashes.push({clashInCurriculum : allocation.curriculumCode, clashInSubject : allocation.days.periods.subject});
               }
-              //timetableForTeacher[parseInt(allocation.days.dayIndex)].periods[allocation.days.periods.index] = timetableCell;
               if (allocationCount === teacherAllocation.length) {
                 res.json({teacherCode : teacher.code, teachersTimetable : timetableForTeacher});
               }
