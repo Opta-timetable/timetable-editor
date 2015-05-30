@@ -12,8 +12,10 @@ var mongoose = require('mongoose'),
  * Create a Teacher
  */
 exports.create = function (req, res) {
-  var teacher = new Teacher(req.body);
+  var teacher = new Teacher();
   teacher.user = req.user;
+  teacher.code = req.body.code;
+  console.log('variable teacher is %j', teacher);
 
   teacher.save(function (err) {
     if (err) {

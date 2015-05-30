@@ -176,33 +176,35 @@ function SetClashInOtherClassTimetable(clashes) {
   }
 }
 
-function UnsetClashInOtherClassTimetable(clash) {
+function UnsetClashesInOtherClassTimetable(clashes) {
 //new clashes updated. Clear old clash if any
-  if (JSON.stringify(clash) !== '{}') {
-    console.log('Entered Clash to clear:  %j', clash);
-    Timetable.findOne({curriculumReference : clash.curriculumReference}).exec()
-      .then(function (timetable) {
-        console.log('timetableToClearClash: %j', timetable);
-        console.log('Found clash to clear');
-        timetable.days[parseInt(clash.days.dayIndex)].
-          periods[clash.days.periods.index].clash = false;
-        Timetable.update({curriculumReference : clash.curriculumReference},
-          {$set : {days : timetable.days}}).exec().then(null, function (err) {
-            if (err instanceof Error) {
-              console.log('Error while clearing clash');
-              throw err;
-            }
-          });
-      })
-      .then(function () {
-        console.log('clash cleared successfully');
-      });
+  if (clashes.length > 0) {
+    clashes.forEach(function (clash) {
+      console.log('Entered Clash to clear:  %j', clash);
+      Timetable.findOne({curriculumReference : clash.curriculumReference}).exec()
+        .then(function (timetable) {
+          console.log('timetableToClearClash: %j', timetable);
+          console.log('Found clash to clear');
+          timetable.days[parseInt(clash.days.dayIndex)].
+            periods[clash.days.periods.index].clash = false;
+          Timetable.update({curriculumReference : clash.curriculumReference},
+            {$set : {days : timetable.days}}).exec().then(null, function (err) {
+              if (err instanceof Error) {
+                console.log('Error while clearing clash');
+                throw err;
+              }
+            });
+        })
+        .then(function () {
+          console.log('clash cleared successfully');
+        });
+    });
   } else {
     console.log('No clashes to clear');
   }
 }
 
-function modifyAPeriodAllocation(curriculum, dayToMatch, periodIndex, subject, teacher, clashToUpdate, onComplete){
+function modifyAPeriodAllocation(curriculum, dayToMatch, periodIndex, subject, teacher, clashesToUpdate, onComplete){
   var newTimetableDays, currentPeriod, clashesToSend;
     //Extract the timetable document to update
     Timetable.findOne({curriculumReference : curriculum}).exec()
@@ -240,7 +242,7 @@ function modifyAPeriodAllocation(curriculum, dayToMatch, periodIndex, subject, t
       .then(function (o) {
         console.log('timetable for current class updated');
         console.log('Clearing existing clashes if any');
-        return new UnsetClashInOtherClassTimetable(clashToUpdate);
+        return new UnsetClashesInOtherClassTimetable(clashesToUpdate);
       })
       .then(null, function(err){
         if (err instanceof Error){
@@ -261,14 +263,14 @@ exports.modifyPeriodAllocation = function (req, res) {
     subject = req.body.allocatedCourse.code,
     teacher = req.body.allocatedCourse._teacher.code,
 
-  //Clash because of the current allocation aka 'Existing Clash'
-    clashToUpdate = req.body.clashToUpdate;
+  //Clashes because of the current allocation aka 'Existing Clashes'
+    clashesToUpdate = req.body.clashesToUpdate;
 
   console.log('Modifying allocation for Class %j on day %j, periodIndex %j with subject %j and teacher %j ',
     curriculum, dayToMatch, periodIndex, subject, teacher);
-  console.log('Clash due to existing allocation ' + JSON.stringify(clashToUpdate));
+  console.log('Clashes due to existing allocation ' + JSON.stringify(clashesToUpdate));
 
-  new modifyAPeriodAllocation(curriculum, dayToMatch, periodIndex, subject, teacher, clashToUpdate, function(err, clashesToSend){
+  new modifyAPeriodAllocation(curriculum, dayToMatch, periodIndex, subject, teacher, clashesToUpdate, function(err, clashesToSend){
     if (err instanceof Error) {
       console.log('Error during update' + errorHandler.getErrorMessage(err));
       return res.status(400).send({
@@ -335,17 +337,17 @@ exports.collectStats = function (req, res) {
     });
 };
 
-function ExtractClashFromList(period, clashesToUpdate){
+function ExtractClashesFromList(period, clashesToUpdate){
   return clashesToUpdate.filter(function (clash) {
     return clash.days.dayIndex === period.dayIndex && clash.days.periods.index === period.periodIndex;
-  })[0];
+  });
 }
 
 function ModifyTeacherInAllPeriodsForSubject(curriculum, periods, subjectCode, teacherCode, clashesToUpdate, onComplete){
 
   var newClashesDueToTeacherAssignment = [];
   var period = periods.pop();
-  var clashToUpdate = new ExtractClashFromList(period, clashesToUpdate);
+  var clashToUpdate = new ExtractClashesFromList(period, clashesToUpdate);
   console.log('Existing clash for period %j : %j', period, clashToUpdate);
 
   new modifyAPeriodAllocation(curriculum, period.dayIndex, period.periodIndex, subjectCode, teacherCode, clashToUpdate, function (err, newClashes){

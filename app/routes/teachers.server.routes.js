@@ -11,7 +11,8 @@ module.exports = function (app) {
 
   //HACK Alert!!!
   app.route('/timetables/teachers')
-    .get(users.requiresLogin, teachers.list);
+    .get(users.requiresLogin, teachers.list)
+    .post(users.requiresLogin, teachers.create);
 
   app.route('/teachers/:teacherId')
     .get(users.requiresLogin, teachers.read)

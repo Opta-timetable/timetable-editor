@@ -57,6 +57,7 @@
               <!-- NOTE: Conditional Links: http://stackoverflow.com/a/16579695/218882 -->
               <div data-ng-switch="period.clash">
                 <a data-ng-href="{{getClashLink(day.dayIndex, period.index)}}" ng-switch-when="true">{{period.subject}}</a>
+
                 <span ng-switch-when="false">{{period.subject}}</span>
               </div>
               <span ng-show="period.subject" ng-click="removeAllocation(day.dayIndex, period.index)"
@@ -73,7 +74,7 @@
           <div class="col-sm-5" data-ng-if="clashes.length">
             <h4> Clashes </h4>
             <div class="list-group">
-              <a data-ng-repeat="clash in clashes" data-ng-href="{{getClashLink(clash.days.dayIndex, clash.days.periods.index)}}"
+              <a data-ng-repeat="clash in clashes" data-ng-href="{{getClashLink(clash.days.dayIndex, clash.days.periods.index, clash.curriculumReference)}}"
                  class="list-group-item" ng-class="{'list-group-item-danger': clash.highlight}"
                  data-ng-mouseenter="highlight(true, clash.days.dayIndex, clash.days.periods.index)"
                  data-ng-mouseleave="unHighlight(true, clash.days.dayIndex, clash.days.periods.index)">
