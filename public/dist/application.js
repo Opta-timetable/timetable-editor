@@ -599,11 +599,17 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
   function ($http, $scope, $stateParams, $location, Authentication, Timetables, Teachers) {
     $scope.authentication = Authentication;
 
-    $scope.formatClassSubject = function (curriculum, subject) {
-      if (curriculum && subject) {
-        return curriculum + ', ' + subject;
+    $scope.formatClassSubject = function (period) {
+      var allocationStr = '';
+      if (period.curriculum && period.subject) {
+        allocationStr = period.curriculum + ', ' + period.subject;
       }
-      return '';
+      if (period.clash){
+        for (var i = 0; i < period.clashes.length; i++){
+          allocationStr = allocationStr + ', [' + period.clashes[i].clashInCurriculum + ', ' + period.clashes[i].clashInSubject + ']';
+        }
+      }
+      return allocationStr;
     };
 
     $scope.findOne = function () {
@@ -635,13 +641,17 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       return $scope.timetableForCurriculum.timetable.days[dayIndexAsInt].periods[periodIndexAsInt];
     }
 
-    function extractClash(dayIndex, periodIndex) {
-      // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-      // Filter returns an array of matches -
-      return $scope.clashes.filter(function (clash) {
-        return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex);
-      })[0];
-    }
+    function extractClashes(dayIndex, periodIndex, curriculumReference) {
+          // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+          // Filter returns an array of matches -
+          return $scope.clashes.filter(function (clash) {
+            if (curriculumReference !== undefined){
+              return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex) && clash.curriculumReference === curriculumReference;
+            }else{
+              return clash.days.dayIndex === dayIndex && clash.days.periods.index === parseInt(periodIndex);
+            }
+          });
+        }
 
     function extractCourse(dayIndex, periodIndex) {
       var period = extractPeriod(dayIndex, periodIndex);
@@ -651,29 +661,31 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function popClashFromLocalList(dayIndex, periodIndex) {
-      var clashToUpdate = {};
+      var clashesToUpdate = [];
       var currentPeriod = extractPeriod(dayIndex, periodIndex);
 
       if (currentPeriod.clash) {
 
-        clashToUpdate = extractClash(dayIndex, periodIndex);
-
+        clashesToUpdate = extractClashes(dayIndex, periodIndex);
         // remove this clash from the local array (in the controller).
         // It will get updated with the new one, if any
-        $scope.clashes.splice($scope.clashes.indexOf(clashToUpdate), 1);
+        clashesToUpdate.forEach(function(clashToUpdate){
+          $scope.clashes.splice($scope.clashes.indexOf(clashToUpdate), 1);
+        });
+
       }
 
-      console.log('clash to update is ' + JSON.stringify(clashToUpdate));
+      console.log('clash to update is ' + JSON.stringify(clashesToUpdate));
 
-      return clashToUpdate;
+      return clashesToUpdate;
     }
 
-    function updateAllocation(dayIndex, periodIndex, allocatedCourse, currentClash) {
+    function updateAllocation(dayIndex, periodIndex, allocatedCourse, currentClashes) {
       $http.post('/timetables/modifyPeriodAllocation', {
         currentDay      : dayIndex,
         currentPeriod   : extractPeriod(dayIndex, periodIndex),
         allocatedCourse : allocatedCourse,
-        clashToUpdate   : currentClash
+        clashesToUpdate   : currentClashes
       })
         .success(function (data, status, headers, config) {
           var updatedPeriod = extractPeriod(dayIndex, periodIndex);
@@ -706,10 +718,14 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       };
 
       // get the clash for the current period, if any after removing it from the local list
-      var clashToUpdate = popClashFromLocalList(dayIndex, periodIndex);
+      var clashesToUpdate = popClashFromLocalList(dayIndex, periodIndex);
 
+      // If there are 2 or more existing clashes, don't update clashes in the db because the clashes would still exist in the other classes
+      if (clashesToUpdate.length > 1){
+        clashesToUpdate = [];
+      }
       // call the API to update the period allocation setting up callbacks
-      updateAllocation(dayIndex, periodIndex, allocatedCourse, clashToUpdate);
+      updateAllocation(dayIndex, periodIndex, allocatedCourse, clashesToUpdate);
 
       // Update the UI to reflect the after state of the allocation
       var period = extractPeriod(dayIndex, periodIndex);
@@ -888,18 +904,23 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     };
 
-    $scope.getClashLink = function (dayIndex, periodIndex) {
-      var clashInScope = extractClash(dayIndex, periodIndex);
-      if (clashInScope) {
-        return '#!/timetables/' + clashInScope.curriculumReference;
+    $scope.getClashLink = function (dayIndex, periodIndex, curriculumReference) {
+      var clashesInScope;
+      if (curriculumReference !== undefined){
+        clashesInScope = extractClashes(dayIndex, periodIndex, curriculumReference);
+      }else{
+        clashesInScope = extractClashes(dayIndex, periodIndex);
+      }
+      if (clashesInScope.length > 0) { //TODO getClash link in the view doesn't have a provision to display multiple links. A popover would look good.
+        return '#!/timetables/' + clashesInScope[0].curriculumReference;
       }
       return undefined;
     };
 
     $scope.hasHighlight = function (clash, dayIndex, periodIndex) {
       if (clash) {
-        var clashInScope = extractClash(dayIndex, periodIndex);
-        return clashInScope ? clashInScope.highlight : false;
+        var clashInScope = extractClashes(dayIndex, periodIndex);
+        return clashInScope.length > 0 ? clashInScope.highlight : false;
       }
     };
 
@@ -908,9 +929,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       if (course) {
         course.highlight = true;
         if (clash) {
-          var clashInScope = extractClash(dayIndex, periodIndex);
-          if (clashInScope) {
-            clashInScope.highlight = true;
+          var clashesInScope = extractClashes(dayIndex, periodIndex);
+          if (clashesInScope.length > 0) {
+            clashesInScope.forEach(function(clashInScope){
+              clashInScope.highlight = true;
+            });
             course.clashHighlight = true;
           }
         }
@@ -922,9 +945,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       if (course) {
         course.highlight = false;
         if (clash) {
-          var clashInScope = extractClash(dayIndex, periodIndex);
-          if (clashInScope) {
-            clashInScope.highlight = false;
+          var clashesInScope = extractClashes(dayIndex, periodIndex);
+          if (clashesInScope.length > 0) {
+            clashesInScope.forEach(function(clashInScope){
+              clashInScope.highlight = false;
+            });
             course.clashHighlight = false;
           }
         }
@@ -1009,6 +1034,15 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     function createNewTeacherAndUpdateSubject(subjectCode, newTeacherCode){
       console.log('Inside CreateNewTeacherAndUpdateSubject');
       //TO DO submit 2 posts to the backend
+      var teacher = new Teachers({
+        teacherID : ($scope.teachers.length+1).toString(),
+        code      : newTeacherCode
+      });
+      teacher.$save(function (response) {
+        console.log('Created teacher %j', response);
+      }, function (errorResponse) {
+        $scope.error = errorResponse.data.message;
+      });
     }
 
     function updateTeacherForSubject(subjectCode, newTeacherID, newTeacherCode){
@@ -1065,8 +1099,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           }
         }else{
           //New teacher being created
-          console.info('The user wants to create a new teacher with code %j', $scope.selectedTeacher);
-          createNewTeacherAndUpdateSubject($scope.subjectCode, $scope.selectedTeacher);
+          console.info('The user wants to create a new teacher with code %j', $scope.selectedTeacher.code);
+          createNewTeacherAndUpdateSubject($scope.subjectCode, $scope.selectedTeacher.code);
         }
 
       }, function () {
