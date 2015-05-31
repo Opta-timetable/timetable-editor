@@ -91,7 +91,7 @@
             <div data-ng-if="stats">
               <h4>
                 <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-                  {{stats.header}}
+                {{stats.header}}
               </h4>
               <table class="table">
                 <tr data-ng-repeat="stat in stats.data"><td>{{stat.name}}</td><td>{{stat.value}}</td></tr>
@@ -131,11 +131,11 @@
               </li>
             </ul>
           </div>
-        <div class="panel-footer">
-          <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-            <b>Drag</b> a subject to the desired cell to allocate</p>
-          <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-            Click on a subject to <b>View</b> Stats or <b>Assign</b> a different teacher</p>
+          <div class="panel-footer">
+            <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+              <b>Drag</b> a subject to the desired cell to allocate</p>
+            <p><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+              Click on a subject to <b>View</b> Stats or <b>Assign</b> a different teacher</p>
           </div>
         </div>
       </div>
@@ -156,25 +156,28 @@
       <h3 class="modal-title">Assign a different Teacher for {{subjectCode}}</h3>
     </div>
     <div class="modal-body">
+
       <div class="input-group">
         <div class="input-group-btn" dropdown is-open="status.isopen">
           <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle ng-disabled="disabled" aria-expanded="false">
             Select From List <span class="caret"></span></button>
           <ul class="dropdown-menu" role="menu">
-            <li><a data-ng-click="createNewTeacher()">Add a new Teacher</a></li></li>
+            <li><a data-ng-click="createNewTeacher()">Add a new Teacher</a></li>
             <li data-ng-repeat="teacher in teachers"><a data-ng-click="selectTeacher(teacher)">{{teacher.code}}</a></li>
           </ul>
-        </div><!-- /btn-group -->
+        </div>
+
         <input type="text" placeholder="Or Search..." typeahead-editable="true"
                typeahead="teacher as teacher.code for teacher in teachers | filter:$viewValue | limitTo:8"
                data-ng-model="selectedTeacher.code" class="form-control" aria-label="..."
-                              data-ng-if="newTeacher===false">
+               data-ng-if="!newTeacher">
+        <input type="text" placeholder="Enter Unique Code for new Teacher" data-ng-model="selectedTeacher.code" class="form-control" aria-label="..."
+               data-ng-if="newTeacher">
+      </div>
 
-
-        <input type="text" placeholder="Enter Unique Code for new Teacher" data-ng-model="selectedTeacher.code" class="form-control" aria-label="..." data-ng-if="newTeacher===true">
-          </div><!-- /input-group -->
-        <p>The user has added {{selectedTeacher.code}}</p>
+      <p>The user has added {{selectedTeacher.code}}</p>
     </div>
+
     <div class="modal-footer">
       <button class="btn btn-primary" ng-click="ok()">Submit</button>
       <button class="btn btn-warning" ng-click="cancel()">Cancel</button>

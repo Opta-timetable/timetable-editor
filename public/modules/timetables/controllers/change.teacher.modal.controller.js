@@ -1,4 +1,3 @@
-/*jshint unused: false */
 'use strict';
 angular.module('timetables').controller('ModalInstanceCtrl', function ($scope, $modalInstance, teachers, subjectCode) {
 
@@ -22,7 +21,7 @@ angular.module('timetables').controller('ModalInstanceCtrl', function ($scope, $
 
   $scope.createNewTeacher = function () {
     $scope.newTeacher = true;
-
+    $scope.selectedTeacher = {};
   };
 
 });
