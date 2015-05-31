@@ -5,56 +5,79 @@
   <div ncy-breadcrumb></div>
   <div class="row">
     <div class="col-md-4">
-      <h3>Select a class (Curriculum)</h3>
-      <div class="list-group">
-        <a data-ng-repeat="curriculum in curriculums" data-ng-href="#!/timetables/{{curriculum.id}}" class="list-group-item">
-          <h4 class="list-group-item-heading" data-ng-bind="curriculum.code"></h4>
-          <p class="list-group-item-text">
-            <span>ID: </span>
-            <span data-ng-bind="curriculum.id"></span>
-          </p>
-          <p class="list-group-item-text">
-            <span>Curriculum ID: </span>
-            <span data-ng-bind="curriculum.curriculumID"></span>
-          </p>
-          <p class="list-group-item-text">
-            <span>Curriculum: </span>
-            <span data-ng-bind="curriculum.code"></span>
-          </p>
-        </a>
-      </div>
-      <div class="alert alert-warning text-center" data-ng-if="curriculums.$resolved && !curriculums.length">
-        No curricula yet, initialise using the command line?
-      </div>
-    </div>
-    <div class="col-md-4">
-      <h3>Select a Teacher</h3>
-      <div class="list-group">
-        <a data-ng-repeat="teacher in teachers" data-ng-href="#!/timetables/teachers/{{teacher._id}}" class="list-group-item">
-          <h4 class="list-group-item-heading" data-ng-bind="teacher.code"></h4>
-          <p class="list-group-item-text">
-            <span>ID: </span>
-            <span data-ng-bind="teacher._id"></span>
-          </p>
-          <p class="list-group-item-text">
-            <span>Teacher ID: </span>
-            <span data-ng-bind="teacher.teacherID"></span>
-          </p>
-          <p class="list-group-item-text">
-            <span>Code: </span>
-            <span data-ng-bind="teacher.code"></span>
-          </p>
-        </a>
-      </div>
-    </div>
-    <div class="col-md-4">
-          <h3>Select a Day</h3>
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <h3 class="panel-title">View and Edit Class Timetables</h3>
+        </div>
+        <div class="panel-body">
+          <p class="lead">Select a class to continue</p>
           <div class="list-group">
-            <a data-ng-repeat="day in workingDays" data-ng-href="#!/timetables/days/{{day.dayIndex}}" class="list-group-item">
-              <h4 class="list-group-item-heading" data-ng-bind="day.dayName"></h4>
+            <a data-ng-repeat="curriculum in curriculums" data-ng-href="#!/timetables/{{curriculum.id}}" class="list-group-item">
+              <h4 class="list-group-item-heading" data-ng-bind="curriculum.code"></h4>
+              <p class="list-group-item-text">
+                <span>ID: </span>
+                <span data-ng-bind="curriculum.id"></span>
+              </p>
+              <p class="list-group-item-text">
+                <span>Curriculum ID: </span>
+                <span data-ng-bind="curriculum.curriculumID"></span>
+              </p>
+              <p class="list-group-item-text">
+                <span>Curriculum: </span>
+                <span data-ng-bind="curriculum.code"></span>
+              </p>
             </a>
           </div>
         </div>
+        <div class="alert alert-warning text-center" data-ng-if="curriculums.$resolved && !curriculums.length">
+          No curricula yet, initialise using the command line?
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title">View Teacher Timetables</h3>
+        </div>
+        <div class="panel-body">
+          <p class="lead">Select a Teacher</p>
+          <div class="list-group">
+            <a data-ng-repeat="teacher in teachers" data-ng-href="#!/timetables/teachers/{{teacher._id}}" class="list-group-item">
+              <h4 class="list-group-item-heading" data-ng-bind="teacher.code"></h4>
+              <p class="list-group-item-text">
+                <span>ID: </span>
+                <span data-ng-bind="teacher._id"></span>
+              </p>
+              <p class="list-group-item-text">
+                <span>Teacher ID: </span>
+                <span data-ng-bind="teacher.teacherID"></span>
+              </p>
+              <p class="list-group-item-text">
+                <span>Code: </span>
+                <span data-ng-bind="teacher.code"></span>
+              </p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">View Day-wise Timetables</h3>
+          </div>
+          <div class="panel-body">
+            <p class="lead">Select a Day</p>
+            <div class="list-group">
+              <a data-ng-repeat="day in workingDays" data-ng-href="#!/timetables/days/{{day.dayIndex}}" class="list-group-item">
+                <h4 class="list-group-item-heading" data-ng-bind="day.dayName"></h4>
+              </a>
+            </div>
+          </div>
+      </div>
+
+    </div>
   </div>
 
 </section>
