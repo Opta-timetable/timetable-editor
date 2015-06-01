@@ -174,8 +174,12 @@
         <input type="text" placeholder="Enter Unique Code for new Teacher" data-ng-model="selectedTeacher.code" class="form-control" aria-label="..."
                data-ng-if="newTeacher">
       </div>
-
-      <p>The user has added {{selectedTeacher.code}}</p>
+      <!--<br>-->
+      <!--&lt;!&ndash;<div class="alert alert-danger" role="alert"> {{selectedTeacher.code}} already in system. Enter a unique code for the teacher.</div>&ndash;&gt;-->
+      <!--<div class="alert alert-warning alert-dismissible" role="alert">-->
+        <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+        <!--<strong>Warning!</strong> {{selectedTeacher.code}} already in system. Enter a unique code for the teacher.-->
+      <!--</div>-->
     </div>
 
     <div class="modal-footer">

@@ -12,7 +12,7 @@ var CourseSchema = new Schema({
   minWorkingDaySize   : String,
   curriculumReference : String,
   studentSize         : String,
-  _teacher            : {type : Number, ref : 'Teacher'}
+  _teacher            : {type : String, ref : 'Teacher'}
 });
 
 mongoose.model('Course', CourseSchema);

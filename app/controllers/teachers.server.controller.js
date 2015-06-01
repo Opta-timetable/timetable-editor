@@ -12,13 +12,13 @@ var mongoose = require('mongoose'),
  * Create a Teacher
  */
 exports.create = function (req, res) {
-  var teacher = new Teacher();
-  teacher.user = req.user;
-  teacher.code = req.body.code;
+  var teacher = new Teacher(req.body);
+  teacher._id = mongoose.Types.ObjectId();
   console.log('variable teacher is %j', teacher);
 
   teacher.save(function (err) {
     if (err) {
+      console.log('Hit an error while saving %j', err );
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)
       });
