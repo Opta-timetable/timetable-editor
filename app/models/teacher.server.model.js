@@ -6,7 +6,10 @@ var mongoose = require('mongoose'),
 var TeacherSchema = new Schema({
   _id       : String,
   teacherID : String,
-  code      : String
+  code: {
+    type: String,
+    unique: true
+  }
 });
 
 mongoose.model('Teacher', TeacherSchema);
