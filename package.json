@@ -1,7 +1,7 @@
 {
   "name": "timetable",
   "description": "An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "author": "The Kollavarsham Team",
   "engines": {
     "node": "0.10.x",

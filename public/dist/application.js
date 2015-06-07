@@ -497,7 +497,6 @@ angular.module('timetables').config(['$stateProvider',
   }
 ]);
 
-/*jshint unused: false */
 'use strict';
 angular.module('timetables').controller('ModalInstanceCtrl', ["$scope", "$modalInstance", "teachers", "subjectCode", function ($scope, $modalInstance, teachers, subjectCode) {
 
@@ -521,7 +520,7 @@ angular.module('timetables').controller('ModalInstanceCtrl', ["$scope", "$modalI
 
   $scope.createNewTeacher = function () {
     $scope.newTeacher = true;
-
+    $scope.selectedTeacher = {};
   };
 
 }]);
@@ -1031,20 +1030,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       return clashesToUpdate;
     }
 
-    function createNewTeacherAndUpdateSubject(subjectCode, newTeacherCode){
-      console.log('Inside CreateNewTeacherAndUpdateSubject');
-      //TO DO submit 2 posts to the backend
-      var teacher = new Teachers({
-        teacherID : ($scope.teachers.length+1).toString(),
-        code      : newTeacherCode
-      });
-      teacher.$save(function (response) {
-        console.log('Created teacher %j', response);
-      }, function (errorResponse) {
-        $scope.error = errorResponse.data.message;
-      });
-    }
-
     function updateTeacherForSubject(subjectCode, newTeacherID, newTeacherCode){
       // get the clashes for the current teacher, if any after removing it from the local list
       var clashesToUpdate = popAllClashesForTeacherFromLocalList($scope.teacherCode);
@@ -1066,6 +1051,21 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         .error(function (data, status, headers, config) {
 
         });
+    }
+
+    function createNewTeacherAndUpdateSubject(subjectCode, newTeacherCode){
+      console.log('Inside CreateNewTeacherAndUpdateSubject');
+      var teacher = new Teachers({
+        teacherID : ($scope.teachers.length+1).toString(),
+        code      : newTeacherCode
+      });
+      teacher.$save(function (response) {
+        console.log('Created teacher %j', response);
+        //Call update function using the new teacher
+        updateTeacherForSubject(subjectCode, response._id, response.code);
+      }, function (errorResponse) {
+        $scope.error = errorResponse.data.message;
+      });
     }
 
     $scope.displayTeacherAssignmentModal = function(course, size){
