@@ -14,6 +14,14 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
         ncyBreadcrumb : {
           label : 'Home'
         }
+      }).
+      state('generateTimetable', {
+        url           : '/generate',
+        templateUrl   : 'modules/core/views/generate.client.view.html',
+        ncyBreadcrumb : {
+          label  : 'Generate Timetable',
+          parent : 'home'
+        }
       });
   }
 ]);

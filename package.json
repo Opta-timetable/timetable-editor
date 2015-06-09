@@ -1,7 +1,7 @@
 {
   "name": "timetable",
   "description": "An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "author": "The Kollavarsham Team",
   "engines": {
     "node": "0.10.x",
@@ -41,7 +41,9 @@
     "passport-linkedin": "~0.1.3",
     "passport-local": "~1.0.0",
     "passport-twitter": "~1.0.3",
-    "swig": "~1.4.2"
+    "swig": "~1.4.2",
+    "http": "*",
+    "querystring":"*"
   },
   "devDependencies": {
     "grunt-bump": "^0.3.1",
