@@ -43,7 +43,9 @@
           <thead>
             <tr>
               <th>Day</th>
-              <th data-ng-repeat="period in timetableForCurriculum.timetable.days[0].periods">{{ "Period-" + (period.index +1)}}</th>
+              <th data-ng-repeat="period in timetableForCurriculum.timetable.days[0].periods">
+              {{ "Period-" + (period.index +1)}}
+              </th>
             </tr>
           </thead>
           <tr data-ng-repeat="day in timetableForCurriculum.timetable.days">
@@ -53,6 +55,7 @@
                 data-ng-mouseleave="unHighlight(period.clash, day.dayIndex, period.index)"
                 data-ng-drop-success="onDropComplete($data, $event, day.dayIndex, period.index, false)"
                 ng-class="{'bg-warning text-warning' : period.clash, 'bg-danger text-danger' : hasHighlight(period.clash, day.dayIndex, period.index), 'period-highlight' : period.highlightPeriod}"
+                ng-style="{'background-color' : getBackgroundColorForSubject(period.subject)}"
                 ng-init="findClashes(period.clash, day.dayIndex, period.index)">
               <!-- NOTE: Conditional Links: http://stackoverflow.com/a/16579695/218882 -->
               <div data-ng-switch="period.clash">
@@ -126,6 +129,7 @@
                   data-ng-click="collectStats(course)"
                   data-ng-mouseenter="highlightPeriods(course.code, course._teacher.code)"
                   data-ng-mouseleave="unHighlightPeriods(course.code, course._teacher.code)"
+                  ng-style="{'background-color' : getBackgroundColorForSubject(course.code)}"
                   class="list-group-item">
                 {{ course.code }} - {{ course._teacher.code }}
               </li>

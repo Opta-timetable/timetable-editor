@@ -18,6 +18,23 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       return $scope.timetableForCurriculum.timetable.days[dayIndexAsInt].periods[periodIndexAsInt];
     }
 
+    function assignBackgroundColorForSubjects(){
+      //Assume a class won't have more than 16 colors
+      //We might need to add a bg-color property to the cell in the timetable itself so that the same color remains across refreshes as well
+      var colors= ['plum', 'orchid', 'coral', 'teal', 'bisque', 'peru',
+      'thistle', 'olive', 'pink', 'sienna', 'ivory', 'linen', 'orange', 'gold', 'purple', 'crimson'];
+      $scope.backgroundColorForSubjects = {};
+      var index = 0;
+      $scope.timetableForCurriculum.courses.forEach(function (course){
+        $scope.backgroundColorForSubjects[course.code] = colors[index];
+        index++;
+      });
+    }
+
+    $scope.getBackgroundColorForSubject = function (subject){
+      return $scope.backgroundColorForSubjects[subject];
+    };
+
     function extractClashes(dayIndex, periodIndex, curriculumReference) {
           // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
           // Filter returns an array of matches -
@@ -159,6 +176,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           var column = {start : i, end : Math.min(i + SUBJECT_ROWS_PER_COLUMN, $scope.timetableForCurriculum.courses.length)};
           $scope.subjectColumns.push(column);
         }
+        //Set the bg-colors
+        assignBackgroundColorForSubjects();
       }
     });
 

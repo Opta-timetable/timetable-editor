@@ -44,6 +44,7 @@
               data-ng-mouseleave="unHighlight(period.clash, day.dayIndex, period.index)"
               data-ng-drop-success="onDropComplete($data, $event, day.dayIndex, period.index, false)"
               ng-class="{'bg-warning text-warning' : period.clash, 'bg-danger text-danger' : hasHighlight(period.clash, day.dayIndex, period.index)}"
+              ng-style="{'background-color' : getBackgroundColorForSubject(period.subject)}"
               ng-init="findClashes(period.clash, day.dayIndex, period.index)">
             <!-- Conditional Links: http://stackoverflow.com/a/16579695/218882 -->
             <div data-ng-switch="period.clash">
