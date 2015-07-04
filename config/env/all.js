@@ -28,7 +28,8 @@ module.exports = {
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
         'public/lib/ngDraggable/ngDraggable.js',
         'public/lib/ng-table-to-csv/dist/ng-table-to-csv.js',
-        'public/lib/angular-breadcrumb/release/angular-breadcrumb.js'
+        'public/lib/angular-breadcrumb/release/angular-breadcrumb.js',
+        'public/lib/ng-file-upload/ng-file-upload-all.js'
       ]
     },
     css   : [
