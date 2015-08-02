@@ -47,7 +47,8 @@
     "connect-multiparty":"*",
     "xml2js":"*",
     "xml-writer": "*",
-    "csv-parser": "*"
+    "csv-parser": "*",
+    "request-promise": "~0.4.3"
   },
   "devDependencies": {
     "grunt-bump": "^0.3.1",

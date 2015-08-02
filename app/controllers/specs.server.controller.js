@@ -5,6 +5,8 @@
  */
 var mongoose = require('mongoose'),
 	errorHandler = require('./errors.server.controller'),
+  fs = require('fs'),
+  j2eeClient = require('./OptaplannerJ2EEClientUtils'),
 	Spec = mongoose.model('Spec'),
 	_ = require('lodash');
 
@@ -115,7 +117,6 @@ exports.hasAuthorization = function(req, res, next) {
 var createHandler = function (ipFile, opFile) {
   //TODO Validations for CSV file
   var csv = require('csv-parser'),
-    fs = require('fs'),
     unsolvedXML = require('./timetableXMLUtils');
   var theReadStream = fs.createReadStream(ipFile)
     .pipe(csv());
@@ -147,5 +148,65 @@ exports.uploadSpecFile = function(req, res){
     fileOriginalName: fileOriginalName,
     outputFileName: outputFileName,
     uploadState: 'Data ready for timetable generation'});
+};
+
+/*
+ * Start Solving
+ */
+exports.solve = function(req, res){
+  console.log('Req is ' + req.body.specID);
+  var specId = req.body.specID;
+  //Locate the upload XML file
+  //{
+  //	"user" : ObjectId("555ada432714f50a8759e19b"),
+  //	"origFile" : "vidyo_unsolved_spec_raw.csv",
+  //	"unsolvedXML" : "uploads/52483-ievh8z.xml",
+  //	"state" : "Data ready for timetable generation",
+  //	"_id" : ObjectId("5597e986e93a3203cdad854c"),
+  //	"specFile" : "uploads/52483-ievh8z.csv",
+  //	"created" : ISODate("2015-07-04T14:11:18.425Z"),
+  //	"name" : "Vidyodaya-2014-1",
+  //	"__v" : 0
+  //}
+  //var cookiesFromServer;
+  Spec.findById(specId).exec(function(err, spec) {
+ 		if (err) return err;
+ 		if (! spec) return (new Error('Failed to load Spec ' + specId));
+ 		console.log('Spec for this operation is %j', spec);
+ 	}).then(function(spec) {
+    //Got the record, take the spec file and upload it to Optaplanner J2EE Server
+    var unsolvedXMLFilePath = './' + spec.unsolvedXML;
+    var splitPath = unsolvedXMLFilePath.split('/');
+    var unsolvedXMLFileName = splitPath[splitPath.length - 1]; //name will be last
+    console.log('unsolvedXML file name is ' + unsolvedXMLFileName);
+    console.log('unsolvedXML file is in path %j', unsolvedXMLFilePath);
+
+    //Using callbacks for now
+    j2eeClient.uploadUnsolvedFile(unsolvedXMLFilePath, unsolvedXMLFileName, function(){
+      j2eeClient.initializeSolver(function(){
+        j2eeClient.startSolver(function(){
+          res.status(200).send();
+        });
+      });
+    });
+  });
+};
+
+/*
+ * Is a solution in progress
+ */
+exports.isSolving = function(req, res){
+  j2eeClient.isSolving(function(status){
+    res.status(200).send(status);
+  });
+};
+
+/*
+ * Terminate current solving
+ */
+exports.terminateSolving = function(req, res) {
+  j2eeClient.terminateSolving(function() {
+    res.status(200).send();
+  });
 };
 

@@ -15,7 +15,22 @@ module.exports = function(app) {
 		.delete(users.requiresLogin, specs.hasAuthorization, specs.delete);
 
   app.route('/specs/upload')
-    .post(specs.uploadSpecFile);
+      .post(specs.uploadSpecFile);
+
+  app.route('/specs/solve')
+    .post(specs.solve);
+
+  app.route('/specs/isSolving')
+    .get(specs.isSolving);
+
+  app.route('/specs/terminateSolving')
+    .post(specs.terminateSolving);
+
+  //app.route('/specs/progress')
+  //  .get(specs.getProgress);
+  //
+  //app.route('/specs/terminate')
+  //  .post(specs.terminateSolving);
 
 	// Finish by binding the Spec middleware
 	app.param('specId', specs.specByID);

@@ -1,8 +1,8 @@
 'use strict';
 
 // Specs controller
-angular.module('specs').controller('SpecsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Specs', 'Upload',
-	function($scope, $stateParams, $location, $http, Authentication, Specs, Upload) {
+angular.module('specs').controller('SpecsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', '$modal', 'Specs', 'Upload',
+	function($scope, $stateParams, $location, $http, Authentication, $modal, Specs, Upload) {
 		$scope.authentication = Authentication;
 
 		// Create new Spec
@@ -91,6 +91,34 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
             $scope.uploadState = data.uploadState;
           });
       }
+    };
+
+    $scope.generateTimetable = function(size){
+      //Inform server to start solving
+      $http.post('/specs/solve', {
+        specID : $stateParams.specId
+      })
+        .success(function (data, status, headers, config) {
+          console.log('Started solving');
+          var modalInstance = $modal.open({
+            animation: true,
+            templateUrl: 'generate.timetable.modal.client.view.html',
+            controller: 'GenerateModalInstanceCtrl',
+            size: size,
+            resolve: {
+              specId: function () {
+                return $stateParams.specId;
+              }
+            }
+          });
+          modalInstance.result.then(function (result) {
+          }, function () {
+            console.info('Modal dismissed at: ' + new Date());
+          });
+        })
+        .error(function (data, status, headers, config) {
+
+        });
     };
 	}
 ]);
