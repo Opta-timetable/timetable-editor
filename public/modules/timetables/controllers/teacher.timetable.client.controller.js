@@ -1,8 +1,8 @@
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TeacherTimetableController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $stateParams, $location, Authentication, Timetables, Teachers) {
+angular.module('timetables').controller('TeacherTimetableController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Timetables', 'TimetableForTeacher', 'SpecIdHolder',
+  function ($http, $scope, $stateParams, $location, Authentication, Timetables, TimetableForTeacher, SpecIdHolder) {
     $scope.authentication = Authentication;
 
     $scope.formatClassSubject = function (period) {
@@ -19,7 +19,9 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
     };
 
     $scope.findOne = function () {
-      $scope.timetableForTeacher = Teachers.get({
+      $scope.specId = SpecIdHolder.getSpecId();
+      $scope.timetableForTeacher = TimetableForTeacher.get({
+        specId : $scope.specId,
         _id : $stateParams._id
       });
 

@@ -161,3 +161,63 @@ exports.terminateSolving = function(callback){
         });
         req.end();
 };
+
+exports.currentSolutionScore = function(callback){
+  console.log('Will use cookies from last call: %j', cookiesFromServer);
+    var options = {
+        hostname : 'localhost',
+        port     : 8080,
+        path     : '/123/timetable/currentSolutionScore',
+        method   : 'GET'
+          };
+      var req = http.request(options, function (res) {
+        console.log('STATUS: ' + res.statusCode);
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        //res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+          console.log('BODY: ' + chunk);
+          callback(chunk);
+        });
+      });
+      req.on('error', function (e) {
+        console.log('problem with request: ' + e.message);
+      });
+      cookiesFromServer.forEach(function(cookieFromServer){
+        req.setHeader('Cookie', cookieFromServer);
+      });
+      req.end();
+};
+
+// Using the method described here:
+// http://stackoverflow.com/questions/11944932/how-to-download-a-file-with-node-js
+var download = function(dest, cb) {
+  var file = fs.createWriteStream(dest);
+  var options = {
+    hostname : 'localhost',
+    port     : 8080,
+    path     : '/123/timetable/solutionFile',
+    method   : 'GET'
+  };
+  var req = http.request(options, function(response) {
+    //console.log('response is %j', response);
+    response.pipe(file);
+    file.on('finish', function() {
+      file.close(cb);  // close() is async, call cb after close completes.
+    });
+  });
+  req.on('error', function(err) { // Handle errors
+    fs.unlink(dest); // Delete the file async. (But we don't check the result)
+    if (cb) cb(err.message);
+  });
+  cookiesFromServer.forEach(function(cookieFromServer){
+    req.setHeader('Cookie', cookieFromServer);
+  });
+  req.end();
+};
+
+exports.getSolvedXML = function(solvedXMLPath, callback){
+  console.log('Calling j2ee client utils getSolvedXML');
+  download(solvedXMLPath, callback);
+};
+
+

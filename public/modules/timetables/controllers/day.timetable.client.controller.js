@@ -52,10 +52,12 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
     };
 
     $scope.findOne = function () {
+      $scope.specId = $stateParams.specId;
       $scope.timetable = Days.get({
+        specId : $scope.specId,
         dayIndex : $stateParams.dayIndex
       });
-      $scope.teachers = Teachers.query();
+      $scope.teachers = Teachers.query({specId : $scope.specId});
     };
 
     //Due to the checks there, only one of the below will trigger the prepareUnassignedTeachersForPeriods Functionality.

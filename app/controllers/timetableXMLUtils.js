@@ -1,4 +1,16 @@
 'use strict';
+var mongoose = require('mongoose'),
+  xml2js = require('xml2js'),
+  fs = require('fs');
+
+
+// Models
+var Course = mongoose.model('Course');
+var Period = mongoose.model('Period');
+var Lecture = mongoose.model('Lecture');
+var Curriculum = mongoose.model('Curriculum');
+var Teacher = mongoose.model('Teacher');
+var Timetable = mongoose.model('Timetable');
 
 var uniqueId = 0;
 var rawData = [];
@@ -361,7 +373,7 @@ exports.prepareXML = function (opfile) {
   xw.startDocument();
   xw.startElement('CourseSchedule').writeAttribute('id', idProvider());
   xw.writeElement('id', idProvider());
-  xw.writeElement('name', 'vidyodaya');
+  xw.writeElement('name', 'Not Applicable');
   console.log('Length of Row Data ' + rawData.length);
   //Enough of fooling around and start with the real work...
   var rooms = new Rooms();
@@ -404,5 +416,268 @@ exports.prepareXML = function (opfile) {
   //Write to opfile
   ws.write(xw.toString(), 'UTF-8');
   ws.end();
+
+};
+
+//Parse Solved XML and upload the data to the database
+exports.solvedXMLParser = function (specID, filename, callback) {
+
+  //mongoose.connect('mongodb://localhost/timetable-dev');
+  //mongoose.connect('mongodb://kollavarsham:kollavarsham@ds039281.mongolab.com:39281/heroku_app36869144');
+  var saveCount = 0;
+  //var specID = specID;
+
+  var closeConnectionIfComplete = function () {
+    saveCount--;
+    if (saveCount === 0) {
+      console.log('All Saves Complete. Closing Connection.');
+      //mongoose.disconnect();
+      callback();
+    } else {
+      console.log('Other Saves in progress... ' + saveCount);
+    }
+  };
+
+  // Save callbacks
+
+  var saveTimetableCallback = function (err) {
+    closeConnectionIfComplete();
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log('Saving timetable to DB');
+      return;
+    }
+  };
+
+  var saveCourseCallback = function (err /*, course */) {
+    closeConnectionIfComplete();
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log('saving course to DB');
+      return;
+    }
+  };
+
+  var savePeriodCallback = function (err /*, day */) {
+    closeConnectionIfComplete();
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log('saving period to DB');
+      return;
+    }
+  };
+
+  var saveLectureCallback = function (err /*, lecture */) {
+    closeConnectionIfComplete();
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log('saved lecture to DB');
+      return;
+    }
+  };
+
+  var saveCurriculumCallback = function (err /*, curriculum */) {
+    closeConnectionIfComplete();
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log('saved Curriculum to DB');
+      return;
+    }
+  };
+
+  var saveTeacherCallback = function (err /*, teacher */) {
+    closeConnectionIfComplete();
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log('saving teacher to DB');
+      return;
+    }
+  };
+
+  // To convert 'lectures' to a timetable to store in DB
+  var EmptyTimeTableDays = function () {
+
+    // new Array() is not recommended because of the ambiguity in the two types of parameters it takes
+    // read more here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
+    // var timeTableData = new Array();
+    var timeTableData = [];
+    var dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+    //Initialise - Assuming hardcoded metadata (number of days, number of periods)
+    // If we're anyway hard-coding what is the point of doing it two places?
+    // Rather than the magic number 5 below, we could iterate through the dayName array above, right?
+    for (var i = 0; i < 5; i++) {
+      var allocationsForDayOfWeek = {};
+      allocationsForDayOfWeek.dayOfWeek = dayName[i];
+      allocationsForDayOfWeek.dayIndex = i;
+      allocationsForDayOfWeek.periods = [];
+      for (var k = 0; k < 8; k++) {
+        var period = {};
+        period.index = k;
+        period.subject = '';
+        period.teacher = '';
+        period.clash = false;
+        allocationsForDayOfWeek.periods.push(period);
+      }
+      timeTableData.push(allocationsForDayOfWeek);
+    }
+    return timeTableData;
+  };
+
+  console.log('You entered file: ' + filename);
+
+  var parser = new xml2js.Parser({'explicitArray' : false});
+
+  fs.readFile(filename, function (err, data) {
+    parser.parseString(data, function (err, result) {
+
+      // cache xml lists into variables to improve brevity
+      var courseList = result.CourseSchedule.courseList.Course;
+      var dayList = result.CourseSchedule.dayList.Day;
+      var lectureList = result.CourseSchedule.lectureList.Lecture;
+      var curriculumList = result.CourseSchedule.curriculumList.Curriculum;
+      var teacherList = result.CourseSchedule.teacherList.Teacher;
+
+      //Trick to close mongoose connections after all entities are saved
+      saveCount = courseList.length + //Courses
+      dayList.length * dayList[0].periodList.Period.length + //periods
+      lectureList.length + //lectures
+      (2 * curriculumList.length) + //Curriculums + corresponding timetables
+      teacherList.length; //Teachers
+
+      console.log('Total Number of Entities to Save: ' + saveCount);
+
+      for (var i = 0; i < courseList.length; i++) {
+        var course = new Course();
+        course._id = parseInt(courseList[i].$.id);
+        course.courseID = courseList[i].id;
+        course.code = courseList[i].code;
+        course.teacherID = courseList[i].teacher.$.reference;
+        course.lectureSize = courseList[i].lectureSize;
+        course.minWorkingDaySize = courseList[i].minWorkingDaySize;
+        course.curriculumReference = courseList[i].curriculumList.Curriculum.$.reference;
+        course.studentSize = courseList[i].studentSize;
+        course.specReference = specID;
+
+        //Teacher Reference
+        for (var j = 0; j < teacherList.length; j++) {
+          //item is teacher
+          if (course.teacherID === teacherList[j].$.id) {
+            //located the teacher
+            course._teacher = teacherList[j].$.id;
+            break;
+          }
+        }
+        course.save(saveCourseCallback);
+      }
+
+      for (var k = 0; k < dayList.length; k++) {
+        var dayIndex = dayList[k].dayIndex;
+        var timeSlotIndex = 0;
+        for (var l = 0; l < dayList[k].periodList.Period.length; l++) {
+          var period = new Period();
+          period._id = parseInt(dayList[k].periodList.Period[l].$.id);
+          period.periodID = dayList[k].periodList.Period[l].id;
+          period.dayIndex = dayIndex;
+          period.timeslotIndex = timeSlotIndex++; //maintaining an incremented index instead of cross-referencing
+          period.save(savePeriodCallback);
+        }
+      }
+
+      //periods
+      //Period list doesn't seem to carry any value, I am not taking it for now
+
+      for (var m = 0; m < lectureList.length; m++) {
+        var lecture = new Lecture();
+        lecture.id = lectureList[m].$.id;
+        lecture.lectureID = lectureList[m].id;
+        lecture.lectureIndexInCourse = lectureList[m].lectureIndexInCourse;
+        lecture.locked = lectureList[m].locked;
+        lecture.roomReference = lectureList[m].room.$.reference;
+
+        for (var a = 0; a < courseList.length; a++) {
+          if (courseList[a].$.id ===
+            lectureList[m].course.$.reference) {
+            lecture._course = parseInt(courseList[a].$.id);
+            break;
+          }
+        }
+
+        for (var b = 0; b < dayList.length; b++) {
+          for (var c = 0; c < dayList[b].periodList.Period.length; c++) {
+            if (lectureList[m].period.$.reference ===
+              dayList[b].periodList.Period[c].$.id) {
+              lecture._period = parseInt(dayList[b].periodList.Period[c].$.id);
+            }
+          }
+        }
+
+        lecture.save(saveLectureCallback);
+      }
+
+      for (var n = 0; n < curriculumList.length; n++) {
+        var curriculum = new Curriculum();
+        curriculum.id = curriculumList[n].$.id;
+        curriculum.curriculumID = curriculumList[n].id;
+        curriculum.code = curriculumList[n].code;
+        curriculum.specReference = specID;
+
+        //Timetable for this curriculum
+        var timetableForCurriculum = new Timetable();
+        timetableForCurriculum.curriculumReference = curriculum.id;
+        timetableForCurriculum.curriculumCode = curriculum.code;
+        timetableForCurriculum.days = new EmptyTimeTableDays();
+        timetableForCurriculum.specReference = specID;
+
+        //Go through courses and find the ones for this curriculum
+        for (var p = 0; p < courseList.length; p++){
+          if (courseList[p].curriculumList.Curriculum.$.reference === curriculum.id){
+            //Found a course belonging to this curriculum, find it's lectures
+            for (var q = 0; q < lectureList.length; q++){
+              if (lectureList[q].course.$.reference === courseList[p].$.id){
+                //Got a lecture, find the period
+                for (var r = 0; r < dayList.length; r++) {
+                  for (var s = 0; s < dayList[r].periodList.Period.length; s++) {
+                    if (lectureList[q].period.$.reference ===
+                      dayList[r].periodList.Period[s].$.id) {
+                      //Found it's period. Place in the right location in the placeholder
+                      //timetableForCurriculum.days[r].periods[s].clash = false;
+                      timetableForCurriculum.days[r].periods[s].subject = courseList[p].code;
+                      for (var t = 0; t < teacherList.length; t++){
+                        if (teacherList[t].$.id === courseList[p].teacher.$.reference){
+                          timetableForCurriculum.days[r].periods[s].teacher =
+                            teacherList[t].code;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        //Save to MongoDB
+        timetableForCurriculum.save(saveTimetableCallback);
+        curriculum.save(saveCurriculumCallback);
+
+      }
+
+      for (var o = 0; o < teacherList.length; o++) {
+        var teacher = new Teacher();
+        teacher._id = teacherList[o].$.id;
+        teacher.teacherID = teacherList[o].id;
+        teacher.code = teacherList[o].code;
+        teacher.specReference = specID;
+
+        teacher.save(saveTeacherCallback);
+      }
+    });
+  });
 
 };

@@ -12,6 +12,7 @@ var mongoose = require('mongoose'),
   Course = mongoose.model('Course'),
   Timetable = mongoose.model('Timetable'),
   Teacher = mongoose.model('Teacher'),
+  Spec = mongoose.model('Spec'),
   _ = require('lodash');
 
 //For use by TimetableByTeacher
@@ -50,29 +51,45 @@ exports.read = function (req, res, next, id) {
 };
 
 /**
- * Get all curriculums for work with timetable
+ * Get all specs that have a timetable generated
  */
-exports.list = function (req, res) {
-  Curriculum.find().sort('id').exec(function (err, curriculums) {
+exports.list = function(req, res){
+  Spec.find({'state' : 'Timetable Generated and Available for use'}).sort('created').exec(function(err, specs){
+    if (err) {
+          return res.status(400).send({
+            message : errorHandler.getErrorMessage(err)
+          });
+        } else {
+          res.json(specs);
+        }
+  });
+};
+
+/*
+ * Get Timetables for a spec (Class-wise Split)
+ */
+exports.timetableForSpec = function (req, res) {
+console.log('Calling for Spec: ' + req.params.specId);
+  Curriculum.find({'specReference' : req.params.specId}).sort('id').exec(function (err, curricula) {
     if (err) {
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)
       });
     } else {
-      res.json(curriculums);
+      res.json(curricula);
     }
   });
 };
 
 exports.timetableByCurriculum = function (req, res) {
   //Associations now. Will have to live with this now
-  Course.find({curriculumReference : req.id}).populate('_teacher').exec(function (err, courses) {
+  Course.find({'specReference' : req.params.specId, curriculumReference : req.id}).populate('_teacher').exec(function (err, courses) {
     if (err) {
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)
       });
     } else {
-      Timetable.findOne({curriculumReference : req.id}, function (err, timetable) {
+      Timetable.findOne({'specReference' : req.params.specId, curriculumReference : req.id}, function (err, timetable) {
         if (err) {
           return res.status(400).send({
             message : errorHandler.getErrorMessage(err)
@@ -87,8 +104,8 @@ exports.timetableByCurriculum = function (req, res) {
 };
 
 exports.timetableByTeacherID = function (req, res) {
-  console.log('Searching for ' + req.params._id);
-  Teacher.findOne({_id : req.params._id}).exec(function (err, teacher) {
+  console.log('Searching for ' + req.params._id + 'in Spec ' + req.params.specId);
+  Teacher.findOne({_id : req.params._id, 'specReference' : req.params.specId}).exec(function (err, teacher) {
     if (err) {
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)
@@ -133,9 +150,10 @@ exports.timetableByTeacherID = function (req, res) {
 
 exports.timetableByDayIndex = function (req, res) {
   var dayIndex = req.params.dayIndex;
+  var specId = req.params.specId;
   console.log('Searching timetables for Day' + dayIndex);
     Timetable.aggregate({$unwind : '$days'},
-    {$match : {'days.dayIndex' : dayIndex}}, function (err, timetableForDay) {
+    {$match : {'days.dayIndex' : dayIndex, 'specReference' : specId}}, function (err, timetableForDay) {
       if (err) {
         console.log('error in aggregate');
         return res.status(400).send({

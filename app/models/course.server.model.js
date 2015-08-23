@@ -12,6 +12,7 @@ var CourseSchema = new Schema({
   minWorkingDaySize   : String,
   curriculumReference : String,
   studentSize         : String,
+  specReference       : String,
   _teacher            : {type : String, ref : 'Teacher'}
 });
 

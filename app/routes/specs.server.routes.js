@@ -21,10 +21,16 @@ module.exports = function(app) {
     .post(specs.solve);
 
   app.route('/specs/isSolving')
-    .get(specs.isSolving);
+    .post(specs.isSolving);
+
+  app.route('/specs/currentSolutionScore')
+    .post(specs.currentSolutionScore);
 
   app.route('/specs/terminateSolving')
     .post(specs.terminateSolving);
+
+  app.route('/specs/getFinalSolution')
+    .post(specs.getSolvedXML);
 
   //app.route('/specs/progress')
   //  .get(specs.getProgress);

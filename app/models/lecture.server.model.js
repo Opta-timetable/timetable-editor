@@ -10,7 +10,8 @@ var LectureSchema = new Schema({
   locked               : String,
   lectureIndexInCourse : String,
   _period              : {type : Number, ref : 'Period'},
-  roomReference        : String
+  roomReference        : String,
+  specReference        : String
 });
 
 mongoose.model('Lecture', LectureSchema);

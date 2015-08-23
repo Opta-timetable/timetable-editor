@@ -9,12 +9,11 @@ module.exports = function (app) {
     .get(users.requiresLogin, teachers.list)
     .post(users.requiresLogin, teachers.create);
 
-  //HACK Alert!!!
-  app.route('/timetables/teachers')
+  app.route('/teachers/:specId')
     .get(users.requiresLogin, teachers.list)
     .post(users.requiresLogin, teachers.create);
 
-  app.route('/teachers/:teacherId')
+  app.route('/teachers/:specId/teacher/:teacherId')
     .get(users.requiresLogin, teachers.read)
     .put(users.requiresLogin, teachers.hasAuthorization, teachers.update)
     .delete(users.requiresLogin, teachers.hasAuthorization, teachers.delete);

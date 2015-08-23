@@ -7,6 +7,7 @@ var mongoose = require('mongoose'),
 	errorHandler = require('./errors.server.controller'),
   fs = require('fs'),
   j2eeClient = require('./OptaplannerJ2EEClientUtils'),
+  xmlUtils = require('./timetableXMLUtils'),
 	Spec = mongoose.model('Spec'),
 	_ = require('lodash');
 
@@ -116,17 +117,16 @@ exports.hasAuthorization = function(req, res, next) {
  */
 var createHandler = function (ipFile, opFile) {
   //TODO Validations for CSV file
-  var csv = require('csv-parser'),
-    unsolvedXML = require('./timetableXMLUtils');
+  var csv = require('csv-parser');
   var theReadStream = fs.createReadStream(ipFile)
     .pipe(csv());
   theReadStream.on('data', function (data) {
     console.log('row', data);
-    unsolvedXML.addRawData(data);
+    xmlUtils.addRawData(data);
   });
   theReadStream.on('end', function () {
     console.log('Reached End of File');
-    unsolvedXML.prepareXML(opFile);
+    xmlUtils.prepareXML(opFile);
   });
 
 };
@@ -168,7 +168,6 @@ exports.solve = function(req, res){
   //	"name" : "Vidyodaya-2014-1",
   //	"__v" : 0
   //}
-  //var cookiesFromServer;
   Spec.findById(specId).exec(function(err, spec) {
  		if (err) return err;
  		if (! spec) return (new Error('Failed to load Spec ' + specId));
@@ -210,3 +209,35 @@ exports.terminateSolving = function(req, res) {
   });
 };
 
+/*
+ * Get Current Solution Score
+ */
+exports.currentSolutionScore = function(req, res) {
+  j2eeClient.currentSolutionScore(function(status) {
+    res.status(200).send(status);
+  });
+};
+
+/*
+ * Get the solved XML file
+ */
+exports.getSolvedXML = function(req, res){
+  console.log('Req is ' + req.body.specID);
+    var specId = req.body.specID;
+    Spec.findById(specId).exec(function(err, spec) {
+   		if (err) return err;
+   		if (!spec) return (new Error('Failed to load Spec ' + specId));
+   		console.log('Spec for this operation is %j', spec);
+   	}).then(function(spec) {
+      var splitPath = spec.unsolvedXML.split('/'); //Unsolved and solved XMLs have the same name
+      var solvedXMLFileName = splitPath[splitPath.length - 1];
+      var solvedXMLPath = './solved/'+ solvedXMLFileName;
+      j2eeClient.getSolvedXML(solvedXMLPath, function() {
+        xmlUtils.solvedXMLParser(specId, solvedXMLPath, function () {
+          Spec.update({'_id' : specId}, {$set : {'state' : 'Timetable Generated and Available for use'}}, function(){
+            res.status(200).send({'uploadState' : 'Timetable Generated and Available for use' });
+          });
+        });
+      });
+    });
+};

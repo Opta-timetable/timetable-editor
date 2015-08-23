@@ -6,7 +6,7 @@ var ApplicationConfiguration = (function () {
   var applicationModuleName = 'timetable';
   var applicationModuleVendorDependencies = [
     'ngResource', 'ngCookies', 'ngAnimate', 'ngTouch', 'ngSanitize', 'ui.router', 'ui.bootstrap', 'ui.utils',
-    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb'
+    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb', 'ngFileUpload'
   ];
 
   // Add a new vertical module
@@ -62,6 +62,10 @@ ApplicationConfiguration.registerModule('core');
 // Use application configuration module to register a new module
 ApplicationConfiguration.registerModule('courses');
 
+'use strict';
+
+// Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('specs');
 'use strict';
 
 // Use application configuration module to register a new module
@@ -324,17 +328,17 @@ angular.module('core').factory('Version', ['$resource',
 ]);
 
 
-//'use strict';
-//
-//// Courses module config
-//angular.module('courses').run(['Menus',
-//  function (Menus) {
-//    // Set top bar menu items
-//    Menus.addMenuItem('topbar', 'Courses', 'courses', 'dropdown', '/courses(/create)?');
-//    Menus.addSubMenuItem('topbar', 'courses', 'List Courses', 'courses');
-//    Menus.addSubMenuItem('topbar', 'courses', 'New Course', 'courses/create');
-//  }
-//]);
+'use strict';
+
+// Courses module config
+angular.module('courses').run(['Menus',
+  function (Menus) {
+    // Set top bar menu items
+    Menus.addMenuItem('topbar', 'Courses', 'courses', 'dropdown', '/courses(/create)?');
+    Menus.addSubMenuItem('topbar', 'courses', 'List Courses', 'courses');
+    Menus.addSubMenuItem('topbar', 'courses', 'New Course', 'courses/create');
+  }
+]);
 
 'use strict';
 
@@ -457,6 +461,288 @@ angular.module('courses').factory('Courses', ['$resource',
 
 'use strict';
 
+// Configuring the Articles module
+angular.module('specs').run(['Menus',
+  function(Menus) {
+    // Set top bar menu items
+    Menus.addMenuItem('topbar', 'Specs', 'specs', 'dropdown', '/specs(/create)?');
+    Menus.addSubMenuItem('topbar', 'specs', 'List Specs', 'specs');
+    Menus.addSubMenuItem('topbar', 'specs', 'New Spec', 'specs/create');
+  }
+]);
+
+'use strict';
+
+//Setting up route
+angular.module('specs').config(['$stateProvider',
+  function($stateProvider) {
+    // Specs state routing
+    $stateProvider.
+      state('listSpecs', {
+        url: '/specs',
+        templateUrl: 'modules/specs/views/list-specs.client.view.html'
+      }).
+      state('createSpec', {
+        url: '/specs/create',
+        templateUrl: 'modules/specs/views/create-spec.client.view.html'
+      }).
+      state('viewSpec', {
+        url: '/specs/:specId',
+        templateUrl: 'modules/specs/views/view-spec.client.view.html'
+      }).
+      state('editSpec', {
+        url: '/specs/:specId/edit',
+        templateUrl: 'modules/specs/views/edit-spec.client.view.html'
+      });
+  }
+]);
+
+'use strict';
+angular.module('specs').controller('GenerateModalInstanceCtrl', ["$scope", "$modalInstance", "$http", "$interval", "$timeout", "specId", function ($scope, $modalInstance, $http, $interval, $timeout, specId) {
+
+  $scope.specId = specId;
+  $scope.progress = 0;
+  $scope.state = 'Initializing';
+  $scope.solutionHealth = 'Initializing';
+  $scope.disableStop = false;
+  console.log('SpecID for this modal is ' + specId);
+  var worstScore = 0; //Used for Progress indicator
+
+  $scope.checkProgress = function(){
+    $http.post('/specs/isSolving')
+      .success(function (data, status, headers, config) {
+        console.log('Invoked isSolving successfully');
+        console.log('Data is ' + data.response); //{"response":"true"}
+        $scope.state = 'Solving';
+        if (data.response === false){
+          $scope.state = 'Solution complete. Waiting for solution...';
+          $scope.disableStop = true;
+          $scope.progress = 100;
+          $interval.cancel($scope.progressPromise);
+          //Pick up the solution file after waiting for the closing formalities to get done at the J2EE server
+          $timeout(parseSolutionFile(), 10000);
+        }
+      })
+      .error(function (data, status, headers, config) {
+        console.log('Error while getting solution status');
+      });
+
+    $http.post('/specs/currentSolutionScore')
+      .success(function (data, status, headers, config){
+        console.log('Invoked currentSolutionScore successfully');
+        console.log('Data is ' + JSON.stringify(data));
+        if (data.score !== 'No Solution Available')
+        $scope.solutionHealth = data.score;
+      })
+      .error(function (data, status, headers, config){
+        console.log('Error while getting currentSolutionScore');
+      });
+    $scope.progress = calculateProgress($scope.solutionHealth, $scope.progress); //TODO calculateProgress(); using current number of hard constraints which is a reasonable indicator
+    };
+
+  $scope.progressPromise = $interval($scope.checkProgress, 10000); //Check every 10 secs
+
+  $scope.terminateSolving = function(){
+    console.log('You want to solve? Are you sure?');
+    $http.post('/specs/terminateSolving')
+      .success(function (data, status, headers, config) {
+        console.log('Terminated Solving');
+      })
+      .error(function (data, status, headers, config) {
+        console.log('Error in termination');
+      });
+    $interval.cancel($scope.progressPromise);
+    $modalInstance.close();
+  };
+
+  $scope.dismiss = function(){
+    $interval.cancel($scope.progressPromise);
+    $modalInstance.close();
+  };
+
+  function getHardConstraints(score){
+    var re = /\d+/;
+   var hardConstraints = score.match(re);
+    if (hardConstraints !== null && hardConstraints.length >= 1 ){
+      console.log('Hard Constraints =' + hardConstraints[0]);
+      return parseInt(hardConstraints[0]);
+    }
+    return 0; //send a default and let the progress incrementer take care
+  }
+  // Use the highest hard constraints and current hard constraints value and use it for find out solution progress
+  // As the solution progresses, the number of hard constraints will reduce
+  function calculateProgress(newScore, currentProgress){
+    var newHardConstraints = getHardConstraints(newScore);
+    if (newHardConstraints > worstScore){
+      worstScore = newHardConstraints;
+    }
+
+    if (worstScore !== 0 && newScore < worstScore){
+      var newProgress = 100 - (100/worstScore)*currentProgress;
+      return newProgress;
+    }
+    //In the unlikely case the hard constraints starts at 0, there is no other way to find the progress. So give the user some indication of activity
+    return currentProgress+1;
+
+  }
+
+  function parseSolutionFile(){
+    $scope.state = 'Importing Solution to Database...';
+    $http.post('/specs/getFinalSolution', {
+      specID : $scope.specId
+    })
+      .success(function (data, status, headers, config){
+        console.log('Got and parsed solution');
+        $scope.state = 'Complete';
+      })
+      .error(function (data, status, headers, config){
+        console.log('Error in picking solution');
+        $scope.state = 'Error. Please retry...';
+      });
+  }
+
+}]);
+
+'use strict';
+
+// Specs controller
+angular.module('specs').controller('SpecsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', '$modal', 'Specs', 'Upload',
+	function($scope, $stateParams, $location, $http, Authentication, $modal, Specs, Upload) {
+		$scope.authentication = Authentication;
+
+		// Create new Spec
+		$scope.create = function() {
+			// Create new Spec object
+			var spec = new Specs ({
+				name: this.name,
+        specFile: this.specFileName,
+        origFile: this.fileOriginalName,
+        unsolvedXML: this.outputFileName,
+        state: this.uploadState
+			});
+
+			// Redirect after save
+			spec.$save(function(response) {
+				$location.path('specs/' + response._id);
+
+				// Clear form fields
+				$scope.name = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Remove existing Spec
+		$scope.remove = function(spec) {
+			if ( spec ) { 
+				spec.$remove();
+
+				for (var i in $scope.specs) {
+					if ($scope.specs [i] === spec) {
+						$scope.specs.splice(i, 1);
+					}
+				}
+			} else {
+				$scope.spec.$remove(function() {
+					$location.path('specs');
+				});
+			}
+		};
+
+		// Update existing Spec
+		$scope.update = function() {
+			var spec = $scope.spec;
+
+			spec.$update(function() {
+				$location.path('specs/' + spec._id);
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Find a list of Specs
+		$scope.find = function() {
+			$scope.specs = Specs.query();
+		};
+
+		// Find existing Spec
+		$scope.findOne = function() {
+			$scope.spec = Specs.get({ 
+				specId: $stateParams.specId
+			});
+		};
+
+    $scope.upload = function (files) {
+      if (files && files.length) {
+          var file = files[0]; //Only 1 file allowed in this app
+        console.log('file path ' + file.path);
+          Upload.upload({
+            url: 'specs/upload',
+            fields: {
+              //'username': $scope.username
+            },
+            file: file
+          }).progress(function (evt) {
+            var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+            $scope.log = 'progress: ' + progressPercentage + '% ' +
+            evt.config.file.name + '\n' + $scope.log;
+          }).success(function (data, status, headers, config) {
+            //$timeout(function() {
+            //  $scope.log = 'file: ' + config.file.name + ', Response: ' + JSON.stringify(data) + '\n' + $scope.log;
+            //});
+            $scope.specFileName = data.specFileName;
+            $scope.fileOriginalName = data.fileOriginalName;
+            $scope.outputFileName = data.outputFileName;
+            $scope.uploadState = data.uploadState;
+          });
+      }
+    };
+
+    $scope.generateTimetable = function(size){
+      //Inform server to start solving
+      $http.post('/specs/solve', {
+        specID : $stateParams.specId
+      })
+        .success(function (data, status, headers, config) {
+          console.log('Started solving');
+          var modalInstance = $modal.open({
+            animation: true,
+            templateUrl: 'generate.timetable.modal.client.view.html',
+            controller: 'GenerateModalInstanceCtrl',
+            size: size,
+            resolve: {
+              specId: function () {
+                return $stateParams.specId;
+              }
+            }
+          });
+          modalInstance.result.then(function (result) {
+          }, function () {
+            console.info('Modal dismissed at: ' + new Date());
+          });
+        })
+        .error(function (data, status, headers, config) {
+
+        });
+    };
+	}
+]);
+
+'use strict';
+
+//Specs service used to communicate Specs REST endpoints
+angular.module('specs').factory('Specs', ['$resource',
+	function($resource) {
+		return $resource('specs/:specId', { specId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
+'use strict';
+
 // Timetables module config
 angular.module('timetables').run(['Menus',
   function (Menus) {
@@ -476,12 +762,20 @@ angular.module('timetables').config(['$stateProvider',
         url           : '/timetables',
         templateUrl   : 'modules/timetables/views/list-timetables.client.view.html',
         ncyBreadcrumb : {
-          label  : 'Timetables',
+          label  : 'Your Timetables',
+          parent : 'home'
+        }
+      }).
+      state('displayTimetable', {
+        url           : '/timetables/:specId',
+        templateUrl   : 'modules/timetables/views/display-timetable.client.view.html',
+        ncyBreadcrumb : {
+          label  : 'Timetable for Spec',
           parent : 'home'
         }
       }).
       state('viewTimetable', {
-        url           : '/timetables/:curriculumId',
+        url           : '/timetables/:specId/curriculum/:curriculumId',
         templateUrl   : 'modules/timetables/views/view-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Class Timetable',
@@ -489,7 +783,7 @@ angular.module('timetables').config(['$stateProvider',
         }
       }).
       state('viewTeacherTimetable', {
-        url           : '/timetables/teachers/:_id',
+        url           : '/teachers/:specId/teacher/:_id',
         templateUrl   : 'modules/timetables/views/view-teacher-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Teacher Timetable',
@@ -497,7 +791,7 @@ angular.module('timetables').config(['$stateProvider',
         }
       }).
       state('viewDayTimetable', {
-        url           : '/timetables/days/:dayIndex',
+        url           : '/timetables/:specId/day/:dayIndex',
         templateUrl   : 'modules/timetables/views/view-day-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Timetable for Day',
@@ -505,7 +799,7 @@ angular.module('timetables').config(['$stateProvider',
         }
       }).
       state('editTimetable', {
-        url           : '/timetables/edit/:curriculumId',
+        url           : '/timetables/:specId/edit/:curriculumId',
         templateUrl   : 'modules/timetables/views/edit-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Edit Timetable',
@@ -642,7 +936,7 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
 'use strict';
 
 angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers) {
+  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, TimetableForCurriculum, Teachers) {
     var SUBJECT_ROWS_PER_COLUMN = 8;
 
     $scope.authentication = Authentication;
@@ -657,6 +951,23 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       var periodIndexAsInt = typeof periodIndex === 'number' ? periodIndex : parseInt(periodIndex, 10);
       return $scope.timetableForCurriculum.timetable.days[dayIndexAsInt].periods[periodIndexAsInt];
     }
+
+    function assignBackgroundColorForSubjects(){
+      //Assume a class won't have more than 16 colors
+      //We might need to add a bg-color property to the cell in the timetable itself so that the same color remains across refreshes as well
+      var colors= ['plum', 'orchid', 'coral', 'teal', 'bisque', 'peru',
+      'thistle', 'olive', 'pink', 'sienna', 'ivory', 'linen', 'orange', 'gold', 'purple', 'crimson'];
+      $scope.backgroundColorForSubjects = {};
+      var index = 0;
+      $scope.timetableForCurriculum.courses.forEach(function (course){
+        $scope.backgroundColorForSubjects[course.code] = colors[index];
+        index++;
+      });
+    }
+
+    $scope.getBackgroundColorForSubject = function (subject){
+      return $scope.backgroundColorForSubjects[subject];
+    };
 
     function extractClashes(dayIndex, periodIndex, curriculumReference) {
           // Array.filter -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
@@ -799,13 +1110,26 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           var column = {start : i, end : Math.min(i + SUBJECT_ROWS_PER_COLUMN, $scope.timetableForCurriculum.courses.length)};
           $scope.subjectColumns.push(column);
         }
+        //Set the bg-colors
+        assignBackgroundColorForSubjects();
       }
     });
 
+    $scope.list = function() {
+      $scope.allTimetables = Timetables.query();
+    //Get all the generated timetables
+    };
+
     $scope.find = function () {
+      //pick specId in context
+      $scope.specId = $stateParams.specId;
       //one timetable each for one curriculum
-      $scope.curriculums = Timetables.query();
-      $scope.teachers = Teachers.query();
+      $scope.curriculums = Timetables.query({
+        specId : $stateParams.specId
+      });
+      $scope.teachers = Teachers.query({
+        specId : $stateParams.specId
+      });
       //The following should eventually come from a configuration tied to the user and school
       $scope.workingDays = [{dayName:'Monday', dayIndex:0},
         {dayName:'Tuesday', dayIndex:1},
@@ -815,7 +1139,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.findOne = function () {
-      $scope.timetableForCurriculum = Timetables.get({
+      $scope.timetableForCurriculum = TimetableForCurriculum.get({
+        specId : $stateParams.specId,
         curriculumId : $stateParams.curriculumId
       });
     };
@@ -1143,7 +1468,16 @@ angular.module('timetables').filter('slice', [
 
 angular.module('timetables').factory('Timetables', ['$resource',
   function ($resource) {
-    return $resource('timetables/:curriculumId', {
+    return $resource('timetables/:specId', {
+      specId : '@specId'
+    }, {'update' : {method : 'PUT'}});
+  }
+]);
+
+angular.module('timetables').factory('TimetableForCurriculum', ['$resource',
+  function ($resource) {
+    return $resource('timetables/:specId/curriculum/:curriculumId', {
+      specId : '@specId',
       curriculumId : '@curriculumId'
     }, {'update' : {method : 'PUT'}});
   }
@@ -1151,15 +1485,16 @@ angular.module('timetables').factory('Timetables', ['$resource',
 
 angular.module('timetables').factory('Teachers', ['$resource',
   function ($resource) {
-    return $resource('timetables/teachers/:_id', {
-      _id : '@_id'
+    return $resource('teachers/:specId', {
+      specId : '@specId'
     }, {'update' : {method : 'PUT'}});
   }
 ]);
 
 angular.module('timetables').factory('Days', ['$resource',
   function ($resource) {
-    return $resource('timetables/days/:dayIndex', {
+    return $resource('timetables/:specId/days/:dayIndex', {
+      specId : '@specId',
       dayIndex : '@dayIndex'
     }, {'update' : {method : 'PUT'}});
   }

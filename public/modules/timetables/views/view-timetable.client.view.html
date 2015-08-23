@@ -12,7 +12,7 @@
          download="{{timetableForCurriculum.timetable.curriculumCode +'-timetable.csv'}}">
         <i class="glyphicon glyphicon-new-window"></i> &#160;Export
       </a>
-      <a class="btn btn-group-sm btn-success" title="Edit Timetable" href="/#!/timetables/edit/{{timetableForCurriculum.timetable.curriculumReference}}">
+      <a class="btn btn-group-sm btn-success" title="Edit Timetable" href="/#!/timetables/{{specId}}/edit/{{timetableForCurriculum.timetable.curriculumReference}}">
         <i class="glyphicon glyphicon-edit"></i> &#160;Edit
       </a>
     </div>
@@ -80,7 +80,7 @@
   <!-- Back Button -->
   <div class="row">
     <div class="col-md-12">
-      <a class="btn btn-group-sm btn-default" href="/#!/timetables">
+      <a class="btn btn-group-sm btn-default" href="/#!/timetables/{{specId}}">
         <i class="glyphicon glyphicon-backward"></i> &#160;Back
       </a>
     </div>

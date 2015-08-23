@@ -52,13 +52,14 @@
       <h3 class="modal-title">Timetable Generation Progress</h3>
     </div>
     <div class="modal-body">
-      <p> Solution Health: {{progress}}</p>
-      <progressbar animate="true" value="progress" type="success"><b>{{progress}}%</b></progressbar>
+      <p> Solution State : {{state}}</p>
+      <p> Solution Score  : {{solutionHealth}}</p>
+      <progressbar class="progress-striped active" animate="true" value="progress" type="success"><b>{{progress}}%</b></progressbar>
 
     </div>
 
     <div class="modal-footer">
-      <a class="btn btn-warning" data-ng-click="terminateSolving()">
+      <a class="btn btn-warning" ng-disabled="disableStop" data-ng-click="terminateSolving()">
         <i class="glyphicon glyphicon-stop"></i> &#160;Stop Solving
       </a>
       <a class="btn btn-primary" data-ng-click="dismiss()">

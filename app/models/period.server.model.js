@@ -7,7 +7,8 @@ var PeriodSchema = new Schema({
   _id           : Number,
   periodID      : String,
   timeslotIndex : String,
-  dayIndex      : String
+  dayIndex      : String,
+  specReference : String
 });
 
 mongoose.model('Period', PeriodSchema);

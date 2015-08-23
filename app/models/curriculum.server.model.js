@@ -6,7 +6,8 @@ var mongoose = require('mongoose'),
 var CurriculumSchema = new Schema({
   id           : String,
   curriculumID : String,
-  code         : String
+  code         : String,
+  specReference: String
 });
 
 mongoose.model('Curriculum', CurriculumSchema);

@@ -9,36 +9,44 @@ angular.module('timetables').config(['$stateProvider',
         url           : '/timetables',
         templateUrl   : 'modules/timetables/views/list-timetables.client.view.html',
         ncyBreadcrumb : {
-          label  : 'Timetables',
+          label  : 'Your Timetables',
           parent : 'home'
         }
       }).
+      state('displayTimetable', {
+        url           : '/timetables/:specId',
+        templateUrl   : 'modules/timetables/views/display-timetable.client.view.html',
+        ncyBreadcrumb : {
+          label  : 'Timetable for Spec',
+          parent : 'listTimetables'
+        }
+      }).
       state('viewTimetable', {
-        url           : '/timetables/:curriculumId',
+        url           : '/timetables/:specId/curriculum/:curriculumId',
         templateUrl   : 'modules/timetables/views/view-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Class Timetable',
-          parent : 'listTimetables'
+          parent : 'displayTimetable'
         }
       }).
       state('viewTeacherTimetable', {
-        url           : '/timetables/teachers/:_id',
+        url           : '/timetables/:specId/teacher/:_id',
         templateUrl   : 'modules/timetables/views/view-teacher-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Teacher Timetable',
-          parent : 'listTimetables'
+          parent : 'displayTimetable'
         }
       }).
       state('viewDayTimetable', {
-        url           : '/timetables/days/:dayIndex',
+        url           : '/timetables/:specId/day/:dayIndex',
         templateUrl   : 'modules/timetables/views/view-day-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Timetable for Day',
-          parent : 'listTimetables'
+          parent : 'displayTimetable'
         }
       }).
       state('editTimetable', {
-        url           : '/timetables/edit/:curriculumId',
+        url           : '/timetables/:specId/edit/:curriculumId',
         templateUrl   : 'modules/timetables/views/edit-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Edit Timetable',

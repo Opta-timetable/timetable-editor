@@ -1,8 +1,8 @@
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers) {
+angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers', 'TimetableForCurriculum', 'SpecIdHolder',
+  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers, TimetableForCurriculum, SpecIdHolder) {
     var SUBJECT_ROWS_PER_COLUMN = 8;
 
     $scope.authentication = Authentication;
@@ -181,10 +181,23 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     });
 
+    $scope.list = function() {
+      $scope.allTimetables = Timetables.query();
+    //Get all the generated timetables
+    };
+
     $scope.find = function () {
+      //pick specId in context
+      $scope.specId = $stateParams.specId;
+      //Set specId into Holder so that other controllers can access it
+      SpecIdHolder.setSpecId($stateParams.specId);
       //one timetable each for one curriculum
-      $scope.curriculums = Timetables.query();
-      $scope.teachers = Teachers.query();
+      $scope.curriculums = Timetables.query({
+        specId : $stateParams.specId
+      });
+      $scope.teachers = Teachers.query({
+        specId : $stateParams.specId
+      });
       //The following should eventually come from a configuration tied to the user and school
       $scope.workingDays = [{dayName:'Monday', dayIndex:0},
         {dayName:'Tuesday', dayIndex:1},
@@ -194,9 +207,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.findOne = function () {
-      $scope.timetableForCurriculum = Timetables.get({
+      $scope.timetableForCurriculum = TimetableForCurriculum.get({
+        specId : $stateParams.specId,
         curriculumId : $stateParams.curriculumId
       });
+      $scope.specId = $stateParams.specId;
     };
 
     $scope.formatAllocationHistory = function (allocation) {

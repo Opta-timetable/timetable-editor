@@ -75,7 +75,8 @@ exports.delete = function (req, res) {
  * List of Teachers
  */
 exports.list = function (req, res) {
-  Teacher.find().sort('code').exec(function (err, teachers) {
+  console.log('finding teacher by specID ' + req.params.specId);
+  Teacher.find({'specReference' : req.params.specId}).sort('code').exec(function (err, teachers) {
     if (err) {
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)
@@ -90,7 +91,7 @@ exports.list = function (req, res) {
  * Teacher middleware
  */
 exports.teacherByID = function (req, res, next, id) {
-  Teacher.findById(id).populate('user', 'displayName').exec(function (err, teacher) {
+  Teacher.find({'_id' : id, 'specReference' : req.param.specId}).populate('user', 'displayName').exec(function (err, teacher) {
     if (err) return next(err);
     if (!teacher) return next(new Error('Failed to load Teacher ' + id));
     req.teacher = teacher;
