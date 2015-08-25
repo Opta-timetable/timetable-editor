@@ -44,6 +44,6 @@ angular.module('timetables').factory('Days', ['$resource',
 
 angular.module('timetables').service('SpecIdHolder', function() {
     this.specId = '';
-    this.setSpecId = function(specIdInContext) { this.specId = specIdInContext };
+    this.setSpecId = function(specIdInContext) { this.specId = specIdInContext; };
     this.getSpecId = function() { return this.specId; };
 });

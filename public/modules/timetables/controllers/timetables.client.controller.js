@@ -270,7 +270,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         curriculumId : $stateParams.curriculumId,
         clashes      : $scope.clashes
       }, function () {
-        $location.path('timetables/' + $stateParams.curriculumId);
+        $location.path('timetables/' + $scope.specId + '/curriculum/' + $stateParams.curriculumId);
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });
@@ -298,10 +298,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         console.log('clash for this element :' + clash);
         console.log('day for this element :' + dayIndex);
         console.log('period for this element :' + periodIndex);
-        $http.post('/timetables/discoverClashes', {
+        $http.post('/timetables/' + $stateParams.specId + '/discoverClashes', {
           currentDay    : dayIndex,
           currentPeriod : extractPeriod(dayIndex, periodIndex),
-          curriculumId  : $stateParams.curriculumId
+          curriculumId  : $stateParams.curriculumId,
+          specId        : $stateParams.specId
         })
           .success(function (data, status, headers, config) {
             if (data.clashIn.length >= 1) {
@@ -323,7 +324,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         clashesInScope = extractClashes(dayIndex, periodIndex);
       }
       if (clashesInScope.length > 0) { //TODO getClash link in the view doesn't have a provision to display multiple links. A popover would look good.
-        return '#!/timetables/' + clashesInScope[0].curriculumReference;
+        return '#!/timetables/' + $stateParams.specId + '/curriculum/' + clashesInScope[0].curriculumReference;
       }
       return undefined;
     };
@@ -413,7 +414,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         subjectCode : subjectCode
       };
       //Collect Teacher totals from server
-      $http.post('/timetables/collectStats', {
+      $http.post('/timetables/' + $stateParams.specId + '/collectStats', {
         teacherCode : teacherCode
       })
         .success(function (data, status, headers, config) {

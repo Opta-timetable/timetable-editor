@@ -320,13 +320,15 @@ exports.update = function (req, res) {
 exports.discoverClashes = function (req, res) {
   var dayToMatch = req.body.currentDay,
     period = req.body.currentPeriod,
-    curriculum = req.body.curriculumId;
+    curriculum = req.body.curriculumId,
+    specId = req.params.specId;
 
   Timetable.aggregate({$unwind : '$days'}, {$unwind : '$days.periods'},
     {$match : {'days.dayIndex' : dayToMatch}},
     {$match : {'days.periods.index' : period.index}},
     {$match : {'days.periods.teacher' : period.teacher}},
-    {$match : {'curriculumReference' : {$ne : curriculum}}}, function (err, clashes) {
+    {$match : {'curriculumReference' : {$ne : curriculum}}},
+    {$match : {'specReference' : specId}}, function (err, clashes) {
       if (err) {
         console.log('error in aggregate');
         return res.status(400).send({
@@ -340,10 +342,12 @@ exports.discoverClashes = function (req, res) {
 };
 
 exports.collectStats = function (req, res) {
-  var teacherCode = req.body.teacherCode;
+  var teacherCode = req.body.teacherCode,
+  specId = req.params.specId;
   console.log('Teacher code is ' + teacherCode);
   Timetable.aggregate({$unwind : '$days'}, {$unwind : '$days.periods'},
-    {$match : {'days.periods.teacher' : teacherCode}}, function (err, periodsForTeacher) {
+    {$match : {'days.periods.teacher' : teacherCode}},
+    {$match : {'specReference' : specId}}, function (err, periodsForTeacher) {
       if (err) {
         console.log('error in aggregate');
         return res.status(400).send({

@@ -21,13 +21,13 @@ module.exports = function (app) {
   app.route('/timetables/modifyPeriodAllocation')
     .post(users.requiresLogin, timetables.modifyPeriodAllocation);
 
-  app.route('/timetables/discoverClashes')
+  app.route('/timetables/:specId/discoverClashes')
     .post(users.requiresLogin, timetables.discoverClashes);
 
   app.route('/timetables/:specId/teacher/:_id')
     .get(users.requiresLogin, timetables.timetableByTeacherID);
 
-  app.route('/timetables/collectStats')
+  app.route('/timetables/:specId/collectStats')
     .post(users.requiresLogin, timetables.collectStats);
 
   app.route('/timetables/:specId/day/:dayIndex')
