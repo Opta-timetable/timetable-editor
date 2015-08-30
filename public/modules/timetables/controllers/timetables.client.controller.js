@@ -75,11 +75,12 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function updateAllocation(dayIndex, periodIndex, allocatedCourse, currentClashes) {
-      $http.post('/timetables/modifyPeriodAllocation', {
+      $http.post('/timetables/' + $scope.specId + '/modifyPeriodAllocation', {
         currentDay      : dayIndex,
         currentPeriod   : extractPeriod(dayIndex, periodIndex),
         allocatedCourse : allocatedCourse,
-        clashesToUpdate   : currentClashes
+        clashesToUpdate : currentClashes,
+        specReference   : $scope.specId
       })
         .success(function (data, status, headers, config) {
           var updatedPeriod = extractPeriod(dayIndex, periodIndex);
@@ -446,7 +447,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     function updateTeacherForSubject(subjectCode, newTeacherID, newTeacherCode){
       // get the clashes for the current teacher, if any after removing it from the local list
       var clashesToUpdate = popAllClashesForTeacherFromLocalList($scope.teacherCode);
-      $http.post('/timetables/changeTeacherAssignment', {
+      $http.post('/timetables/' + $scope.specId + '/changeTeacherAssignment', {
         teacherReference : newTeacherID,
         teacherCode : newTeacherCode,
         subjectCode : subjectCode,
@@ -475,7 +476,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       teacher.$save(function (response) {
         console.log('Created teacher %j', response);
         //Call update function using the new teacher
-        updateTeacherForSubject(subjectCode, response._id, response.code);
+        updateTeacherForSubject(subjectCode, response.id, response.code);
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });
@@ -508,7 +509,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           //Assignment using an existing teacher
           console.info('The user has selected %j', $scope.selectedTeacher);
           if ($scope.selectedTeacher.code !== $scope.teacherCode){
-            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher._id, $scope.selectedTeacher.code);
+            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher.id, $scope.selectedTeacher.code);
           }
         }else{
           //New teacher being created

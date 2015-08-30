@@ -555,7 +555,7 @@ exports.solvedXMLParser = function (specID, filename, callback) {
 
       for (var i = 0; i < courseList.length; i++) {
         var course = new Course();
-        course._id = parseInt(courseList[i].$.id);
+        course.id = parseInt(courseList[i].$.id);
         course.courseID = courseList[i].id;
         course.code = courseList[i].code;
         course.teacherID = courseList[i].teacher.$.reference;
@@ -570,7 +570,7 @@ exports.solvedXMLParser = function (specID, filename, callback) {
           //item is teacher
           if (course.teacherID === teacherList[j].$.id) {
             //located the teacher
-            course._teacher = teacherList[j].$.id;
+            course._teacher = specID + '-' + teacherList[j].$.id;
             break;
           }
         }
@@ -582,7 +582,7 @@ exports.solvedXMLParser = function (specID, filename, callback) {
         var timeSlotIndex = 0;
         for (var l = 0; l < dayList[k].periodList.Period.length; l++) {
           var period = new Period();
-          period._id = parseInt(dayList[k].periodList.Period[l].$.id);
+          period.id = parseInt(dayList[k].periodList.Period[l].$.id);
           period.periodID = dayList[k].periodList.Period[l].id;
           period.dayIndex = dayIndex;
           period.timeslotIndex = timeSlotIndex++; //maintaining an incremented index instead of cross-referencing
@@ -670,7 +670,7 @@ exports.solvedXMLParser = function (specID, filename, callback) {
 
       for (var o = 0; o < teacherList.length; o++) {
         var teacher = new Teacher();
-        teacher._id = teacherList[o].$.id;
+        teacher._id = specID + '-' + teacherList[o].$.id;
         teacher.teacherID = teacherList[o].id;
         teacher.code = teacherList[o].code;
         teacher.specReference = specID;

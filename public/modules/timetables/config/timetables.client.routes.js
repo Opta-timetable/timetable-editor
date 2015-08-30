@@ -30,7 +30,7 @@ angular.module('timetables').config(['$stateProvider',
         }
       }).
       state('viewTeacherTimetable', {
-        url           : '/timetables/:specId/teacher/:_id',
+        url           : '/timetables/:specId/teacher/:id',
         templateUrl   : 'modules/timetables/views/view-teacher-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Teacher Timetable',

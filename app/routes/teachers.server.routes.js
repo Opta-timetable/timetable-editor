@@ -13,7 +13,7 @@ module.exports = function (app) {
     .get(users.requiresLogin, teachers.list)
     .post(users.requiresLogin, teachers.create);
 
-  app.route('/teachers/:specId/teacher/:teacherId')
+  app.route('/teachers/:specId/teacher/:id')
     .get(users.requiresLogin, teachers.read)
     .put(users.requiresLogin, teachers.hasAuthorization, teachers.update)
     .delete(users.requiresLogin, teachers.hasAuthorization, teachers.delete);

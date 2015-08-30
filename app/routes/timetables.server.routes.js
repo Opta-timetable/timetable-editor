@@ -18,13 +18,13 @@ module.exports = function (app) {
     .put(users.requiresLogin, timetables.update);
   //.delete(users.requiresLogin, timetables.hasAuthorization, timetables.delete);
 
-  app.route('/timetables/modifyPeriodAllocation')
+  app.route('/timetables/:specId/modifyPeriodAllocation')
     .post(users.requiresLogin, timetables.modifyPeriodAllocation);
 
   app.route('/timetables/:specId/discoverClashes')
     .post(users.requiresLogin, timetables.discoverClashes);
 
-  app.route('/timetables/:specId/teacher/:_id')
+  app.route('/timetables/:specId/teacher/:id')
     .get(users.requiresLogin, timetables.timetableByTeacherID);
 
   app.route('/timetables/:specId/collectStats')
@@ -33,7 +33,7 @@ module.exports = function (app) {
   app.route('/timetables/:specId/day/:dayIndex')
     .get(users.requiresLogin, timetables.timetableByDayIndex);
 
-  app.route('/timetables/changeTeacherAssignment')
+  app.route('/timetables/:specId/changeTeacherAssignment')
     .post(users.requiresLogin, timetables.changeTeacherAssignment);
   
   app.param('curriculumId', timetables.read);

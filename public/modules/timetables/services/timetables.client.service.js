@@ -27,9 +27,9 @@ angular.module('timetables').factory('Teachers', ['$resource',
 
 angular.module('timetables').factory('TimetableForTeacher', ['$resource',
 function ($resource) {
-  return $resource('timetables/:specId/teacher/:_id', {
+  return $resource('timetables/:specId/teacher/:id', {
     specId : '@specId',
-    _id : '@_id'
+    id : '@id'
   });
 }]);
 

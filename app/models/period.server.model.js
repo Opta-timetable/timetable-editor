@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
 var PeriodSchema = new Schema({
-  _id           : Number,
+  _id           : String,
   periodID      : String,
   timeslotIndex : String,
   dayIndex      : String,

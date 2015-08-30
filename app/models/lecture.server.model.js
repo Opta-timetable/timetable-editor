@@ -9,7 +9,7 @@ var LectureSchema = new Schema({
   _course              : {type : Number, ref : 'Course'},
   locked               : String,
   lectureIndexInCourse : String,
-  _period              : {type : Number, ref : 'Period'},
+  _period              : {type : String, ref : 'Period'},
   roomReference        : String,
   specReference        : String
 });

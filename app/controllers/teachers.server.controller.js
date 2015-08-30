@@ -91,7 +91,7 @@ exports.list = function (req, res) {
  * Teacher middleware
  */
 exports.teacherByID = function (req, res, next, id) {
-  Teacher.find({'_id' : id, 'specReference' : req.param.specId}).populate('user', 'displayName').exec(function (err, teacher) {
+  Teacher.findOne({'id' : req.params.id, 'specReference' : req.params.specId}).populate('user', 'displayName').exec(function (err, teacher) {
     if (err) return next(err);
     if (!teacher) return next(new Error('Failed to load Teacher ' + id));
     req.teacher = teacher;

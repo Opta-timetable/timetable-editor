@@ -88,7 +88,7 @@ exports.list = function (req, res) {
  * Course middleware
  */
 exports.courseByID = function (req, res, next, id) {
-  Course.findById(id).populate('_teacher').exec(function (err, course) {
+  Course.find({id : id}).populate('_teacher').exec(function (err, course) {
     if (err) return next(err);
     if (!course) return next(new Error('Failed to load course ' + id));
     req.course = course;

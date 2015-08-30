@@ -22,7 +22,7 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
       $scope.specId = SpecIdHolder.getSpecId();
       $scope.timetableForTeacher = TimetableForTeacher.get({
         specId : $scope.specId,
-        _id : $stateParams._id
+        id : $stateParams.id
       });
 
     };
