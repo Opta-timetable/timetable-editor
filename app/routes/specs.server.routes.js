@@ -20,23 +20,14 @@ module.exports = function(app) {
   app.route('/specs/solve')
     .post(specs.solve);
 
-  app.route('/specs/isSolving')
-    .post(specs.isSolving);
+  app.route('/specs/:specId/solution')
+    .get(specs.isSolving);
 
-  app.route('/specs/currentSolutionScore')
-    .post(specs.currentSolutionScore);
+  app.route('/specs/:specId/solution')
+    .delete(specs.terminateSolving);
 
-  app.route('/specs/terminateSolving')
-    .post(specs.terminateSolving);
-
-  app.route('/specs/getFinalSolution')
-    .post(specs.getSolvedXML);
-
-  //app.route('/specs/progress')
-  //  .get(specs.getProgress);
-  //
-  //app.route('/specs/terminate')
-  //  .post(specs.terminateSolving);
+  app.route('/specs/:specId/solutionFile')
+    .get(specs.getSolvedXML);
 
 	// Finish by binding the Spec middleware
 	app.param('specId', specs.specByID);

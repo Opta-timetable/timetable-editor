@@ -4,48 +4,30 @@ angular.module('specs').controller('GenerateModalInstanceCtrl', function ($scope
   $scope.specId = specId;
   $scope.progress = 0;
   $scope.state = 'Initializing';
-  $scope.solutionHealth = 'Initializing';
+  $scope.solutionHealth = 'Unavailable';
   $scope.disableStop = false;
   console.log('SpecID for this modal is ' + specId);
   var worstScore = 0; //Used for Progress indicator
 
   $scope.checkProgress = function(){
-    $http.post('/specs/isSolving')
+    $http.get('/specs/' + $scope.specId + '/solution')
       .success(function (data, status, headers, config) {
         console.log('Invoked isSolving successfully');
-        console.log('Data is ' + data.response); //{"response":"true"}
-        $scope.state = 'Solving';
-        if (data.response === false){
-          $scope.state = 'Solution complete. Waiting for solution...';
-          $scope.disableStop = true;
-          $scope.progress = 100;
-          $interval.cancel($scope.progressPromise);
-          //Pick up the solution file after waiting for the closing formalities to get done at the J2EE server
-          $timeout(parseSolutionFile(), 10000);
-        }
+        console.log('Data is ' + data);
+        getCurrentStatusAndScore(data);
+        $scope.progress = calculateProgress($scope.solutionHealth, $scope.progress); //TODO calculateProgress(); using current number of hard constraints which is a reasonable indicator
+
       })
       .error(function (data, status, headers, config) {
         console.log('Error while getting solution status');
       });
-
-    $http.post('/specs/currentSolutionScore')
-      .success(function (data, status, headers, config){
-        console.log('Invoked currentSolutionScore successfully');
-        console.log('Data is ' + JSON.stringify(data));
-        if (data.score !== 'No Solution Available')
-        $scope.solutionHealth = data.score;
-      })
-      .error(function (data, status, headers, config){
-        console.log('Error while getting currentSolutionScore');
-      });
-    $scope.progress = calculateProgress($scope.solutionHealth, $scope.progress); //TODO calculateProgress(); using current number of hard constraints which is a reasonable indicator
     };
 
   $scope.progressPromise = $interval($scope.checkProgress, 10000); //Check every 10 secs
 
   $scope.terminateSolving = function(){
     console.log('You want to solve? Are you sure?');
-    $http.post('/specs/terminateSolving')
+    $http.delete('/specs/' + $scope.specId + '/solution')
       .success(function (data, status, headers, config) {
         console.log('Terminated Solving');
       })
@@ -70,6 +52,43 @@ angular.module('specs').controller('GenerateModalInstanceCtrl', function ($scope
     }
     return 0; //send a default and let the progress incrementer take care
   }
+
+  function parseSolutionFile(){
+    $scope.state = 'Importing Solution to Database...';
+    $http.get('/specs/' + $scope.specId + '/solutionFile')
+      .success(function (data, status, headers, config){
+        console.log('Got and parsed solution');
+        $scope.state = 'Complete';
+      })
+      .error(function (data, status, headers, config){
+        console.log('Error in picking solution');
+        $scope.state = 'Error. Please retry...';
+      });
+  }
+
+  // Parse response to get Solution state and score values
+  function getCurrentStatusAndScore(response){
+    var tokenisedString = response.split(', ');
+    if (tokenisedString.length !== 2){
+      console.log('Incorrect Response format. Unable to calculate progress');
+      $scope.state = 'Error';
+    }else{
+      var stateString = tokenisedString[0];
+      var scoreString = tokenisedString[1];
+      if (stateString.split(': ')[1].indexOf('true') !== -1){ //contains 'true'
+        $scope.state = 'Solving';
+      }else{
+        $scope.state = 'Solution complete. Waiting for solution...';
+        $scope.disableStop = true;
+        $scope.progress = 100;
+        $interval.cancel($scope.progressPromise);
+        //Pick up the solution file after waiting for the closing formalities to get done at the J2EE server
+        $timeout(parseSolutionFile(), 10000);
+      }
+      $scope.solutionHealth = scoreString.split(': ')[1];
+    }
+  }
+
   // Use the highest hard constraints and current hard constraints value and use it for find out solution progress
   // As the solution progresses, the number of hard constraints will reduce
   function calculateProgress(newScore, currentProgress){
@@ -85,21 +104,6 @@ angular.module('specs').controller('GenerateModalInstanceCtrl', function ($scope
     //In the unlikely case the hard constraints starts at 0, there is no other way to find the progress. So give the user some indication of activity
     return currentProgress+1;
 
-  }
-
-  function parseSolutionFile(){
-    $scope.state = 'Importing Solution to Database...';
-    $http.post('/specs/getFinalSolution', {
-      specID : $scope.specId
-    })
-      .success(function (data, status, headers, config){
-        console.log('Got and parsed solution');
-        $scope.state = 'Complete';
-      })
-      .error(function (data, status, headers, config){
-        console.log('Error in picking solution');
-        $scope.state = 'Error. Please retry...';
-      });
   }
 
 });

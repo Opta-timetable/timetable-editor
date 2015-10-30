@@ -546,7 +546,7 @@ exports.solvedXMLParser = function (specID, filename, callback) {
 
       //Trick to close mongoose connections after all entities are saved
       saveCount = courseList.length + //Courses
-      dayList.length * dayList[0].periodList.Period.length + //periods
+      //dayList.length * dayList[0].periodList.Period.length + //periods
       lectureList.length + //lectures
       (2 * curriculumList.length) + //Curriculums + corresponding timetables
       teacherList.length; //Teachers
@@ -577,21 +577,21 @@ exports.solvedXMLParser = function (specID, filename, callback) {
         course.save(saveCourseCallback);
       }
 
-      for (var k = 0; k < dayList.length; k++) {
-        var dayIndex = dayList[k].dayIndex;
-        var timeSlotIndex = 0;
-        for (var l = 0; l < dayList[k].periodList.Period.length; l++) {
-          var period = new Period();
-          period.id = parseInt(dayList[k].periodList.Period[l].$.id);
-          period.periodID = dayList[k].periodList.Period[l].id;
-          period.dayIndex = dayIndex;
-          period.timeslotIndex = timeSlotIndex++; //maintaining an incremented index instead of cross-referencing
-          period.save(savePeriodCallback);
-        }
-      }
-
       //periods
       //Period list doesn't seem to carry any value, I am not taking it for now
+
+      //for (var k = 0; k < dayList.length; k++) {
+      //  var dayIndex = dayList[k].dayIndex;
+      //  var timeSlotIndex = 0;
+      //  for (var l = 0; l < dayList[k].periodList.Period.length; l++) {
+      //    var period = new Period();
+      //    period.id = parseInt(dayList[k].periodList.Period[l].$.id);
+      //    period.periodID = dayList[k].periodList.Period[l].id;
+      //    period.dayIndex = dayIndex;
+      //    period.timeslotIndex = timeSlotIndex++; //maintaining an incremented index instead of cross-referencing
+      //    period.save(savePeriodCallback);
+      //  }
+      //}
 
       for (var m = 0; m < lectureList.length; m++) {
         var lecture = new Lecture();

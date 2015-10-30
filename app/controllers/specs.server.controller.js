@@ -180,12 +180,9 @@ exports.solve = function(req, res){
     console.log('unsolvedXML file name is ' + unsolvedXMLFileName);
     console.log('unsolvedXML file is in path %j', unsolvedXMLFilePath);
 
-    //Using callbacks for now
-    j2eeClient.uploadUnsolvedFile(unsolvedXMLFilePath, unsolvedXMLFileName, function(){
-      j2eeClient.initializeSolver(function(){
-        j2eeClient.startSolver(function(){
-          res.status(200).send();
-        });
+    j2eeClient.uploadUnsolvedFile(specId, unsolvedXMLFilePath, unsolvedXMLFileName, function(){
+      j2eeClient.startSolver(specId, function(){
+        res.status(200).send();
       });
     });
   });
@@ -195,7 +192,8 @@ exports.solve = function(req, res){
  * Is a solution in progress
  */
 exports.isSolving = function(req, res){
-  j2eeClient.isSolving(function(status){
+  var specId = req.params.specId;
+  j2eeClient.isSolving(specId, function(status){
     res.status(200).send(status);
   });
 };
@@ -204,7 +202,8 @@ exports.isSolving = function(req, res){
  * Terminate current solving
  */
 exports.terminateSolving = function(req, res) {
-  j2eeClient.terminateSolving(function() {
+  var specId = req.params.specId;
+  j2eeClient.terminateSolving(specId, function() {
     res.status(200).send();
   });
 };
@@ -222,8 +221,8 @@ exports.currentSolutionScore = function(req, res) {
  * Get the solved XML file
  */
 exports.getSolvedXML = function(req, res){
-  console.log('Req is ' + req.body.specID);
-    var specId = req.body.specID;
+  console.log('Req is ' + req.params.specId);
+    var specId = req.params.specId;
     Spec.findById(specId).exec(function(err, spec) {
    		if (err) return err;
    		if (!spec) return (new Error('Failed to load Spec ' + specId));
@@ -232,7 +231,7 @@ exports.getSolvedXML = function(req, res){
       var splitPath = spec.unsolvedXML.split('/'); //Unsolved and solved XMLs have the same name
       var solvedXMLFileName = splitPath[splitPath.length - 1];
       var solvedXMLPath = './solved/'+ solvedXMLFileName;
-      j2eeClient.getSolvedXML(solvedXMLPath, function() {
+      j2eeClient.getSolvedXML(specId, solvedXMLPath, function() {
         xmlUtils.solvedXMLParser(specId, solvedXMLPath, function () {
           Spec.update({'_id' : specId}, {$set : {'state' : 'Timetable Generated and Available for use'}}, function(){
             res.status(200).send({'uploadState' : 'Timetable Generated and Available for use' });
