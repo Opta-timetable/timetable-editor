@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
 var CourseSchema = new Schema({
-  _id                 : Number,
+  id                 : String,
   courseID            : String,
   code                : String,
   teacherID           : String,
@@ -12,6 +12,7 @@ var CourseSchema = new Schema({
   minWorkingDaySize   : String,
   curriculumReference : String,
   studentSize         : String,
+  specReference       : String,
   _teacher            : {type : String, ref : 'Teacher'}
 });
 

@@ -43,7 +43,12 @@
     "passport-twitter": "~1.0.3",
     "swig": "~1.4.2",
     "http": "*",
-    "querystring":"*"
+    "querystring":"*",
+    "connect-multiparty":"*",
+    "xml2js":"*",
+    "xml-writer": "*",
+    "csv-parser": "*",
+    "request-promise": "~0.4.3"
   },
   "devDependencies": {
     "grunt-bump": "^0.3.1",

@@ -13,6 +13,7 @@ var daySchema = mongoose.Schema({
 var timetableSchema = mongoose.Schema({
   curriculumReference : String,
   curriculumCode      : String,
+  specReference       : String,
   days                : [daySchema]
 });
 var Timetable = mongoose.model('Timetable', timetableSchema);

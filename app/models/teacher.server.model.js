@@ -6,10 +6,8 @@ var mongoose = require('mongoose'),
 var TeacherSchema = new Schema({
   _id       : String,
   teacherID : String,
-  code: {
-    type: String,
-    unique: true
-  }
+  specReference : String,
+  code: String
 });
 
 mongoose.model('Teacher', TeacherSchema);

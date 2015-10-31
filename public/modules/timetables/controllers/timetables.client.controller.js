@@ -1,8 +1,8 @@
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers) {
+angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers', 'TimetableForCurriculum', 'SpecIdHolder',
+  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers, TimetableForCurriculum, SpecIdHolder) {
     var SUBJECT_ROWS_PER_COLUMN = 8;
 
     $scope.authentication = Authentication;
@@ -75,11 +75,12 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function updateAllocation(dayIndex, periodIndex, allocatedCourse, currentClashes) {
-      $http.post('/timetables/modifyPeriodAllocation', {
+      $http.post('/timetables/' + $scope.specId + '/modifyPeriodAllocation', {
         currentDay      : dayIndex,
         currentPeriod   : extractPeriod(dayIndex, periodIndex),
         allocatedCourse : allocatedCourse,
-        clashesToUpdate   : currentClashes
+        clashesToUpdate : currentClashes,
+        specReference   : $scope.specId
       })
         .success(function (data, status, headers, config) {
           var updatedPeriod = extractPeriod(dayIndex, periodIndex);
@@ -181,10 +182,23 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     });
 
+    $scope.list = function() {
+      $scope.allTimetables = Timetables.query();
+    //Get all the generated timetables
+    };
+
     $scope.find = function () {
+      //pick specId in context
+      $scope.specId = $stateParams.specId;
+      //Set specId into Holder so that other controllers can access it
+      SpecIdHolder.setSpecId($stateParams.specId);
       //one timetable each for one curriculum
-      $scope.curriculums = Timetables.query();
-      $scope.teachers = Teachers.query();
+      $scope.curriculums = Timetables.query({
+        specId : $stateParams.specId
+      });
+      $scope.teachers = Teachers.query({
+        specId : $stateParams.specId
+      });
       //The following should eventually come from a configuration tied to the user and school
       $scope.workingDays = [{dayName:'Monday', dayIndex:0},
         {dayName:'Tuesday', dayIndex:1},
@@ -194,9 +208,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.findOne = function () {
-      $scope.timetableForCurriculum = Timetables.get({
+      $scope.timetableForCurriculum = TimetableForCurriculum.get({
+        specId : $stateParams.specId,
         curriculumId : $stateParams.curriculumId
       });
+      $scope.specId = $stateParams.specId;
     };
 
     $scope.formatAllocationHistory = function (allocation) {
@@ -255,7 +271,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         curriculumId : $stateParams.curriculumId,
         clashes      : $scope.clashes
       }, function () {
-        $location.path('timetables/' + $stateParams.curriculumId);
+        $location.path('timetables/' + $scope.specId + '/curriculum/' + $stateParams.curriculumId);
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });
@@ -283,10 +299,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         console.log('clash for this element :' + clash);
         console.log('day for this element :' + dayIndex);
         console.log('period for this element :' + periodIndex);
-        $http.post('/timetables/discoverClashes', {
+        $http.post('/timetables/' + $stateParams.specId + '/discoverClashes', {
           currentDay    : dayIndex,
           currentPeriod : extractPeriod(dayIndex, periodIndex),
-          curriculumId  : $stateParams.curriculumId
+          curriculumId  : $stateParams.curriculumId,
+          specId        : $stateParams.specId
         })
           .success(function (data, status, headers, config) {
             if (data.clashIn.length >= 1) {
@@ -308,7 +325,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         clashesInScope = extractClashes(dayIndex, periodIndex);
       }
       if (clashesInScope.length > 0) { //TODO getClash link in the view doesn't have a provision to display multiple links. A popover would look good.
-        return '#!/timetables/' + clashesInScope[0].curriculumReference;
+        return '#!/timetables/' + $stateParams.specId + '/curriculum/' + clashesInScope[0].curriculumReference;
       }
       return undefined;
     };
@@ -398,7 +415,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         subjectCode : subjectCode
       };
       //Collect Teacher totals from server
-      $http.post('/timetables/collectStats', {
+      $http.post('/timetables/' + $stateParams.specId + '/collectStats', {
         teacherCode : teacherCode
       })
         .success(function (data, status, headers, config) {
@@ -430,7 +447,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     function updateTeacherForSubject(subjectCode, newTeacherID, newTeacherCode){
       // get the clashes for the current teacher, if any after removing it from the local list
       var clashesToUpdate = popAllClashesForTeacherFromLocalList($scope.teacherCode);
-      $http.post('/timetables/changeTeacherAssignment', {
+      $http.post('/timetables/' + $scope.specId + '/changeTeacherAssignment', {
         teacherReference : newTeacherID,
         teacherCode : newTeacherCode,
         subjectCode : subjectCode,
@@ -459,7 +476,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       teacher.$save(function (response) {
         console.log('Created teacher %j', response);
         //Call update function using the new teacher
-        updateTeacherForSubject(subjectCode, response._id, response.code);
+        updateTeacherForSubject(subjectCode, response.id, response.code);
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });
@@ -492,7 +509,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           //Assignment using an existing teacher
           console.info('The user has selected %j', $scope.selectedTeacher);
           if ($scope.selectedTeacher.code !== $scope.teacherCode){
-            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher._id, $scope.selectedTeacher.code);
+            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher.id, $scope.selectedTeacher.code);
           }
         }else{
           //New teacher being created

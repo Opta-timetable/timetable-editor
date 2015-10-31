@@ -22,7 +22,7 @@
         <!-- Edit Toolbar -->
         <div class="clearfix">
           <div class="form-group">
-            <a class="btn btn-group-sm btn-default" ng-href="#!/timetables/{{timetableForCurriculum.timetable.curriculumReference}}">
+            <a class="btn btn-group-sm btn-default" ng-href="#!/timetables/{{specId}}/curriculum/{{timetableForCurriculum.timetable.curriculumReference}}">
               <i class="glyphicon glyphicon-backward"></i> &#160;Back
             </a>
             <a data-ng-disabled="!undoStack.length" ng-class="{'btn-danger' : undoStack.length}" class="btn btn-group-sm btn-default" ng-click="undo()">

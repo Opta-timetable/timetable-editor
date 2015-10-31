@@ -8,29 +8,32 @@ module.exports = function (app) {
   // Course Routes
   app.route('/timetables')
     .get(users.requiresLogin, timetables.list);
+
+  app.route('/timetables/:specId')
+    .get(users.requiresLogin, timetables.timetableForSpec);
   //.post(users.requiresLogin, timetables.create); //Later
 
-  app.route('/timetables/:curriculumId')
+  app.route('/timetables/:specId/curriculum/:curriculumId')
     .get(users.requiresLogin, timetables.timetableByCurriculum)
     .put(users.requiresLogin, timetables.update);
   //.delete(users.requiresLogin, timetables.hasAuthorization, timetables.delete);
 
-  app.route('/timetables/modifyPeriodAllocation')
+  app.route('/timetables/:specId/modifyPeriodAllocation')
     .post(users.requiresLogin, timetables.modifyPeriodAllocation);
 
-  app.route('/timetables/discoverClashes')
+  app.route('/timetables/:specId/discoverClashes')
     .post(users.requiresLogin, timetables.discoverClashes);
 
-  app.route('/timetables/teachers/:_id')
+  app.route('/timetables/:specId/teacher/:id')
     .get(users.requiresLogin, timetables.timetableByTeacherID);
 
-  app.route('/timetables/collectStats')
+  app.route('/timetables/:specId/collectStats')
     .post(users.requiresLogin, timetables.collectStats);
 
-  app.route('/timetables/days/:dayIndex')
+  app.route('/timetables/:specId/day/:dayIndex')
     .get(users.requiresLogin, timetables.timetableByDayIndex);
 
-  app.route('/timetables/changeTeacherAssignment')
+  app.route('/timetables/:specId/changeTeacherAssignment')
     .post(users.requiresLogin, timetables.changeTeacherAssignment);
   
   app.param('curriculumId', timetables.read);
