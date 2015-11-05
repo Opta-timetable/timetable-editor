@@ -1,0 +1,41 @@
+<section data-ng-controller="TeachersController">
+  <div class="page-header">
+    <h1>New Teacher</h1>
+  </div>
+  <div class="col-md-12">
+    <form class="form-horizontal" data-ng-submit="create()" novalidate>
+      <fieldset>
+        <div class="form-group">
+          <label class="control-label" for="firstName">First Name</label>
+          <div class="controls">
+            <input type="text" data-ng-model="firstName" id="firstName" class="form-control" placeholder="First Name (Eg. Vimal)" required>
+          </div>
+          <label class="control-label" for="lastName">Last Name</label>
+          <div class="controls">
+            <input type="text" data-ng-model="lastName" id="lastName" class="form-control" placeholder="Last Name (Eg. Kumar)" required>
+          </div>
+
+          <label class="control-label" for="email">Email ID</label>
+          <div class="controls">
+            <input type="text" data-ng-model="email" id="email" class="form-control" placeholder="Email ID (Eg. VimalK@gmail.com)">
+          </div>
+          <label class="control-label" for="details">Details</label>
+          <div class="controls">
+            <input type="text" data-ng-model="details" id="details" class="form-control" placeholder="Details (Eg. Computer, Science)">
+          </div>
+          <label class="control-label" for="code">Teacher Code</label>
+          <div class="controls">
+            <input type="text" data-ng-model="code" id="code" class="form-control" placeholder="Teacher Code (Eg. VK)" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="submit" class="btn btn-default">
+        </div>
+        <div data-ng-show="error" class="text-danger">
+          <strong data-ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

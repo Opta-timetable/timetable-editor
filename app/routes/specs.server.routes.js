@@ -29,6 +29,11 @@ module.exports = function(app) {
   app.route('/specs/:specId/solutionFile')
     .get(specs.getSolvedXML);
 
+  app.route('/specs/:specId/teachers')
+      .get(specs.listTeachers);
+
+
+
 	// Finish by binding the Spec middleware
 	app.param('specId', specs.specByID);
 };

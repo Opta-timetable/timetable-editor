@@ -1,0 +1,15 @@
+<section data-ng-controller="TeachersController" data-ng-init="findOne()">
+	<div class="page-header">
+		<h1>{{teacher.firstName + " " + teacher.lastName}}</h1>
+    <h2>{{teacher.code}}</h2>
+	</div>
+	<div class="pull-right" data-ng-show="(authentication.user)"> <!--" && (authentication.user._id == teacher.user._id))">-->
+		<a class="btn btn-primary" href="/#!/teachers/{{teacher._id}}/edit">
+			<i class="glyphicon glyphicon-edit"></i>
+		</a>
+		<a class="btn btn-primary" data-ng-click="remove();">
+			<i class="glyphicon glyphicon-trash"></i>
+		</a>
+	</div>
+  <pre>{{teacher | json}}</pre>
+</section>

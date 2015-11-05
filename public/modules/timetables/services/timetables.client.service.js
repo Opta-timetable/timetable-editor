@@ -17,13 +17,13 @@ angular.module('timetables').factory('TimetableForCurriculum', ['$resource',
   }
 ]);
 
-angular.module('timetables').factory('Teachers', ['$resource',
+/*angular.module('timetables').factory('Teachers', ['$resource',
   function ($resource) {
     return $resource('teachers/:specId', {
       specId : '@specId'
     }, {'update' : {method : 'PUT'}});
   }
-]);
+]);*/
 
 angular.module('timetables').factory('TimetableForTeacher', ['$resource',
 function ($resource) {

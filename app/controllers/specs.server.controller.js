@@ -9,6 +9,7 @@ var mongoose = require('mongoose'),
   j2eeClient = require('./OptaplannerJ2EEClientUtils'),
   xmlUtils = require('./timetableXMLUtils'),
 	Spec = mongoose.model('Spec'),
+  Teacher = mongoose.model('Teacher'),
 	_ = require('lodash');
 
 /**
@@ -239,4 +240,20 @@ exports.getSolvedXML = function(req, res){
         });
       });
     });
+};
+
+/**
+ * List of Teachers
+ */
+exports.listTeachers = function (req, res) {
+  console.log('finding teacher by specID ' + req.params.specId);
+  Teacher.find({'specReference' : req.params.specId}).sort('code').exec(function (err, teachers) {
+    if (err) {
+      return res.status(400).send({
+        message : errorHandler.getErrorMessage(err)
+      });
+    } else {
+      return res.jsonp(teachers);
+    }
+  });
 };

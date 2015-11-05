@@ -7,6 +7,10 @@ var TeacherSchema = new Schema({
   _id       : String,
   teacherID : String,
   specReference : String,
+  firstName : String,
+  lastName : String,
+  email : String,
+  details : String,
   code: String
 });
 
