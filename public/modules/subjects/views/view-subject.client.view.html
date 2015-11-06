@@ -1,0 +1,22 @@
+<section data-ng-controller="SubjectsController" data-ng-init="findOne()">
+	<div class="page-header">
+		<h1 data-ng-bind="subject.name"></h1>
+    <h2 data-ng-bind="subject.code"></h2>
+	</div>
+	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == subject.user._id))">
+		<a class="btn btn-primary" href="/#!/subjects/{{subject._id}}/edit">
+			<i class="glyphicon glyphicon-edit"></i>
+		</a>
+		<a class="btn btn-primary" data-ng-click="remove();">
+			<i class="glyphicon glyphicon-trash"></i>
+		</a>
+	</div>
+	<small>
+		<em class="text-muted">
+			Posted on
+			<span data-ng-bind="subject.created | date:'mediumDate'"></span>
+			by
+			<span data-ng-bind="subject.user.displayName"></span>
+		</em>
+	</small>
+</section>

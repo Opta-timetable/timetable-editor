@@ -13,7 +13,7 @@ module.exports = function (app) {
     .get(users.requiresLogin, timetables.timetableForSpec);
   //.post(users.requiresLogin, timetables.create); //Later
 
-  app.route('/timetables/:specId/curriculum/:curriculumId')
+  app.route('/timetables/:specId/curriculum/:id')
     .get(users.requiresLogin, timetables.timetableByCurriculum)
     .put(users.requiresLogin, timetables.update);
   //.delete(users.requiresLogin, timetables.hasAuthorization, timetables.delete);

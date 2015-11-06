@@ -83,14 +83,14 @@ console.log('Calling for Spec: ' + req.params.specId);
 
 exports.timetableByCurriculum = function (req, res) {
   //Associations now. Will have to live with this now
-  console.log('Finding spec : ' + req.params.specId + ' curriculum : ' + req.params.curriculumId);
-  Course.find({'specReference' : req.params.specId, curriculumReference : req.params.curriculumId}).populate('_teacher').exec(function (err, courses) {
+  console.log('Finding spec : ' + req.params.specId + ' curriculum : ' + req.params.id);
+  Course.find({'specReference' : req.params.specId, curriculumReference : req.params.id}).populate('_teacher').exec(function (err, courses) {
     if (err) {
       return res.status(400).send({
         message : errorHandler.getErrorMessage(err)
       });
     } else {
-      Timetable.findOne({'specReference' : req.params.specId, curriculumReference : req.params.curriculumId}, function (err, timetable) {
+      Timetable.findOne({'specReference' : req.params.specId, curriculumReference : req.params.id}, function (err, timetable) {
         if (err) {
           return res.status(400).send({
             message : errorHandler.getErrorMessage(err)

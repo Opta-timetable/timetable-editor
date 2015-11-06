@@ -13,10 +13,13 @@ var mongoose = require('mongoose'),
  */
 exports.create = function(req, res) {
 	var teacher = new Teacher(req.body);
-	teacher.user = req.user;
-
+  console.log('req.user is ' + req.user);
+	//teacher.user = req.user;
+  teacher._id = mongoose.Types.ObjectId();
+console.log('Received Teacher is %j', teacher);
 	teacher.save(function(err) {
 		if (err) {
+      console.log('Received error: %j', err);
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)
 			});
@@ -31,7 +34,7 @@ exports.create = function(req, res) {
  */
 exports.read = function(req, res) {
   var teacherId = req.params.teacherId;
-  Teacher.findOne({"_id": teacherId}).exec(function(err, teacher) {
+  Teacher.findOne({'_id': teacherId}).exec(function(err, teacher) {
   		if (err) {
   			return res.status(400).send({
   				message: errorHandler.getErrorMessage(err)
