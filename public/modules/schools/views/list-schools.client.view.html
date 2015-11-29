@@ -1,0 +1,19 @@
+<section data-ng-controller="SchoolsController" data-ng-init="find()">
+    <div class="page-header">
+        <h1>Schools</h1>
+    </div>
+    <div class="list-group">
+        <a data-ng-repeat="school in schools" data-ng-href="#!/schools/{{school._id}}" class="list-group-item">
+			<small class="list-group-item-text">
+				Posted on
+				<span data-ng-bind="school.created | date:'medium'"></span>
+				by
+				<span data-ng-bind="school.user.displayName"></span>
+			</small>
+			<h4 class="list-group-item-heading"> {{school.name + '-' + school.code}} </h4>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" data-ng-hide="!schools.$resolved || schools.length">
+    	No Schools yet, why don't you <a href="/#!/schools/create">create one</a>?
+    </div>
+</section>

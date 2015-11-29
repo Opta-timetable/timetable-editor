@@ -9,6 +9,7 @@ var mongoose = require('mongoose'),
   j2eeClient = require('./OptaplannerJ2EEClientUtils'),
   xmlUtils = require('./timetableXMLUtils'),
 	Spec = mongoose.model('Spec'),
+  Assignment = mongoose.model('Assignment'),
   Teacher = mongoose.model('Teacher'),
 	_ = require('lodash');
 
@@ -257,3 +258,89 @@ exports.listTeachers = function (req, res) {
     }
   });
 };
+
+/** Add Sections to the Spec
+ *
+ */
+exports.addSectionsForSpec = function(req, res) {
+  var specId = req.params.specId;
+  console.log('adding sections to ' + specId);
+  console.log('sections to add: ' + req.body.sections);
+  console.log('Length of sections: ' + req.body.sections.length);
+
+    Spec.update({'_id' : specId}, {$addToSet: {sections: {$each: req.body.sections}}},function(err, specToUpdate) {
+    if (err) {
+      console.log('Unable to find spec');
+      return res.status(500).send({
+        message : errorHandler.getErrorMessage(err)
+      });
+    }
+    else
+    {
+      return res.status(200).send();
+
+    }
+  });
+};
+
+/**
+ * Get Sections for the Spec
+ */
+exports.getSectionsForSpec = function(req, res) {
+  var specId = req.params.specId;
+  Spec.findById(specId).exec(function(err, spec){
+    if (err) {
+      return res.status(500).send({
+        message : errorHandler.getErrorMessage(err)
+      });
+    }else{
+      return res.jsonp(spec.sections);
+    }
+  });
+};
+
+/**
+ * Add Assignments for the Spec
+ */
+exports.addAssignmentsForSpec = function(req, res) {
+  var specId = req.params.specId;
+  var assignments = req.body.assignments;
+  console.log('assignments to save %j', assignments);
+  console.log('Number of assignments to save ' + assignments.length);
+
+  var assignmentsToSave = [];
+  for (var i = 0; i < assignments.length; i++){
+    var thisAssignment = new Assignment(assignments[i]);
+    assignmentsToSave.push(thisAssignment);
+  }
+  Spec.update({'_id' : specId}, {$addToSet: {assignments: {$each: assignmentsToSave}}},function(err) {
+    if (err) {
+      console.log('Unable to find spec');
+      return res.status(500).send({
+        message : errorHandler.getErrorMessage(err)
+      });
+    }
+    else {
+      return res.status(200).send();
+    }
+  });
+};
+
+
+/**
+ * Get Assignments for the Spec
+ */
+exports.getAssignmentsForSpec = function(req, res){
+  var specId = req.params.specId;
+    Spec.findById(specId).exec(function(err, spec){
+      if (err) {
+        return res.status(500).send({
+          message : errorHandler.getErrorMessage(err)
+        });
+      }else{
+        return res.jsonp(spec.assignments);
+      }
+    });
+};
+
+

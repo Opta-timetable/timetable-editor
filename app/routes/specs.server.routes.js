@@ -32,6 +32,13 @@ module.exports = function(app) {
   app.route('/specs/:specId/teachers')
       .get(specs.listTeachers);
 
+  app.route('/specs/:specId/sections')
+    .get(specs.getSectionsForSpec)
+    .post(specs.addSectionsForSpec);
+
+  app.route('/specs/:specId/assignments')
+    .get(specs.getAssignmentsForSpec)
+    .post(specs.addAssignmentsForSpec);
 
 
 	// Finish by binding the Spec middleware

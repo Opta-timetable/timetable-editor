@@ -20,6 +20,18 @@ angular.module('specs').config(['$stateProvider',
       state('editSpec', {
         url: '/specs/:specId/edit',
         templateUrl: 'modules/specs/views/edit-spec.client.view.html'
+      }).
+    state('addSectionsToSpec', {
+        url: '/specs/:specId/addSections',
+        templateUrl: 'modules/specs/views/add-sections-to-spec.client.view.html'
+      }).
+    state('assignSubjectsToSections', {
+        url: '/specs/:specId/assignSubjects',
+        templateUrl: 'modules/specs/views/assign-subjects-to-sections.client.view.html'
+      }).
+    state('assignTeachersToSubjects', {
+        url: '/specs/:specId/assignTeachers',
+        templateUrl: '/modules/specs/views/assign-teachers-to-subjects.client.view.html'
       });
   }
 ]);

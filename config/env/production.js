@@ -20,7 +20,8 @@ module.exports = {
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'public/lib/ngDraggable/ngDraggable.js',
         'public/lib/ng-table-to-csv/dist/ng-table-to-csv.min.js',
-        'public/lib/angular-breadcrumb/release/angular-breadcrumb.min.js'
+        'public/lib/angular-breadcrumb/release/angular-breadcrumb.min.js',
+        'public/lib/isteven-angular-multiselect/angular-multi-select.js'
       ]
     },
     css : 'public/dist/application.min.css',

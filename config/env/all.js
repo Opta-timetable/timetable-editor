@@ -15,6 +15,7 @@ module.exports = {
       css : [
         'public/lib/bootstrap/dist/css/bootstrap.css',
         'public/lib/bootstrap/dist/css/bootstrap-theme.css',
+        'public/lib/isteven-angular-multiselect/angular-multi-select.css'
       ],
       js  : [
         'public/lib/angular/angular.js',
@@ -29,7 +30,8 @@ module.exports = {
         'public/lib/ngDraggable/ngDraggable.js',
         'public/lib/ng-table-to-csv/dist/ng-table-to-csv.js',
         'public/lib/angular-breadcrumb/release/angular-breadcrumb.js',
-        'public/lib/ng-file-upload/ng-file-upload-all.js'
+        'public/lib/ng-file-upload/ng-file-upload-all.js',
+        'public/lib/isteven-angular-multiselect/angular-multi-select.js'
       ]
     },
     css   : [

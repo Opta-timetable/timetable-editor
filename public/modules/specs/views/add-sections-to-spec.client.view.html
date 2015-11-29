@@ -1,0 +1,34 @@
+<section data-ng-controller="SpecsController" data-ng-init="initSections()">
+  <div class="page-header">
+    <h1>New Specification for Timetable</h1>
+    <ol class="progtrckr" data-progtrckr-steps="5">
+        <li class="progtrckr-done">Define Spec</li>
+        <li class="progtrckr-todo">Add Sections</li>
+        <li class="progtrckr-todo">Assign Subjects to Sections</li>
+        <li class="progtrckr-todo">Assign Teachers to Subjects</li>
+        <li class="progtrckr-todo">Review and Submit</li>
+    </ol>
+  </div>
+  <div class="col-md-12">
+    <h2> Add Sections(Classes + Division) to your New Specification</h2>
+    <div class="col-md-6">
+      <h3>Select sections</h3>
+      <div
+              multi-select
+              input-model="allSections"
+              output-model="selectedSections"
+              button-label="name"
+              item-label="name"
+              tick-property="ticked"
+          >
+          </div>
+    </div>
+    <div class="col-md-6">
+      <h3>Sections in your Specification</h3>
+      <p>{{selectedSections}}</p>
+    </div>
+    <div class="form-group">
+              <button ng-click="addSections()" class="btn btn-primary">Save and Proceed</button>
+            </div>
+  </div>
+</section>

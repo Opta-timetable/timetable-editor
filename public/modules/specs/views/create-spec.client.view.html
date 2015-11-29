@@ -1,6 +1,13 @@
 <section data-ng-controller="SpecsController">
   <div class="page-header">
     <h1>New Specification for Timetable</h1>
+    <ol class="progtrckr" data-progtrckr-steps="5">
+        <li class="progtrckr-todo">Define Spec</li>
+        <li class="progtrckr-todo">Add Sections</li>
+        <li class="progtrckr-todo">Assign Subjects to Sections</li>
+        <li class="progtrckr-todo">Assign Teachers to Subjects</li>
+        <li class="progtrckr-todo">Review and Submit</li>
+    </ol>
   </div>
   <div class="col-md-12">
     <form class="form-horizontal" data-ng-submit="create()" novalidate>
@@ -12,13 +19,14 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="control-label" for="SpecificationsFile">Timetable Specifications File</label>
+          <label class="control-label" for="SpecificationsFile">Timetable Specifications File (Optional)</label>
           <div class="controls">
-            <input type="file" id="SpecificationsFile" class="form-control" ngf-select ngf-change="upload($files)" required>
+            <input type="file" id="SpecificationsFile" class="form-control" ngf-select ngf-change="upload($files)">
           </div>
         </div>
-        <!--<input type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)"/>-->
+
         <div class="form-group">
+          <button ng-click="create()" class="btn btn-primary">Save and Proceed</button>
           <input type="submit" class="btn btn-default">
         </div>
         <div data-ng-show="error" class="text-danger">

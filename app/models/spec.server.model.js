@@ -6,6 +6,13 @@
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 
+var AssignmentSchema = new Schema({
+  section: String,
+  subjectCode: String,
+  teacherCode: String,
+  numberOfClassesInAWeek: Number
+});
+
 /**
  * Spec Schema
  */
@@ -14,7 +21,8 @@ var SpecSchema = new Schema({
 		type: String,
 		default: '',
 		required: 'Please fill Spec name',
-		trim: true
+		trim: true,
+    unique: true
 	},
 	created: {
 		type: Date,
@@ -27,12 +35,14 @@ var SpecSchema = new Schema({
   specFile: {
     type: String,
     default: '',
-    required: 'Please upload your Spec File',
     trim: true
   },
   origFile: String,
   unsolvedXML: String,
+  sections: [String],
+  assignments: [AssignmentSchema],
   state: String
 });
 
+mongoose.model('Assignment', AssignmentSchema);
 mongoose.model('Spec', SpecSchema);

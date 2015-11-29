@@ -18,6 +18,7 @@
     "angular-breadcrumb": "~0.3.3",
     "ng-table-to-csv": "~0.2.1",
     "ng-file-upload": "~5.0.9",
-    "ng-file-upload-shim": "~5.0.9"
+    "ng-file-upload-shim": "~5.0.9",
+    "isteven-angular-multiselect":"~2.0.0"
   }
 }

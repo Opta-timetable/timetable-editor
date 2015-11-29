@@ -1,0 +1,30 @@
+<section data-ng-controller="SpecsController" data-ng-init="initSubjects()">
+  <div class="page-header">
+    <h1>New Specification for Timetable</h1>
+    <ol class="progtrckr" data-progtrckr-steps="5">
+        <li class="progtrckr-done">Define Spec</li>
+        <li class="progtrckr-done">Add Sections</li>
+        <li class="progtrckr-todo">Assign Subjects to Sections</li>
+        <li class="progtrckr-todo">Assign Teachers to Subjects</li>
+        <li class="progtrckr-todo">Review and Submit</li>
+    </ol>
+  </div>
+  <div class="col-md-12">
+    <!--<label class="checkbox">
+        <input type="checkbox" ng-model="sectionsAccordionOneAtATime">
+        Open only one Section at a time
+      </label>-->
+    <h2> Add Subjects to Sections</h2>
+    <accordion close-others="sectionsAccordionOneAtATime">
+        <accordion-group ng-repeat="section in assignedSections" heading="{{section.name}}">
+          <h3>Select Subjects</h3>
+          <div multi-select input-model="section.allSubjects" output-model="section.selectedSubjects" button-label="name" item-label="name"
+               tick-property="ticked">
+          </div>
+        </accordion-group>
+      </accordion>
+  </div>
+  <div class="form-group">
+    <button ng-click="saveSubjectsAndProceed()" class="btn btn-primary">Save and Proceed</button>
+  </div>
+</section>
