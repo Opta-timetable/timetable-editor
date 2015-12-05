@@ -343,4 +343,23 @@ exports.getAssignmentsForSpec = function(req, res){
     });
 };
 
+/**
+ * Update Assignments in Spec
+ */
+exports.updateAssignmentsForSpec = function(req, res){
+  var specId = req.params.specId;
+  var assignments = req.body.assignments;
+  console.log('assignments to update %j', assignments);
 
+  Spec.update({'_id' : specId}, {$set: {assignments: assignments}},function(err) {
+      if (err) {
+        console.log('Unable to find spec');
+        return res.status(500).send({
+          message : errorHandler.getErrorMessage(err)
+        });
+      }
+      else {
+        return res.status(200).send();
+      }
+    });
+};

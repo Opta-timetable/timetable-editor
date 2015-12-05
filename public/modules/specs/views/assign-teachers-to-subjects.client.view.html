@@ -15,6 +15,12 @@
         Open only one Section at a time
       </label>-->
     <h2> Assign Teachers to Subjects </h2>
+    <div class="form-group">
+      <label class="control-label" for="assignmentFilter">Filter: </label>
+      <div class="controls">
+        <input type="text" data-ng-model="assignmentFilter" id="assignmentFilter" class="form-control" placeholder="Enter Section, Subject or Teacher Code to Filter...">
+      </div>
+    </div>
     <table class="table table-bordered">
       <tr>
         <th>Section</th>
@@ -22,17 +28,17 @@
         <th>Teacher</th>
         <th>Number of Periods in a week</th>
       </tr>
-      <tr ng-repeat="assignment in assignments">
+      <tr ng-repeat="assignment in assignments | filter:assignmentFilter | orderBy: 'section'">
         <td>{{ assignment.section }}</td>
         <td>{{ assignment.subjectCode }}</td>
         <td>
           <form class="form-inline">
             <div class="form-group">
               <input class="form-control" autocomplete="off" ng-model="assignment.teacherCode" placeholder="Search..." type="text"
-                     typeahead="teacher as teacher.code for teacher in allTeachers | filter:$viewValue" required/>
+                     typeahead="teacher for teacher in allTeachers | filter:$viewValue" required/>
             </div>
             <div class="form-group">
-              <select class="form-control" ng-model="assignment.teacherCode" ng-options="teacher.code for teacher in allTeachers">
+              <select class="form-control" ng-model="assignment.teacherCode" ng-options="teacher for teacher in allTeachers">
                 <option value="">Select</option>
               </select>
             </div>

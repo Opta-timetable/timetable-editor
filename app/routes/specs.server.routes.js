@@ -38,8 +38,8 @@ module.exports = function(app) {
 
   app.route('/specs/:specId/assignments')
     .get(specs.getAssignmentsForSpec)
-    .post(specs.addAssignmentsForSpec);
-
+    .put(specs.addAssignmentsForSpec)
+    .post(specs.updateAssignmentsForSpec);
 
 	// Finish by binding the Spec middleware
 	app.param('specId', specs.specByID);

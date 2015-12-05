@@ -225,7 +225,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           assignments.push(assignmentObject);
         }
       }
-      $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
+      $http.put('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
         .success(function(data, status, headers, config){
           $location.path('specs/' + $stateParams.specId + '/assignTeachers');
         })
@@ -239,21 +239,28 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
         console.log('received following assignments: %j', data);
         $scope.assignments = data;
+
       }).error(function (data, status, headers, config){
         $scope.error = data.message;
         $scope.assignments = [];
       });
       //Pick up All Teachers
-      $scope.allTeachers = Teachers.query();
-
-      //Pick up sections for the accordion
-      $http.get('/specs/' + $stateParams.specId + '/sections').success(function(data, status, headers, config){
-        console.log('received following assignments: %j', data);
-        $scope.sections = data;
-      }).error(function (data, status, headers, config){
-        $scope.error = data.message;
-        $scope.sections = [];
+      $scope.allTeachers = [];
+      var teachers = Teachers.query(function(){
+        teachers.forEach(function(teacher){
+          $scope.allTeachers.push(teacher.code);
+        });
       });
+    };
+
+    $scope.assignTeachersAndProceed = function(){
+      $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: $scope.assignments})
+        .success(function(data, status, headers, config){
+          //$location.path('specs/' + $stateParams.specId + '/assignTeachers');
+        })
+        .error(function(data, status, headers, config){
+          $scope.error = data.message;
+        });
     };
 	}
 ]);
