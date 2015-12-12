@@ -133,7 +133,7 @@ var createHandler = function (ipFile, opFile) {
 
 };
 /*
- * Upload Spec file
+ * Upload Spec file - Used if CSV is uploaded by user
  */
 exports.uploadSpecFile = function(req, res){
   //console.dir(req.files);
@@ -150,6 +150,45 @@ exports.uploadSpecFile = function(req, res){
     fileOriginalName: fileOriginalName,
     outputFileName: outputFileName,
     uploadState: 'Data ready for timetable generation'});
+};
+
+/*
+ * Generate Spec File from assignments in spec
+ */
+exports.generateSpecFile = function(req, res){
+  var specId = req.params.specId;
+  Spec.findById(specId, function(err, spec){
+    if (err) {
+      return res.status(400).send({
+        message : errorHandler.getErrorMessage(err)
+      });
+    } else {
+      var assignments = spec.assignments;
+      var ipfile = './uploads/' + specId + '.csv';
+      var fs = require('fs');
+      var stream = fs.createWriteStream(ipfile);
+      stream.once('open', function(fd) {
+        stream.write('Class,Subject,Teacher,PeriodsInAWeek\n');
+        for (var i=0; i<assignments.length; i++){
+          stream.write(assignments[i].section + ',' +
+            assignments[i].subjectCode + ',' +
+            assignments[i].teacherCode + ',' +
+            assignments[i].numberOfClassesInAWeek + '\n');
+        }
+        stream.end();
+        console.log('spec file is ' + ipfile);
+        console.log('original file name is ' + 'Not Applicable');
+        console.log('converting CSV to Optaplanner InputXML');
+        var outputFileName = ipfile.replace('csv', 'xml');
+        console.log('output file name is ' + outputFileName);
+        //createHandler(ipfile, outputFileName);
+        res.status(200).send({specFileName: ipfile,
+          fileOriginalName: 'Not Applicable',
+          outputFileName: outputFileName,
+          uploadState: 'Data ready for timetable generation'});
+      });
+    }
+  });
 };
 
 /*

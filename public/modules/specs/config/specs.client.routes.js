@@ -32,6 +32,10 @@ angular.module('specs').config(['$stateProvider',
     state('assignTeachersToSubjects', {
         url: '/specs/:specId/assignTeachers',
         templateUrl: '/modules/specs/views/assign-teachers-to-subjects.client.view.html'
+      }).
+    state('reviewAndSubmit', {
+        url: '/specs/:specId/reviewAndSubmit',
+        templateUrl: '/modules/specs/views/review-and-submit-spec.client.view.html'
       });
   }
 ]);

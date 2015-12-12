@@ -202,9 +202,9 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         allSubjects.forEach(function(subject){
           $scope.allSubjects.push({name: subject.name, ticked: false});
         });
+        getSectionsForSpec();
       });
       $scope.sectionsAccordionOneAtATime = true;
-      getSectionsForSpec();
       $scope.sectionsAccordionStatus = {
         isFirstOpen: true,
         isFirstDisabled: false
@@ -256,11 +256,26 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     $scope.assignTeachersAndProceed = function(){
       $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: $scope.assignments})
         .success(function(data, status, headers, config){
-          //$location.path('specs/' + $stateParams.specId + '/assignTeachers');
+          $location.path('specs/' + $stateParams.specId + '/reviewAndSubmit');
         })
         .error(function(data, status, headers, config){
           $scope.error = data.message;
         });
     };
+
+    $scope.submitSpec = function(){
+      $http.post('/specs/' + $stateParams.specId + '/generate',{})
+        .success(function(data, status, headers, config){
+          $scope.specFileName = data.specFileName;
+          $scope.fileOriginalName = data.fileOriginalName;
+          $scope.outputFileName = data.outputFileName;
+          $scope.uploadState = data.uploadState;
+          $scope.csvFileUploaded = true;
+          $location.path('specs/' + $stateParams.specId);
+        })
+        .error(function(data, status, headers, config){
+          $scope.error = data.message;
+        });
+    }
 	}
 ]);

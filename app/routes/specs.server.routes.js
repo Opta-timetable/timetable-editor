@@ -17,6 +17,9 @@ module.exports = function(app) {
   app.route('/specs/upload')
       .post(specs.uploadSpecFile);
 
+  app.route('/specs/:specId/generate')
+    .post(specs.generateSpecFile);
+
   app.route('/specs/solve')
     .post(specs.solve);
 
