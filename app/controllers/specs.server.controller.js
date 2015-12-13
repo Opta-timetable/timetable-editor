@@ -181,11 +181,25 @@ exports.generateSpecFile = function(req, res){
         console.log('converting CSV to Optaplanner InputXML');
         var outputFileName = ipfile.replace('csv', 'xml');
         console.log('output file name is ' + outputFileName);
-        //createHandler(ipfile, outputFileName);
-        res.status(200).send({specFileName: ipfile,
-          fileOriginalName: 'Not Applicable',
-          outputFileName: outputFileName,
-          uploadState: 'Data ready for timetable generation'});
+        createHandler(ipfile, outputFileName);
+        //Update the spec with the new values
+        spec.origFile = 'Not Applicable';
+        spec.origFile = 'Not Applicable';
+        spec.state = 'Data ready for timetable generation';
+        spec.unsolvedXML = outputFileName;
+        spec.save(function(err){
+          if (err){
+            return res.status(400).send({
+              message : errorHandler.getErrorMessage(err)
+            });
+          }else{
+            res.status(200).send({specFileName: ipfile,
+              fileOriginalName: 'Not Applicable',
+              outputFileName: outputFileName,
+              uploadState: 'Data ready for timetable generation'});
+          }
+        });
+
       });
     }
   });

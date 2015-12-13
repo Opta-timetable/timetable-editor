@@ -200,7 +200,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       $scope.allSubjects = [];
       var allSubjects = Subjects.query(function(){
         allSubjects.forEach(function(subject){
-          $scope.allSubjects.push({name: subject.name, ticked: false});
+          $scope.allSubjects.push({name: subject.code, ticked: false});
         });
         getSectionsForSpec();
       });
@@ -218,7 +218,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         for (var j = 0; j < $scope.assignedSections[i].selectedSubjects.length; j++){
           var assignmentObject = {};
           assignmentObject.section = $scope.assignedSections[i].name;
-          assignmentObject.subjectCode = $scope.assignedSections[i].selectedSubjects[j].name;
+          assignmentObject.subjectCode = $scope.assignedSections[i].selectedSubjects[j].name; //selectedSubjects is not a 'subject' obj.
           assignmentObject.teacherCode = '';
           assignmentObject.numberOfClassesInAWeek = 0;
 
@@ -276,6 +276,6 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         .error(function(data, status, headers, config){
           $scope.error = data.message;
         });
-    }
+    };
 	}
 ]);
