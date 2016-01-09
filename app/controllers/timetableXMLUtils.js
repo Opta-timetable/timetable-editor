@@ -358,12 +358,19 @@ var Days = function () {
   };
 };
 
+exports.clearRawData = function(){
+  rawData = [];
+};
+
 exports.addRawData = function (row) {
   rawData.push(row);
 };
 
 exports.prepareXML = function (opfile) {
+  //reset uniqueID and rawData
+  uniqueId = 0;
   var XMLWriter = require('xml-writer'),
+
     fs = require('fs');
   var ws = fs.createWriteStream(opfile);
   ws.on('close', function () {

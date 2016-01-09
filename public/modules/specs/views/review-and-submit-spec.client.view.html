@@ -14,7 +14,7 @@
         <input type="checkbox" ng-model="sectionsAccordionOneAtATime">
         Open only one Section at a time
       </label>-->
-    <h2> Assign Teachers to Subjects </h2>
+    <h2> Review Assignments </h2>
     <div class="form-group">
       <label class="control-label" for="assignmentFilter">Filter: </label>
       <div class="controls">
@@ -37,6 +37,7 @@
     </table>
   </div>
   <div class="form-group">
+    <button ng-click="backTo('assignTeachers')" class="btn btn-primary">Back</button>
     <button ng-click="submitSpec()" class="btn btn-primary">Submit</button>
   </div>
 </section>

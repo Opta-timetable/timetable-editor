@@ -67,7 +67,12 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 			var spec = $scope.spec;
 
 			spec.$update(function() {
-				$location.path('specs/' + spec._id);
+        if ($scope.csvFileUploaded === true){
+          $location.path('specs/' + spec._id);
+        }else{
+          $location.path('specs/' + spec._id + '/addSections');
+        }
+
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
@@ -146,6 +151,20 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       var allSections = Sections.query(function(){
         allSections.forEach(function(section){
           $scope.allSections.push({name: section.name, ticked: false});
+          if (allSections.length === $scope.allSections.length){
+            //Pick the sections that are already allocated to the Spec and set ticked = true for them
+            $http.get('/specs/' + $stateParams.specId + '/sections').success(function(data, status, headers, config){
+              console.log('received following sections: %j', data);
+              $scope.allSections.forEach(function(section){
+                if (data.indexOf(section.name) !== -1){
+                  //section is present in the spec
+                  section.ticked = true;
+                }
+              });
+            }).error(function (data, status, headers, config){
+              $scope.error = data.message;
+            });
+          }
         });
       });
     };
@@ -155,7 +174,6 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       sections.forEach(function(section){
         var thisSection = {};
         thisSection.name = section;
-        //var array2 = [].concat(array1 || []);
         thisSection.allSubjects = [];
         $scope.allSubjects.forEach(function (subject){
           var subjectCopy = {}; //Creating a copy to allow multi-select for multiple input-models corresponding to each accordion group.
@@ -276,6 +294,10 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         .error(function(data, status, headers, config){
           $scope.error = data.message;
         });
+    };
+
+    $scope.backTo = function(location){
+      $location.path('/specs/' + $stateParams.specId + '/' + location);
     };
 	}
 ]);

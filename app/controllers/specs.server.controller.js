@@ -122,6 +122,7 @@ var createHandler = function (ipFile, opFile) {
   var csv = require('csv-parser');
   var theReadStream = fs.createReadStream(ipFile)
     .pipe(csv());
+  xmlUtils.clearRawData();
   theReadStream.on('data', function (data) {
     console.log('row', data);
     xmlUtils.addRawData(data);
@@ -321,7 +322,8 @@ exports.addSectionsForSpec = function(req, res) {
   console.log('sections to add: ' + req.body.sections);
   console.log('Length of sections: ' + req.body.sections.length);
 
-    Spec.update({'_id' : specId}, {$addToSet: {sections: {$each: req.body.sections}}},function(err, specToUpdate) {
+    //Spec.update({'_id' : specId}, {$addToSet: {sections: {$each: req.body.sections}}},function(err, specToUpdate) {
+  Spec.update({'_id' : specId}, {$set: {sections: req.body.sections}},function(err) {
     if (err) {
       console.log('Unable to find spec');
       return res.status(500).send({
@@ -331,7 +333,6 @@ exports.addSectionsForSpec = function(req, res) {
     else
     {
       return res.status(200).send();
-
     }
   });
 };
