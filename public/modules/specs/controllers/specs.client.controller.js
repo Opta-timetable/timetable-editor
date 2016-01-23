@@ -169,26 +169,50 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       });
     };
 
-    function prepareSectionAssignmentsHolder(sections) {
+    function isSubjectAssignedToSection(currentAssignments, subjectCode, section){
+      var found = false;
+      for (var i=0; i < currentAssignments.length; i++){
+        var assignment = currentAssignments[i];
+        if ((assignment.subjectCode === subjectCode) && (assignment.section === section)){
+          found = true;
+          break;
+        }
+      }
+      return found;
+    }
+    
+    function prepareSectionAssignmentsHolder(sections, currentAssignments) {
       $scope.assignedSections = [];
       sections.forEach(function(section){
         var thisSection = {};
         thisSection.name = section;
         thisSection.allSubjects = [];
+        thisSection.selectedSubjects = [];
         $scope.allSubjects.forEach(function (subject){
           var subjectCopy = {}; //Creating a copy to allow multi-select for multiple input-models corresponding to each accordion group.
           angular.copy(subject, subjectCopy);
+          //Tick subject if it is already assigned
+          if (isSubjectAssignedToSection(currentAssignments, subjectCopy.name, section) === true){
+            subjectCopy.ticked = true;
+            thisSection.selectedSubjects.push(subjectCopy);
+          }
           thisSection.allSubjects.push(subjectCopy);
         });
-        thisSection.selectedSubjects = [];
         $scope.assignedSections.push(thisSection);
       });
     }
 
     function getSectionsForSpec(){
      $http.get('/specs/' + $stateParams.specId + '/sections').success(function(data, status, headers, config){
-       console.log('received following sections: %j', data);
-       prepareSectionAssignmentsHolder(data);
+       var sections = data;
+       console.log('received following sections: %j', sections);
+       //Now get the assignments in case sections have subjects assigned already
+       $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
+         var currentAssignments = data;
+         console.log('received following assignments: %j', currentAssignments);
+         prepareSectionAssignmentsHolder(sections, currentAssignments);
+       });
+
      }).error(function (data, status, headers, config){
        $scope.error = data.message;
        $scope.assignedSections = [];
