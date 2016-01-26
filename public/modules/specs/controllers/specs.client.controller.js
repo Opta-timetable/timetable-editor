@@ -11,25 +11,20 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 		// Create new Spec
     $scope.create = function() {
       // Create new Spec object
-      var spec;
+      var spec = new Specs();
       if (this.csvFileUploaded === true){
-        spec = new Specs ({
-          name: this.name,
-          specFile: this.specFileName,
-          origFile: this.fileOriginalName,
-          unsolvedXML: this.outputFileName,
-          state: this.uploadState
-        });
+          spec.name = this.name;
+          spec.specFile = this.specFileName;
+          spec.origFile = this.fileOriginalName;
+          spec.unsolvedXML = this.outputFileName;
+          spec.state = this.uploadState;
       }else{
-        spec = new Specs ({
-          name: this.name,
-          specFile: '',
-          origFile: '',
-          unsolvedXML: '',
-          state: 'Initialized. Data not defined yet.'
-        });
+          spec.name = this.name;
+          spec.specFile = '';
+          spec.origFile = '';
+          spec.unsolvedXML = '';
+          spec.state = 'Initialized. Data not defined yet.';
       }
-
 			// Redirect after save
       spec.$save(function(response) {
         if ($scope.csvFileUploaded === true){
@@ -180,7 +175,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       }
       return found;
     }
-    
+
     function prepareSectionAssignmentsHolder(sections, currentAssignments) {
       $scope.assignedSections = [];
       sections.forEach(function(section){
