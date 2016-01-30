@@ -10,7 +10,7 @@ var mongoose = require('mongoose'),
   xmlUtils = require('./timetableXMLUtils'),
 	Spec = mongoose.model('Spec'),
   Assignment = mongoose.model('Assignment'),
-  Teacher = mongoose.model('Teacher'),
+  Teacher = mongoose.model('Lecturer'),
 	_ = require('lodash');
 
 /**
