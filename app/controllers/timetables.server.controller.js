@@ -11,7 +11,7 @@ var mongoose = require('mongoose'),
   Curriculum = mongoose.model('Curriculum'),
   Course = mongoose.model('Course'),
   Timetable = mongoose.model('Timetable'),
-  Teacher = mongoose.model('Teacher'),
+  Teacher = mongoose.model('Lecturer'),
   Spec = mongoose.model('Spec'),
   _ = require('lodash');
 

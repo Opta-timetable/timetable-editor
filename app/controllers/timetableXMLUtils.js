@@ -9,7 +9,7 @@ var Course = mongoose.model('Course');
 var Period = mongoose.model('Period');
 var Lecture = mongoose.model('Lecture');
 var Curriculum = mongoose.model('Curriculum');
-var Teacher = mongoose.model('Teacher');
+var Teacher = mongoose.model('Lecturer');
 var Timetable = mongoose.model('Timetable');
 
 var uniqueId = 0;
