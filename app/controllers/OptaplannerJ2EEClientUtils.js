@@ -2,14 +2,14 @@
 
 var fs = require('fs'),
   http = require('http'),
-  optaplannerServer = require('./OptaplannerServer.config.js');
+  config = require('../../config/config');
 
 exports.uploadUnsolvedFile = function(specID, filePath, fileName, callback) {
 
   var options = {
-    hostname : optaplannerServer.config.hostname,
-    port     : optaplannerServer.config.port,
-    path     : optaplannerServer.config.basepath + '/specs/' + specID,
+    hostname : config.optaplannerService.hostname,
+    port     : config.optaplannerService.port,
+    path     : config.optaplannerService.basepath + '/specs/' + specID,
     method   : 'POST'
   };
 
@@ -45,9 +45,9 @@ exports.uploadUnsolvedFile = function(specID, filePath, fileName, callback) {
 
 exports.startSolver = function(specID, callback){
   var options = {
-    hostname : optaplannerServer.config.hostname,
-    port     : optaplannerServer.config.port,
-    path     : optaplannerServer.config.basepath + '/specs/' + specID + '/solution',
+    hostname : config.optaplannerService.hostname,
+    port     : config.optaplannerService.port,
+    path     : config.optaplannerService.basepath + '/specs/' + specID + '/solution',
     method   : 'POST'
   };
     var req = http.request(options, function (res) {
@@ -65,9 +65,9 @@ exports.startSolver = function(specID, callback){
 
 exports.terminateSolving = function(specID, callback){
       var options = {
-        hostname : optaplannerServer.config.hostname,
-        port     : optaplannerServer.config.port,
-          path     : optaplannerServer.config.basepath + '/specs/' + specID + '/solution',
+        hostname : config.optaplannerService.hostname,
+        port     : config.optaplannerService.port,
+          path     : config.optaplannerService.basepath + '/specs/' + specID + '/solution',
           method   : 'DELETE'
             };
         var req = http.request(options, function (res) {
@@ -87,9 +87,9 @@ exports.terminateSolving = function(specID, callback){
 
 exports.isSolving = function(specID, callback){
     var options = {
-      hostname : optaplannerServer.config.hostname,
-      port     : optaplannerServer.config.port,
-        path     : optaplannerServer.config.basepath + '/specs/' + specID + '/solution',
+      hostname : config.optaplannerService.hostname,
+      port     : config.optaplannerService.port,
+        path     : config.optaplannerService.basepath + '/specs/' + specID + '/solution',
         method   : 'GET'
           };
       var req = http.request(options, function (res) {
@@ -109,9 +109,9 @@ exports.isSolving = function(specID, callback){
 
 exports.getScore = function(specID, callback){
     var options = {
-      hostname : optaplannerServer.config.hostname,
-      port     : optaplannerServer.config.port,
-        path     : optaplannerServer.config.basepath + '/specs/' + specID + '/solution',
+      hostname : config.optaplannerService.hostname,
+      port     : config.optaplannerService.port,
+        path     : config.optaplannerService.basepath + '/specs/' + specID + '/solution',
         method   : 'GET'
           };
       var req = http.request(options, function (res) {
@@ -134,9 +134,9 @@ exports.getScore = function(specID, callback){
 var download = function(specID, dest, cb) {
   var file = fs.createWriteStream(dest);
   var options = {
-    hostname : optaplannerServer.config.hostname,
-    port     : optaplannerServer.config.port,
-    path     : optaplannerServer.config.basepath + '/specs/' + specID,
+    hostname : config.optaplannerService.hostname,
+    port     : config.optaplannerService.port,
+    path     : config.optaplannerService.basepath + '/specs/' + specID,
     method   : 'GET'
   };
   var req = http.request(options, function(response) {
@@ -160,9 +160,9 @@ exports.getSolvedXML = function(specID, solvedXMLPath, callback){
 
 exports.deleteSpec = function(specID, callback){
       var options = {
-        hostname : optaplannerServer.config.hostname,
-        port     : optaplannerServer.config.port,
-          path     : optaplannerServer.config.basepath + '/specs/' + specID,
+        hostname : config.optaplannerService.hostname,
+        port     : config.optaplannerService.port,
+          path     : config.optaplannerService.basepath + '/specs/' + specID,
           method   : 'DELETE'
             };
         var req = http.request(options, function (res) {

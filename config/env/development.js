@@ -6,6 +6,11 @@ module.exports = {
     title : 'timetable - Development Environment',
     description: 'An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.'
   },
+  optaplannerService : {
+    host : 'localhost',
+    port : 8080,
+    basepath : '/timetablesolverservice-1.0'
+  },
   facebook : {
     clientID     : process.env.FACEBOOK_ID || 'APP_ID',
     clientSecret : process.env.FACEBOOK_SECRET || 'APP_SECRET',
