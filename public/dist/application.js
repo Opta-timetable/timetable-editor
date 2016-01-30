@@ -1959,9 +1959,20 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       $scope.curriculums = Timetables.query({
         specId : $stateParams.specId
       });
-      $scope.teachers = Teachers.query({
-        specId : $stateParams.specId
-      });
+
+      $http.get('/specs/' + $stateParams.specId + '/teachers', {})
+        .success(function (data, status, headers, config) {
+          $scope.teachers = data;
+        })
+        .error(function (data, status, headers, config) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+          $scope.error = data.message;
+        });
+
+      //$scope.teachers = Teachers.query({
+      //  specId : $stateParams.specId
+      //});
       //The following should eventually come from a configuration tied to the user and school
       $scope.workingDays = [{dayName:'Monday', dayIndex:0},
         {dayName:'Tuesday', dayIndex:1},
