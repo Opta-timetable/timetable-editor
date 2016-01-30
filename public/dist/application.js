@@ -6,7 +6,7 @@ var ApplicationConfiguration = (function () {
   var applicationModuleName = 'timetable';
   var applicationModuleVendorDependencies = [
     'ngResource', 'ngCookies', 'ngAnimate', 'ngTouch', 'ngSanitize', 'ui.router', 'ui.bootstrap', 'ui.utils',
-    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb', 'ngFileUpload'
+    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb', 'ngFileUpload', 'multi-select'
   ];
 
   // Add a new vertical module
@@ -65,7 +65,27 @@ ApplicationConfiguration.registerModule('courses');
 'use strict';
 
 // Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('curriculums');
+'use strict';
+
+// Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('schools');
+'use strict';
+
+// Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('sections');
+'use strict';
+
+// Use applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('specs');
+'use strict';
+
+// Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('subjects');
+'use strict';
+
+// Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('teachers');
 'use strict';
 
 // Use application configuration module to register a new module
@@ -334,9 +354,10 @@ angular.module('core').factory('Version', ['$resource',
 angular.module('courses').run(['Menus',
   function (Menus) {
     // Set top bar menu items
-    Menus.addMenuItem('topbar', 'Courses', 'courses', 'dropdown', '/courses(/create)?');
-    Menus.addSubMenuItem('topbar', 'courses', 'List Courses', 'courses');
-    Menus.addSubMenuItem('topbar', 'courses', 'New Course', 'courses/create');
+    //Hiding Courses as it is "internal"
+    //Menus.addMenuItem('topbar', 'Courses', 'courses', 'dropdown', '/courses(/create)?');
+    //Menus.addSubMenuItem('topbar', 'courses', 'List Courses', 'courses');
+    //Menus.addSubMenuItem('topbar', 'courses', 'New Course', 'courses/create');
   }
 ]);
 
@@ -462,6 +483,355 @@ angular.module('courses').factory('Courses', ['$resource',
 'use strict';
 
 // Configuring the Articles module
+angular.module('curriculums').run(['Menus',
+	function(Menus) {
+		// Set top bar menu items
+    //Hiding "Curriculums" as it is internal
+		//Menus.addMenuItem('topbar', 'Curriculums', 'curriculums', 'dropdown', '/curriculums(/create)?');
+		//Menus.addSubMenuItem('topbar', 'curriculums', 'List Curriculums', 'curriculums');
+		//Menus.addSubMenuItem('topbar', 'curriculums', 'New Curriculum', 'curriculums/create');
+	}
+]);
+
+'use strict';
+
+//Setting up route
+angular.module('curriculums').config(['$stateProvider',
+	function($stateProvider) {
+		// Curriculums state routing
+		$stateProvider.
+		state('listCurriculums', {
+			url: '/curriculums',
+			templateUrl: 'modules/curriculums/views/list-curriculums.client.view.html'
+		}).
+		state('createCurriculum', {
+			url: '/curriculums/create',
+			templateUrl: 'modules/curriculums/views/create-curriculum.client.view.html'
+		}).
+		state('viewCurriculum', {
+			url: '/curriculums/:curriculumId',
+			templateUrl: 'modules/curriculums/views/view-curriculum.client.view.html'
+		}).
+		state('editCurriculum', {
+			url: '/curriculums/:curriculumId/edit',
+			templateUrl: 'modules/curriculums/views/edit-curriculum.client.view.html'
+		});
+	}
+]);
+'use strict';
+
+// Curriculums controller
+angular.module('curriculums').controller('CurriculumsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Curriculums',
+	function($scope, $stateParams, $location, Authentication, Curriculums) {
+		$scope.authentication = Authentication;
+
+		// Create new Curriculum
+		$scope.create = function() {
+			// Create new Curriculum object
+			var curriculum = new Curriculums ({
+				name: this.name
+			});
+
+			// Redirect after save
+			curriculum.$save(function(response) {
+				$location.path('curriculums/' + response._id);
+
+				// Clear form fields
+				$scope.name = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Remove existing Curriculum
+		$scope.remove = function(curriculum) {
+			if ( curriculum ) { 
+				curriculum.$remove();
+
+				for (var i in $scope.curriculums) {
+					if ($scope.curriculums [i] === curriculum) {
+						$scope.curriculums.splice(i, 1);
+					}
+				}
+			} else {
+				$scope.curriculum.$remove(function() {
+					$location.path('curriculums');
+				});
+			}
+		};
+
+		// Update existing Curriculum
+		$scope.update = function() {
+			var curriculum = $scope.curriculum;
+
+			curriculum.$update(function() {
+				$location.path('curriculums/' + curriculum._id);
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Find a list of Curriculums
+		$scope.find = function() {
+			$scope.curriculums = Curriculums.query();
+		};
+
+		// Find existing Curriculum
+		$scope.findOne = function() {
+			$scope.curriculum = Curriculums.get({ 
+				curriculumId: $stateParams.curriculumId
+			});
+		};
+	}
+]);
+'use strict';
+
+//Curriculums service used to communicate Curriculums REST endpoints
+angular.module('curriculums').factory('Curriculums', ['$resource',
+	function($resource) {
+		return $resource('curriculums/:curriculumId', { curriculumId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
+'use strict';
+
+// Configuring the Articles module
+angular.module('schools').run(['Menus',
+	function(Menus) {
+		// Set top bar menu items
+		Menus.addMenuItem('topbar', 'Schools', 'schools', 'dropdown', '/schools(/create)?');
+		Menus.addSubMenuItem('topbar', 'schools', 'List Schools', 'schools');
+		Menus.addSubMenuItem('topbar', 'schools', 'New School', 'schools/create');
+	}
+]);
+'use strict';
+
+//Setting up route
+angular.module('schools').config(['$stateProvider',
+	function($stateProvider) {
+		// Schools state routing
+		$stateProvider.
+		state('listSchools', {
+			url: '/schools',
+			templateUrl: 'modules/schools/views/list-schools.client.view.html'
+		}).
+		state('createSchool', {
+			url: '/schools/create',
+			templateUrl: 'modules/schools/views/create-school.client.view.html'
+		}).
+		state('viewSchool', {
+			url: '/schools/:schoolId',
+			templateUrl: 'modules/schools/views/view-school.client.view.html'
+		}).
+		state('editSchool', {
+			url: '/schools/:schoolId/edit',
+			templateUrl: 'modules/schools/views/edit-school.client.view.html'
+		});
+	}
+]);
+'use strict';
+
+// Schools controller
+angular.module('schools').controller('SchoolsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Schools',
+	function($scope, $stateParams, $location, Authentication, Schools) {
+		$scope.authentication = Authentication;
+
+		// Create new School
+		$scope.create = function() {
+			// Create new School object
+			var school = new Schools ({
+				name: this.name,
+        code: this.code
+			});
+
+			// Redirect after save
+			school.$save(function(response) {
+				$location.path('schools/' + response._id);
+
+				// Clear form fields
+				$scope.name = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Remove existing School
+		$scope.remove = function(school) {
+			if ( school ) { 
+				school.$remove();
+
+				for (var i in $scope.schools) {
+					if ($scope.schools [i] === school) {
+						$scope.schools.splice(i, 1);
+					}
+				}
+			} else {
+				$scope.school.$remove(function() {
+					$location.path('schools');
+				});
+			}
+		};
+
+		// Update existing School
+		$scope.update = function() {
+			var school = $scope.school;
+
+			school.$update(function() {
+				$location.path('schools/' + school._id);
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Find a list of Schools
+		$scope.find = function() {
+			$scope.schools = Schools.query();
+		};
+
+		// Find existing School
+		$scope.findOne = function() {
+			$scope.school = Schools.get({ 
+				schoolId: $stateParams.schoolId
+			});
+		};
+	}
+]);
+
+'use strict';
+
+//Schools service used to communicate Schools REST endpoints
+angular.module('schools').factory('Schools', ['$resource',
+	function($resource) {
+		return $resource('schools/:schoolId', { schoolId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
+'use strict';
+
+// Configuring the Articles module
+angular.module('sections').run(['Menus',
+	function(Menus) {
+		// Set top bar menu items
+		Menus.addMenuItem('topbar', 'Sections', 'sections', 'dropdown', '/sections(/create)?');
+		Menus.addSubMenuItem('topbar', 'sections', 'List Sections', 'sections');
+		Menus.addSubMenuItem('topbar', 'sections', 'New Section', 'sections/create');
+	}
+]);
+'use strict';
+
+//Setting up route
+angular.module('sections').config(['$stateProvider',
+	function($stateProvider) {
+		// Sections state routing
+		$stateProvider.
+		state('listSections', {
+			url: '/sections',
+			templateUrl: 'modules/sections/views/list-sections.client.view.html'
+		}).
+		state('createSection', {
+			url: '/sections/create',
+			templateUrl: 'modules/sections/views/create-section.client.view.html'
+		}).
+		state('viewSection', {
+			url: '/sections/:sectionId',
+			templateUrl: 'modules/sections/views/view-section.client.view.html'
+		}).
+		state('editSection', {
+			url: '/sections/:sectionId/edit',
+			templateUrl: 'modules/sections/views/edit-section.client.view.html'
+		});
+	}
+]);
+'use strict';
+
+// Sections controller
+angular.module('sections').controller('SectionsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Sections',
+	function($scope, $stateParams, $location, Authentication, Sections) {
+		$scope.authentication = Authentication;
+
+		// Create new Section
+		$scope.create = function() {
+			// Create new Section object
+			var section = new Sections ({
+				name: this.name
+			});
+
+			// Redirect after save
+			section.$save(function(response) {
+				$location.path('sections/' + response._id);
+
+				// Clear form fields
+				$scope.name = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Remove existing Section
+		$scope.remove = function(section) {
+			if ( section ) { 
+				section.$remove();
+
+				for (var i in $scope.sections) {
+					if ($scope.sections [i] === section) {
+						$scope.sections.splice(i, 1);
+					}
+				}
+			} else {
+				$scope.section.$remove(function() {
+					$location.path('sections');
+				});
+			}
+		};
+
+		// Update existing Section
+		$scope.update = function() {
+			var section = $scope.section;
+
+			section.$update(function() {
+				$location.path('sections/' + section._id);
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Find a list of Sections
+		$scope.find = function() {
+			$scope.sections = Sections.query();
+		};
+
+		// Find existing Section
+		$scope.findOne = function() {
+			$scope.section = Sections.get({ 
+				sectionId: $stateParams.sectionId
+			});
+		};
+	}
+]);
+'use strict';
+
+//Sections service used to communicate Sections REST endpoints
+angular.module('sections').factory('Sections', ['$resource',
+	function($resource) {
+		return $resource('sections/:sectionId', { sectionId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
+'use strict';
+
+// Configuring the Articles module
 angular.module('specs').run(['Menus',
   function(Menus) {
     // Set top bar menu items
@@ -493,6 +863,22 @@ angular.module('specs').config(['$stateProvider',
       state('editSpec', {
         url: '/specs/:specId/edit',
         templateUrl: 'modules/specs/views/edit-spec.client.view.html'
+      }).
+    state('addSectionsToSpec', {
+        url: '/specs/:specId/addSections',
+        templateUrl: 'modules/specs/views/add-sections-to-spec.client.view.html'
+      }).
+    state('assignSubjectsToSections', {
+        url: '/specs/:specId/assignSubjects',
+        templateUrl: 'modules/specs/views/assign-subjects-to-sections.client.view.html'
+      }).
+    state('assignTeachersToSubjects', {
+        url: '/specs/:specId/assignTeachers',
+        templateUrl: '/modules/specs/views/assign-teachers-to-subjects.client.view.html'
+      }).
+    state('reviewAndSubmit', {
+        url: '/specs/:specId/reviewAndSubmit',
+        templateUrl: '/modules/specs/views/review-and-submit-spec.client.view.html'
       });
   }
 ]);
@@ -503,48 +889,30 @@ angular.module('specs').controller('GenerateModalInstanceCtrl', ["$scope", "$mod
   $scope.specId = specId;
   $scope.progress = 0;
   $scope.state = 'Initializing';
-  $scope.solutionHealth = 'Initializing';
+  $scope.solutionHealth = 'Unavailable';
   $scope.disableStop = false;
   console.log('SpecID for this modal is ' + specId);
   var worstScore = 0; //Used for Progress indicator
 
   $scope.checkProgress = function(){
-    $http.post('/specs/isSolving')
+    $http.get('/specs/' + $scope.specId + '/solution')
       .success(function (data, status, headers, config) {
         console.log('Invoked isSolving successfully');
-        console.log('Data is ' + data.response); //{"response":"true"}
-        $scope.state = 'Solving';
-        if (data.response === false){
-          $scope.state = 'Solution complete. Waiting for solution...';
-          $scope.disableStop = true;
-          $scope.progress = 100;
-          $interval.cancel($scope.progressPromise);
-          //Pick up the solution file after waiting for the closing formalities to get done at the J2EE server
-          $timeout(parseSolutionFile(), 10000);
-        }
+        console.log('Data is ' + data);
+        getCurrentStatusAndScore(data);
+        $scope.progress = calculateProgress($scope.solutionHealth, $scope.progress); //TODO calculateProgress(); using current number of hard constraints which is a reasonable indicator
+
       })
       .error(function (data, status, headers, config) {
         console.log('Error while getting solution status');
       });
-
-    $http.post('/specs/currentSolutionScore')
-      .success(function (data, status, headers, config){
-        console.log('Invoked currentSolutionScore successfully');
-        console.log('Data is ' + JSON.stringify(data));
-        if (data.score !== 'No Solution Available')
-        $scope.solutionHealth = data.score;
-      })
-      .error(function (data, status, headers, config){
-        console.log('Error while getting currentSolutionScore');
-      });
-    $scope.progress = calculateProgress($scope.solutionHealth, $scope.progress); //TODO calculateProgress(); using current number of hard constraints which is a reasonable indicator
     };
 
   $scope.progressPromise = $interval($scope.checkProgress, 10000); //Check every 10 secs
 
   $scope.terminateSolving = function(){
     console.log('You want to solve? Are you sure?');
-    $http.post('/specs/terminateSolving')
+    $http.delete('/specs/' + $scope.specId + '/solution')
       .success(function (data, status, headers, config) {
         console.log('Terminated Solving');
       })
@@ -569,6 +937,43 @@ angular.module('specs').controller('GenerateModalInstanceCtrl', ["$scope", "$mod
     }
     return 0; //send a default and let the progress incrementer take care
   }
+
+  function parseSolutionFile(){
+    $scope.state = 'Importing Solution to Database...';
+    $http.get('/specs/' + $scope.specId + '/solutionFile')
+      .success(function (data, status, headers, config){
+        console.log('Got and parsed solution');
+        $scope.state = 'Complete';
+      })
+      .error(function (data, status, headers, config){
+        console.log('Error in picking solution');
+        $scope.state = 'Error. Please retry...';
+      });
+  }
+
+  // Parse response to get Solution state and score values
+  function getCurrentStatusAndScore(response){
+    var tokenisedString = response.split(', ');
+    if (tokenisedString.length !== 2){
+      console.log('Incorrect Response format. Unable to calculate progress');
+      $scope.state = 'Error';
+    }else{
+      var stateString = tokenisedString[0];
+      var scoreString = tokenisedString[1];
+      if (stateString.split(': ')[1].indexOf('true') !== -1){ //contains 'true'
+        $scope.state = 'Solving';
+      }else{
+        $scope.state = 'Solution complete. Waiting for solution...';
+        $scope.disableStop = true;
+        $scope.progress = 100;
+        $interval.cancel($scope.progressPromise);
+        //Pick up the solution file after waiting for the closing formalities to get done at the J2EE server
+        $timeout(parseSolutionFile(), 10000);
+      }
+      $scope.solutionHealth = scoreString.split(': ')[1];
+    }
+  }
+
   // Use the highest hard constraints and current hard constraints value and use it for find out solution progress
   // As the solution progresses, the number of hard constraints will reduce
   function calculateProgress(newScore, currentProgress){
@@ -586,47 +991,45 @@ angular.module('specs').controller('GenerateModalInstanceCtrl', ["$scope", "$mod
 
   }
 
-  function parseSolutionFile(){
-    $scope.state = 'Importing Solution to Database...';
-    $http.post('/specs/getFinalSolution', {
-      specID : $scope.specId
-    })
-      .success(function (data, status, headers, config){
-        console.log('Got and parsed solution');
-        $scope.state = 'Complete';
-      })
-      .error(function (data, status, headers, config){
-        console.log('Error in picking solution');
-        $scope.state = 'Error. Please retry...';
-      });
-  }
-
 }]);
 
 'use strict';
 
 // Specs controller
-angular.module('specs').controller('SpecsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', '$modal', 'Specs', 'Upload',
-	function($scope, $stateParams, $location, $http, Authentication, $modal, Specs, Upload) {
+angular.module('specs').controller('SpecsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication',
+  '$modal', 'Specs', 'Upload', 'Sections', 'Subjects', 'Teachers',
+	function($scope, $stateParams, $location, $http, Authentication,
+           $modal, Specs, Upload, Sections, Subjects, Teachers) {
 		$scope.authentication = Authentication;
+    $scope.csvFileUploaded = false;
 
 		// Create new Spec
-		$scope.create = function() {
-			// Create new Spec object
-			var spec = new Specs ({
-				name: this.name,
-        specFile: this.specFileName,
-        origFile: this.fileOriginalName,
-        unsolvedXML: this.outputFileName,
-        state: this.uploadState
-			});
-
+    $scope.create = function() {
+      // Create new Spec object
+      var spec = new Specs();
+      if (this.csvFileUploaded === true){
+          spec.name = this.name;
+          spec.specFile = this.specFileName;
+          spec.origFile = this.fileOriginalName;
+          spec.unsolvedXML = this.outputFileName;
+          spec.state = this.uploadState;
+      }else{
+          spec.name = this.name;
+          spec.specFile = '';
+          spec.origFile = '';
+          spec.unsolvedXML = '';
+          spec.state = 'Initialized. Data not defined yet.';
+      }
 			// Redirect after save
-			spec.$save(function(response) {
-				$location.path('specs/' + response._id);
+      spec.$save(function(response) {
+        if ($scope.csvFileUploaded === true){
+          $location.path('specs/' + response._id);
+          // Clear form fields
+          $scope.name = '';
+        }else{
+          $location.path('specs/' + response._id + '/addSections');
+        }
 
-				// Clear form fields
-				$scope.name = '';
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
@@ -654,7 +1057,12 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 			var spec = $scope.spec;
 
 			spec.$update(function() {
-				$location.path('specs/' + spec._id);
+        if ($scope.csvFileUploaded === true){
+          $location.path('specs/' + spec._id);
+        }else{
+          $location.path('specs/' + spec._id + '/addSections');
+        }
+
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
@@ -694,6 +1102,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
             $scope.fileOriginalName = data.fileOriginalName;
             $scope.outputFileName = data.outputFileName;
             $scope.uploadState = data.uploadState;
+            $scope.csvFileUploaded = true;
           });
       }
     };
@@ -725,6 +1134,185 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 
         });
     };
+
+    $scope.initSections = function(){
+      $scope.allSections = [];
+      $scope.selectedSections = []; //TODO: There is a console error for ticked property. It doesn't impact the flow but may need to be looked at
+      var allSections = Sections.query(function(){
+        allSections.forEach(function(section){
+          $scope.allSections.push({name: section.name, ticked: false});
+          if (allSections.length === $scope.allSections.length){
+            //Pick the sections that are already allocated to the Spec and set ticked = true for them
+            $http.get('/specs/' + $stateParams.specId + '/sections').success(function(data, status, headers, config){
+              console.log('received following sections: %j', data);
+              $scope.allSections.forEach(function(section){
+                if (data.indexOf(section.name) !== -1){
+                  //section is present in the spec
+                  section.ticked = true;
+                }
+              });
+            }).error(function (data, status, headers, config){
+              $scope.error = data.message;
+            });
+          }
+        });
+      });
+    };
+
+    function isSubjectAssignedToSection(currentAssignments, subjectCode, section){
+      var found = false;
+      for (var i=0; i < currentAssignments.length; i++){
+        var assignment = currentAssignments[i];
+        if ((assignment.subjectCode === subjectCode) && (assignment.section === section)){
+          found = true;
+          break;
+        }
+      }
+      return found;
+    }
+
+    function prepareSectionAssignmentsHolder(sections, currentAssignments) {
+      $scope.assignedSections = [];
+      sections.forEach(function(section){
+        var thisSection = {};
+        thisSection.name = section;
+        thisSection.allSubjects = [];
+        thisSection.selectedSubjects = [];
+        $scope.allSubjects.forEach(function (subject){
+          var subjectCopy = {}; //Creating a copy to allow multi-select for multiple input-models corresponding to each accordion group.
+          angular.copy(subject, subjectCopy);
+          //Tick subject if it is already assigned
+          if (isSubjectAssignedToSection(currentAssignments, subjectCopy.name, section) === true){
+            subjectCopy.ticked = true;
+            thisSection.selectedSubjects.push(subjectCopy);
+          }
+          thisSection.allSubjects.push(subjectCopy);
+        });
+        $scope.assignedSections.push(thisSection);
+      });
+    }
+
+    function getSectionsForSpec(){
+     $http.get('/specs/' + $stateParams.specId + '/sections').success(function(data, status, headers, config){
+       var sections = data;
+       console.log('received following sections: %j', sections);
+       //Now get the assignments in case sections have subjects assigned already
+       $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
+         var currentAssignments = data;
+         console.log('received following assignments: %j', currentAssignments);
+         prepareSectionAssignmentsHolder(sections, currentAssignments);
+       });
+
+     }).error(function (data, status, headers, config){
+       $scope.error = data.message;
+       $scope.assignedSections = [];
+     });
+    }
+
+    $scope.addSections = function(){
+      var sections = [];
+      $scope.selectedSections.forEach(function (selectedSection){
+        sections.push(selectedSection.name);
+        if (sections.length === $scope.selectedSections.length){
+          //Save in DB
+          $http.post('/specs/' + $stateParams.specId + '/sections', {
+            sections: sections
+          }).success(function (data, status, headers, config) {
+            $location.path('specs/' + $stateParams.specId + '/assignSubjects');
+          }).error(function (data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+            $scope.error = data.message;
+          });
+        }
+      });
+    };
+
+    $scope.initSubjects = function(){
+      $scope.allSubjects = [];
+      var allSubjects = Subjects.query(function(){
+        allSubjects.forEach(function(subject){
+          $scope.allSubjects.push({name: subject.code, ticked: false});
+        });
+        getSectionsForSpec();
+      });
+      $scope.sectionsAccordionOneAtATime = true;
+      $scope.sectionsAccordionStatus = {
+        isFirstOpen: true,
+        isFirstDisabled: false
+      };
+    };
+
+    $scope.saveSubjectsAndProceed = function(){
+      console.log('Subjects Assigned are: %j', $scope.assignedSections);
+      var assignments = [];
+      for (var i = 0; i < $scope.assignedSections.length; i++){
+        for (var j = 0; j < $scope.assignedSections[i].selectedSubjects.length; j++){
+          var assignmentObject = {};
+          assignmentObject.section = $scope.assignedSections[i].name;
+          assignmentObject.subjectCode = $scope.assignedSections[i].selectedSubjects[j].name; //selectedSubjects is not a 'subject' obj.
+          assignmentObject.teacherCode = '';
+          assignmentObject.numberOfClassesInAWeek = 0;
+
+          assignments.push(assignmentObject);
+        }
+      }
+      $http.put('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
+        .success(function(data, status, headers, config){
+          $location.path('specs/' + $stateParams.specId + '/assignTeachers');
+        })
+        .error(function(data, status, headers, config){
+          $scope.error = data.message;
+      });
+    };
+
+    $scope.initAssignments = function(){
+      //Pick up assignments for this spec
+      $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
+        console.log('received following assignments: %j', data);
+        $scope.assignments = data;
+
+      }).error(function (data, status, headers, config){
+        $scope.error = data.message;
+        $scope.assignments = [];
+      });
+      //Pick up All Teachers
+      $scope.allTeachers = [];
+      var teachers = Teachers.query(function(){
+        teachers.forEach(function(teacher){
+          $scope.allTeachers.push(teacher.code);
+        });
+      });
+    };
+
+    $scope.assignTeachersAndProceed = function(){
+      $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: $scope.assignments})
+        .success(function(data, status, headers, config){
+          $location.path('specs/' + $stateParams.specId + '/reviewAndSubmit');
+        })
+        .error(function(data, status, headers, config){
+          $scope.error = data.message;
+        });
+    };
+
+    $scope.submitSpec = function(){
+      $http.post('/specs/' + $stateParams.specId + '/generate',{})
+        .success(function(data, status, headers, config){
+          $scope.specFileName = data.specFileName;
+          $scope.fileOriginalName = data.fileOriginalName;
+          $scope.outputFileName = data.outputFileName;
+          $scope.uploadState = data.uploadState;
+          $scope.csvFileUploaded = true;
+          $location.path('specs/' + $stateParams.specId);
+        })
+        .error(function(data, status, headers, config){
+          $scope.error = data.message;
+        });
+    };
+
+    $scope.backTo = function(location){
+      $location.path('/specs/' + $stateParams.specId + '/' + location);
+    };
 	}
 ]);
 
@@ -734,6 +1322,243 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 angular.module('specs').factory('Specs', ['$resource',
 	function($resource) {
 		return $resource('specs/:specId', { specId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
+'use strict';
+
+// Configuring the Articles module
+angular.module('subjects').run(['Menus',
+	function(Menus) {
+		// Set top bar menu items
+		Menus.addMenuItem('topbar', 'Subjects', 'subjects', 'dropdown', '/subjects(/create)?');
+		Menus.addSubMenuItem('topbar', 'subjects', 'List Subjects', 'subjects');
+		Menus.addSubMenuItem('topbar', 'subjects', 'New Subject', 'subjects/create');
+	}
+]);
+'use strict';
+
+//Setting up route
+angular.module('subjects').config(['$stateProvider',
+	function($stateProvider) {
+		// Subjects state routing
+		$stateProvider.
+		state('listSubjects', {
+			url: '/subjects',
+			templateUrl: 'modules/subjects/views/list-subjects.client.view.html'
+		}).
+		state('createSubject', {
+			url: '/subjects/create',
+			templateUrl: 'modules/subjects/views/create-subject.client.view.html'
+		}).
+		state('viewSubject', {
+			url: '/subjects/:subjectId',
+			templateUrl: 'modules/subjects/views/view-subject.client.view.html'
+		}).
+		state('editSubject', {
+			url: '/subjects/:subjectId/edit',
+			templateUrl: 'modules/subjects/views/edit-subject.client.view.html'
+		});
+	}
+]);
+'use strict';
+
+// Subjects controller
+angular.module('subjects').controller('SubjectsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Subjects',
+	function($scope, $stateParams, $location, Authentication, Subjects) {
+		$scope.authentication = Authentication;
+
+		// Create new Subject
+		$scope.create = function() {
+			// Create new Subject object
+			var subject = new Subjects ({
+				name: this.name,
+        code: this.code
+			});
+
+			// Redirect after save
+			subject.$save(function(response) {
+				$location.path('subjects/' + response._id);
+
+				// Clear form fields
+				$scope.name = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Remove existing Subject
+		$scope.remove = function(subject) {
+			if ( subject ) { 
+				subject.$remove();
+
+				for (var i in $scope.subjects) {
+					if ($scope.subjects [i] === subject) {
+						$scope.subjects.splice(i, 1);
+					}
+				}
+			} else {
+				$scope.subject.$remove(function() {
+					$location.path('subjects');
+				});
+			}
+		};
+
+		// Update existing Subject
+		$scope.update = function() {
+			var subject = $scope.subject;
+
+			subject.$update(function() {
+				$location.path('subjects/' + subject._id);
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Find a list of Subjects
+		$scope.find = function() {
+			$scope.subjects = Subjects.query();
+		};
+
+		// Find existing Subject
+		$scope.findOne = function() {
+			$scope.subject = Subjects.get({ 
+				subjectId: $stateParams.subjectId
+			});
+		};
+	}
+]);
+
+'use strict';
+
+//Subjects service used to communicate Subjects REST endpoints
+angular.module('subjects').factory('Subjects', ['$resource',
+	function($resource) {
+		return $resource('subjects/:subjectId', { subjectId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
+'use strict';
+
+// Configuring the Articles module
+angular.module('teachers').run(['Menus',
+	function(Menus) {
+		// Set top bar menu items
+		Menus.addMenuItem('topbar', 'Teachers', 'teachers', 'dropdown', '/teachers(/create)?');
+		Menus.addSubMenuItem('topbar', 'teachers', 'List Teachers', 'teachers');
+		Menus.addSubMenuItem('topbar', 'teachers', 'New Teacher', 'teachers/create');
+	}
+]);
+'use strict';
+
+//Setting up route
+angular.module('teachers').config(['$stateProvider',
+	function($stateProvider) {
+		// Teachers state routing
+		$stateProvider.
+		state('listTeachers', {
+			url: '/teachers',
+			templateUrl: 'modules/teachers/views/list-teachers.client.view.html'
+		}).
+		state('createTeacher', {
+			url: '/teachers/create',
+			templateUrl: 'modules/teachers/views/create-teacher.client.view.html'
+		}).
+		state('viewTeacher', {
+			url: '/teachers/:teacherId',
+			templateUrl: 'modules/teachers/views/view-teacher.client.view.html'
+		}).
+		state('editTeacher', {
+			url: '/teachers/:teacherId/edit',
+			templateUrl: 'modules/teachers/views/edit-teacher.client.view.html'
+		});
+	}
+]);
+'use strict';
+
+// Teachers controller
+angular.module('teachers').controller('TeachersController', ['$scope', '$stateParams', '$location', 'Authentication', 'Teachers',
+	function($scope, $stateParams, $location, Authentication, Teachers) {
+		$scope.authentication = Authentication;
+
+		// Create new Teacher
+		$scope.create = function() {
+			// Create new Teacher object
+			var teacher = new Teachers ({
+				firstName: this.firstName,
+        lastName: this.lastName,
+        email: this.email,
+        details: this.details,
+        code: this.code
+			});
+
+			// Redirect after save
+			teacher.$save(function(response) {
+				$location.path('teachers/' + response._id);
+
+				// Clear form fields
+				$scope.name = '';
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Remove existing Teacher
+		$scope.remove = function(teacher) {
+			if ( teacher ) { 
+				teacher.$remove();
+
+				for (var i in $scope.teachers) {
+					if ($scope.teachers [i] === teacher) {
+						$scope.teachers.splice(i, 1);
+					}
+				}
+			} else {
+				$scope.teacher.$remove(function() {
+					$location.path('teachers');
+				});
+			}
+		};
+
+		// Update existing Teacher
+		$scope.update = function() {
+			var teacher = $scope.teacher;
+
+			teacher.$update(function() {
+				$location.path('teachers/' + teacher._id);
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		// Find a list of Teachers
+		$scope.find = function() {
+			$scope.teachers = Teachers.query();
+		};
+
+		// Find existing Teacher
+		$scope.findOne = function() {
+			$scope.teacher = Teachers.get({ 
+        teacherId: $stateParams.teacherId
+			});
+		};
+	}
+]);
+
+'use strict';
+
+//Teachers service used to communicate Teachers REST endpoints
+angular.module('teachers').factory('Teachers', ['$resource',
+	function($resource) {
+		return $resource('teachers/:teacherId', { teacherId: '@_id'
 		}, {
 			update: {
 				method: 'PUT'
@@ -771,7 +1596,7 @@ angular.module('timetables').config(['$stateProvider',
         templateUrl   : 'modules/timetables/views/display-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Timetable for Spec',
-          parent : 'home'
+          parent : 'listTimetables'
         }
       }).
       state('viewTimetable', {
@@ -779,15 +1604,15 @@ angular.module('timetables').config(['$stateProvider',
         templateUrl   : 'modules/timetables/views/view-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Class Timetable',
-          parent : 'listTimetables'
+          parent : 'displayTimetable'
         }
       }).
       state('viewTeacherTimetable', {
-        url           : '/teachers/:specId/teacher/:_id',
+        url           : '/timetables/:specId/teacher/:id',
         templateUrl   : 'modules/timetables/views/view-teacher-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Teacher Timetable',
-          parent : 'listTimetables'
+          parent : 'displayTimetable'
         }
       }).
       state('viewDayTimetable', {
@@ -795,7 +1620,7 @@ angular.module('timetables').config(['$stateProvider',
         templateUrl   : 'modules/timetables/views/view-day-timetable.client.view.html',
         ncyBreadcrumb : {
           label  : 'Timetable for Day',
-          parent : 'listTimetables'
+          parent : 'displayTimetable'
         }
       }).
       state('editTimetable', {
@@ -891,10 +1716,12 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
     };
 
     $scope.findOne = function () {
+      $scope.specId = $stateParams.specId;
       $scope.timetable = Days.get({
+        specId : $scope.specId,
         dayIndex : $stateParams.dayIndex
       });
-      $scope.teachers = Teachers.query();
+      $scope.teachers = Teachers.query({specId : $scope.specId});
     };
 
     //Due to the checks there, only one of the below will trigger the prepareUnassignedTeachersForPeriods Functionality.
@@ -906,8 +1733,8 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TeacherTimetableController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $stateParams, $location, Authentication, Timetables, Teachers) {
+angular.module('timetables').controller('TeacherTimetableController', ['$http', '$scope', '$stateParams', '$location', 'Authentication', 'Timetables', 'TimetableForTeacher', 'SpecIdHolder',
+  function ($http, $scope, $stateParams, $location, Authentication, Timetables, TimetableForTeacher, SpecIdHolder) {
     $scope.authentication = Authentication;
 
     $scope.formatClassSubject = function (period) {
@@ -924,8 +1751,10 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
     };
 
     $scope.findOne = function () {
-      $scope.timetableForTeacher = Teachers.get({
-        _id : $stateParams._id
+      $scope.specId = SpecIdHolder.getSpecId();
+      $scope.timetableForTeacher = TimetableForTeacher.get({
+        specId : $scope.specId,
+        id : $stateParams.id
       });
 
     };
@@ -935,8 +1764,8 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
 /*jshint unused: false */
 'use strict';
 
-angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers',
-  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, TimetableForCurriculum, Teachers) {
+angular.module('timetables').controller('TimetablesController', ['$http', '$scope', '$filter', '$stateParams', '$location', '$modal', 'Authentication', 'Timetables', 'Teachers', 'TimetableForCurriculum', 'SpecIdHolder',
+  function ($http, $scope, $filter, $stateParams, $location, $modal, Authentication, Timetables, Teachers, TimetableForCurriculum, SpecIdHolder) {
     var SUBJECT_ROWS_PER_COLUMN = 8;
 
     $scope.authentication = Authentication;
@@ -1009,11 +1838,12 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     }
 
     function updateAllocation(dayIndex, periodIndex, allocatedCourse, currentClashes) {
-      $http.post('/timetables/modifyPeriodAllocation', {
+      $http.post('/timetables/' + $scope.specId + '/modifyPeriodAllocation', {
         currentDay      : dayIndex,
         currentPeriod   : extractPeriod(dayIndex, periodIndex),
         allocatedCourse : allocatedCourse,
-        clashesToUpdate   : currentClashes
+        clashesToUpdate : currentClashes,
+        specReference   : $scope.specId
       })
         .success(function (data, status, headers, config) {
           var updatedPeriod = extractPeriod(dayIndex, periodIndex);
@@ -1123,6 +1953,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     $scope.find = function () {
       //pick specId in context
       $scope.specId = $stateParams.specId;
+      //Set specId into Holder so that other controllers can access it
+      SpecIdHolder.setSpecId($stateParams.specId);
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query({
         specId : $stateParams.specId
@@ -1143,6 +1975,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         specId : $stateParams.specId,
         curriculumId : $stateParams.curriculumId
       });
+      $scope.specId = $stateParams.specId;
     };
 
     $scope.formatAllocationHistory = function (allocation) {
@@ -1201,7 +2034,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         curriculumId : $stateParams.curriculumId,
         clashes      : $scope.clashes
       }, function () {
-        $location.path('timetables/' + $stateParams.curriculumId);
+        $location.path('timetables/' + $scope.specId + '/curriculum/' + $stateParams.curriculumId);
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });
@@ -1229,10 +2062,11 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         console.log('clash for this element :' + clash);
         console.log('day for this element :' + dayIndex);
         console.log('period for this element :' + periodIndex);
-        $http.post('/timetables/discoverClashes', {
+        $http.post('/timetables/' + $stateParams.specId + '/discoverClashes', {
           currentDay    : dayIndex,
           currentPeriod : extractPeriod(dayIndex, periodIndex),
-          curriculumId  : $stateParams.curriculumId
+          curriculumId  : $stateParams.curriculumId,
+          specId        : $stateParams.specId
         })
           .success(function (data, status, headers, config) {
             if (data.clashIn.length >= 1) {
@@ -1254,7 +2088,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         clashesInScope = extractClashes(dayIndex, periodIndex);
       }
       if (clashesInScope.length > 0) { //TODO getClash link in the view doesn't have a provision to display multiple links. A popover would look good.
-        return '#!/timetables/' + clashesInScope[0].curriculumReference;
+        return '#!/timetables/' + $stateParams.specId + '/curriculum/' + clashesInScope[0].curriculumReference;
       }
       return undefined;
     };
@@ -1344,7 +2178,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         subjectCode : subjectCode
       };
       //Collect Teacher totals from server
-      $http.post('/timetables/collectStats', {
+      $http.post('/timetables/' + $stateParams.specId + '/collectStats', {
         teacherCode : teacherCode
       })
         .success(function (data, status, headers, config) {
@@ -1376,7 +2210,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     function updateTeacherForSubject(subjectCode, newTeacherID, newTeacherCode){
       // get the clashes for the current teacher, if any after removing it from the local list
       var clashesToUpdate = popAllClashesForTeacherFromLocalList($scope.teacherCode);
-      $http.post('/timetables/changeTeacherAssignment', {
+      $http.post('/timetables/' + $scope.specId + '/changeTeacherAssignment', {
         teacherReference : newTeacherID,
         teacherCode : newTeacherCode,
         subjectCode : subjectCode,
@@ -1405,7 +2239,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       teacher.$save(function (response) {
         console.log('Created teacher %j', response);
         //Call update function using the new teacher
-        updateTeacherForSubject(subjectCode, response._id, response.code);
+        updateTeacherForSubject(subjectCode, response.id, response.code);
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });
@@ -1438,7 +2272,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           //Assignment using an existing teacher
           console.info('The user has selected %j', $scope.selectedTeacher);
           if ($scope.selectedTeacher.code !== $scope.teacherCode){
-            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher._id, $scope.selectedTeacher.code);
+            updateTeacherForSubject($scope.subjectCode, $scope.selectedTeacher.id, $scope.selectedTeacher.code);
           }
         }else{
           //New teacher being created
@@ -1483,22 +2317,36 @@ angular.module('timetables').factory('TimetableForCurriculum', ['$resource',
   }
 ]);
 
-angular.module('timetables').factory('Teachers', ['$resource',
+/*angular.module('timetables').factory('Teachers', ['$resource',
   function ($resource) {
     return $resource('teachers/:specId', {
       specId : '@specId'
     }, {'update' : {method : 'PUT'}});
   }
-]);
+]);*/
+
+angular.module('timetables').factory('TimetableForTeacher', ['$resource',
+function ($resource) {
+  return $resource('timetables/:specId/teacher/:id', {
+    specId : '@specId',
+    id : '@id'
+  });
+}]);
 
 angular.module('timetables').factory('Days', ['$resource',
   function ($resource) {
-    return $resource('timetables/:specId/days/:dayIndex', {
+    return $resource('timetables/:specId/day/:dayIndex', {
       specId : '@specId',
       dayIndex : '@dayIndex'
     }, {'update' : {method : 'PUT'}});
   }
 ]);
+
+angular.module('timetables').service('SpecIdHolder', function() {
+    this.specId = '';
+    this.setSpecId = function(specIdInContext) { this.specId = specIdInContext; };
+    this.getSpecId = function() { return this.specId; };
+});
 
 'use strict';
 
