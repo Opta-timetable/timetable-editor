@@ -165,15 +165,13 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     };
 
     function isSubjectAssignedToSection(currentAssignments, subjectCode, section){
-      var found = false;
       for (var i=0; i < currentAssignments.length; i++){
         var assignment = currentAssignments[i];
         if ((assignment.subjectCode === subjectCode) && (assignment.section === section)){
-          found = true;
-          break;
+          return {teacherCode: assignment.teacherCode, numberOfClassesInAWeek: assignment.numberOfClassesInAWeek};
         }
       }
-      return found;
+      return null;
     }
 
     function prepareSectionAssignmentsHolder(sections, currentAssignments) {
@@ -187,7 +185,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           var subjectCopy = {}; //Creating a copy to allow multi-select for multiple input-models corresponding to each accordion group.
           angular.copy(subject, subjectCopy);
           //Tick subject if it is already assigned
-          if (isSubjectAssignedToSection(currentAssignments, subjectCopy.name, section) === true){
+          if (isSubjectAssignedToSection(currentAssignments, subjectCopy.name, section) !== null){
             subjectCopy.ticked = true;
             thisSection.selectedSubjects.push(subjectCopy);
           }
@@ -203,9 +201,9 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
        console.log('received following sections: %j', sections);
        //Now get the assignments in case sections have subjects assigned already
        $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
-         var currentAssignments = data;
-         console.log('received following assignments: %j', currentAssignments);
-         prepareSectionAssignmentsHolder(sections, currentAssignments);
+         $scope.currentAssignments = data;
+         console.log('received following assignments: %j', $scope.currentAssignments);
+         prepareSectionAssignmentsHolder(sections, $scope.currentAssignments);
        });
 
      }).error(function (data, status, headers, config){
@@ -256,13 +254,20 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           var assignmentObject = {};
           assignmentObject.section = $scope.assignedSections[i].name;
           assignmentObject.subjectCode = $scope.assignedSections[i].selectedSubjects[j].name; //selectedSubjects is not a 'subject' obj.
-          assignmentObject.teacherCode = '';
-          assignmentObject.numberOfClassesInAWeek = 0;
-
+          //Check if this was already assigned previously and if yes pick up existing teacher code and numberOfClassesInAWeek
+          var currentAssignment = isSubjectAssignedToSection($scope.currentAssignments, assignmentObject.subjectCode, assignmentObject.section);
+          if (currentAssignment === null){
+            assignmentObject.teacherCode = '';
+            assignmentObject.numberOfClassesInAWeek = 0;
+          }else{
+            assignmentObject.teacherCode = currentAssignment.teacherCode;
+            assignmentObject.numberOfClassesInAWeek = currentAssignment.numberOfClassesInAWeek;
+          }
           assignments.push(assignmentObject);
         }
       }
-      $http.put('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
+      $scope.currentAssignments = [];
+      $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
         .success(function(data, status, headers, config){
           $location.path('specs/' + $stateParams.specId + '/assignTeachers');
         })

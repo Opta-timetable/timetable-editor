@@ -384,10 +384,13 @@ exports.getSectionsForSpec = function(req, res) {
     }
   });
 };
+/*
 
+*/
 /**
  * Add Assignments for the Spec
- */
+ *//*
+
 exports.addAssignmentsForSpec = function(req, res) {
   var specId = req.params.specId;
   var assignments = req.body.assignments;
@@ -411,6 +414,7 @@ exports.addAssignmentsForSpec = function(req, res) {
     }
   });
 };
+*/
 
 
 /**
