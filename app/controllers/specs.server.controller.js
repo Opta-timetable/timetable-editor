@@ -11,6 +11,10 @@ var mongoose = require('mongoose'),
 	Spec = mongoose.model('Spec'),
   Assignment = mongoose.model('Assignment'),
   Teacher = mongoose.model('Lecturer'),
+  Timetable = mongoose.model('Timetable'),
+  Course = mongoose.model('Course'),
+  Curriculum = mongoose.model('Curriculum'),
+  Lecture = mongoose.model('Lecture'),
 	_ = require('lodash');
 
 /**
@@ -65,15 +69,43 @@ exports.update = function(req, res) {
 exports.delete = function(req, res) {
 	var spec = req.spec ;
 
-	spec.remove(function(err) {
-		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
-		} else {
-			res.jsonp(spec);
-		}
-	});
+  //Delete Courses, Curriculums, Lecturers, Timetables where the Spec Id matches and finally the
+  //Spec itself
+
+  Course.remove({specReference : spec._id}).exec()
+    .then(function(){
+      return Curriculum.remove({specReference : spec._id}).exec();
+    })
+    .then(function(){
+      return Teacher.remove({specReference : spec._id}).exec();
+    })
+    .then(function(){
+      return Timetable.remove({specReference : spec._id}).exec();
+    })
+    .then(function(){
+      return Lecture.remove({specReference : spec._id}).exec();
+    })
+    .then(function(){
+      return spec.remove().exec();
+    })
+    .then(null, function(err){
+      if (err instanceof Error) {
+        return res.status(400).send({
+          message : errorHandler.getErrorMessage(err)
+        });
+      }else{
+        res.jsonp(spec);
+      }
+    });
+	//spec.remove(function(err) {
+	//	if (err) {
+	//		return res.status(400).send({
+	//			message: errorHandler.getErrorMessage(err)
+	//		});
+	//	} else {
+	//		res.jsonp(spec);
+	//	}
+	//});
 };
 
 /**

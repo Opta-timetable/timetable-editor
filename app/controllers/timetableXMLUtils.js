@@ -607,6 +607,7 @@ exports.solvedXMLParser = function (specID, filename, callback) {
         lecture.lectureIndexInCourse = lectureList[m].lectureIndexInCourse;
         lecture.locked = lectureList[m].locked;
         lecture.roomReference = lectureList[m].room.$.reference;
+        lecture.specReference = specID;
 
         for (var a = 0; a < courseList.length; a++) {
           if (courseList[a].$.id ===
