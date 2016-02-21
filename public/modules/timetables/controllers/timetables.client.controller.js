@@ -20,7 +20,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
     function assignBackgroundColorForSubjects(){
       //Assume a class won't have more than 16 colors
-      //We might need to add a bg-color property to the cell in the timetable itself so that the same color remains across refreshes as well
+      //We might need to add a bg-color property to the cell in the timetable itself
+      // so that the same color remains across refreshes as well
       var colors= ['plum', 'orchid', 'coral', 'teal', 'bisque', 'peru',
       'thistle', 'olive', 'pink', 'sienna', 'ivory', 'linen', 'orange', 'gold', 'purple', 'crimson'];
       $scope.backgroundColorForSubjects = {};
@@ -238,8 +239,6 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
           // or server returns response with an error status.
           $scope.error = data.message;
         });
-
-
     };
 
     $scope.findOne = function () {

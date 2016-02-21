@@ -13,7 +13,7 @@ var CourseSchema = new Schema({
   curriculumReference : String,
   studentSize         : String,
   specReference       : String,
-  _teacher            : {type : String, ref : 'Teacher'}
+  _teacher            : {type : String, ref : 'Lecturer'}
 });
 
 mongoose.model('Course', CourseSchema);
