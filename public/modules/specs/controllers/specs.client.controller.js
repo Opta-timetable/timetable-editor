@@ -12,14 +12,19 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     $scope.create = function() {
       // Create new Spec object
       var spec = new Specs();
+      spec.name = this.name;
+      if ($scope.numberOfWorkingDaysInAWeek !== undefined){
+        spec.numberOfWorkingDaysInAWeek = $scope.numberOfWorkingDaysInAWeek;
+      }
+      if ($scope.numberOfPeriodsInADay !== undefined){
+        spec.numberOfPeriodsInADay = $scope.numberOfPeriodsInADay;
+      }
       if (this.csvFileUploaded === true){
-          spec.name = this.name;
           spec.specFile = this.specFileName;
           spec.origFile = this.fileOriginalName;
           spec.unsolvedXML = this.outputFileName;
           spec.state = this.uploadState;
       }else{
-          spec.name = this.name;
           spec.specFile = '';
           spec.origFile = '';
           spec.unsolvedXML = '';

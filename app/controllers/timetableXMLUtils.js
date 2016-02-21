@@ -249,20 +249,20 @@ var Rooms = function () {
   };
 };
 
-var Days = function () {
+var Days = function (numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
   this.dayList = [];
   this.periodList = [];
   this.timeslotList = [];
   this.dayListID = idProvider();
   this.init = function () {
-    for (var dayCount = 0; dayCount < 5; dayCount++) { //5 days in a week
+    for (var dayCount = 0; dayCount < numberOfWorkingDaysInAWeek; dayCount++) {
       var day = {};
       day.id = idProvider();
       day.dayID = dayCount;
       day.dayIndex = dayCount;
       day.periodList = [];
       day.periodListID = idProvider();
-      for (var periodCount = 0; periodCount < 8; periodCount++) { //8 periods in a day
+      for (var periodCount = 0; periodCount < numberOfPeriodsInADay; periodCount++) {
         var period = {};
         period.id = idProvider();
         period.periodID = dayCount * periodCount + periodCount;
@@ -366,7 +366,7 @@ exports.addRawData = function (row) {
   rawData.push(row);
 };
 
-exports.prepareXML = function (opfile) {
+exports.prepareXML = function (opfile, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
   //reset uniqueID and rawData
   uniqueId = 0;
   var XMLWriter = require('xml-writer'),
@@ -403,7 +403,7 @@ exports.prepareXML = function (opfile) {
 
   //Initialise the days/periods/timeslots based on hardcoded values
   //Values will be picked up from a preference.json file later
-  var days = new Days();
+  var days = new Days(numberOfWorkingDaysInAWeek, numberOfPeriodsInADay);
   days.init();
   days.getDayListXMLContent(xw);
   days.getTimeslotListXMLContent(xw); //timeslots are contained inside dayList array
@@ -427,8 +427,9 @@ exports.prepareXML = function (opfile) {
 };
 
 //Parse Solved XML and upload the data to the database
-exports.solvedXMLParser = function (specID, filename, callback) {
+exports.solvedXMLParser = function (specID, filename, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay, callback) {
 
+  console.log('Starting solvedXMLParser');
   //mongoose.connect('mongodb://localhost/timetable-dev');
   //mongoose.connect('mongodb://kollavarsham:kollavarsham@ds039281.mongolab.com:39281/heroku_app36869144');
   var saveCount = 0;
@@ -508,23 +509,24 @@ exports.solvedXMLParser = function (specID, filename, callback) {
   };
 
   // To convert 'lectures' to a timetable to store in DB
-  var EmptyTimeTableDays = function () {
+  var EmptyTimeTableDays = function (numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
 
+    console.log('Creating empty timetable for days: ' + numberOfWorkingDaysInAWeek + 'periods ' + numberOfPeriodsInADay);
     // new Array() is not recommended because of the ambiguity in the two types of parameters it takes
     // read more here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
     // var timeTableData = new Array();
     var timeTableData = [];
-    var dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    var dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     //Initialise - Assuming hardcoded metadata (number of days, number of periods)
     // If we're anyway hard-coding what is the point of doing it two places?
     // Rather than the magic number 5 below, we could iterate through the dayName array above, right?
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < numberOfWorkingDaysInAWeek; i++) {
       var allocationsForDayOfWeek = {};
       allocationsForDayOfWeek.dayOfWeek = dayName[i];
       allocationsForDayOfWeek.dayIndex = i;
       allocationsForDayOfWeek.periods = [];
-      for (var k = 0; k < 8; k++) {
+      for (var k = 0; k < numberOfPeriodsInADay; k++) {
         var period = {};
         period.index = k;
         period.subject = '';
@@ -553,7 +555,7 @@ exports.solvedXMLParser = function (specID, filename, callback) {
 
       //Trick to close mongoose connections after all entities are saved
       saveCount = courseList.length + //Courses
-      //dayList.length * dayList[0].periodList.Period.length + //periods
+      dayList.length * dayList[0].periodList.Period.length + //periods
       lectureList.length + //lectures
       (2 * curriculumList.length) + //Curriculums + corresponding timetables
       teacherList.length; //Teachers
@@ -585,20 +587,19 @@ exports.solvedXMLParser = function (specID, filename, callback) {
       }
 
       //periods
-      //Period list doesn't seem to carry any value, I am not taking it for now
 
-      //for (var k = 0; k < dayList.length; k++) {
-      //  var dayIndex = dayList[k].dayIndex;
-      //  var timeSlotIndex = 0;
-      //  for (var l = 0; l < dayList[k].periodList.Period.length; l++) {
-      //    var period = new Period();
-      //    period.id = parseInt(dayList[k].periodList.Period[l].$.id);
-      //    period.periodID = dayList[k].periodList.Period[l].id;
-      //    period.dayIndex = dayIndex;
-      //    period.timeslotIndex = timeSlotIndex++; //maintaining an incremented index instead of cross-referencing
-      //    period.save(savePeriodCallback);
-      //  }
-      //}
+      for (var k = 0; k < dayList.length; k++) {
+        var dayIndex = dayList[k].dayIndex;
+        var timeSlotIndex = 0;
+        for (var l = 0; l < dayList[k].periodList.Period.length; l++) {
+          var period = new Period();
+          period.id = parseInt(dayList[k].periodList.Period[l].$.id);
+          period.periodID = dayList[k].periodList.Period[l].id;
+          period.dayIndex = dayIndex;
+          period.timeslotIndex = timeSlotIndex++; //maintaining an incremented index instead of cross-referencing
+          period.save(savePeriodCallback);
+        }
+      }
 
       for (var m = 0; m < lectureList.length; m++) {
         var lecture = new Lecture();
@@ -640,7 +641,9 @@ exports.solvedXMLParser = function (specID, filename, callback) {
         var timetableForCurriculum = new Timetable();
         timetableForCurriculum.curriculumReference = curriculum.id;
         timetableForCurriculum.curriculumCode = curriculum.code;
-        timetableForCurriculum.days = new EmptyTimeTableDays();
+        timetableForCurriculum.days = new EmptyTimeTableDays(numberOfWorkingDaysInAWeek, numberOfPeriodsInADay);
+        console.log('Timetable days array initialised as %j', timetableForCurriculum.days);
+        console.log('Days array length ' + timetableForCurriculum.days.length);
         timetableForCurriculum.specReference = specID;
 
         //Go through courses and find the ones for this curriculum

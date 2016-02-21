@@ -149,7 +149,7 @@ exports.hasAuthorization = function(req, res, next) {
  * Utility function to create the unsolved XML format of the timetable
  * Note: Copied from optatimetablegenerator project for the CLI part
  */
-var createHandler = function (ipFile, opFile) {
+var createHandler = function (ipFile, opFile, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
   //TODO Validations for CSV file
   var csv = require('csv-parser');
   var theReadStream = fs.createReadStream(ipFile)
@@ -161,7 +161,7 @@ var createHandler = function (ipFile, opFile) {
   });
   theReadStream.on('end', function () {
     console.log('Reached End of File');
-    xmlUtils.prepareXML(opFile);
+    xmlUtils.prepareXML(opFile, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay);
   });
 
 };
@@ -214,7 +214,7 @@ exports.generateSpecFile = function(req, res){
         console.log('converting CSV to Optaplanner InputXML');
         var outputFileName = ipfile.replace('csv', 'xml');
         console.log('output file name is ' + outputFileName);
-        createHandler(ipfile, outputFileName);
+        createHandler(ipfile, outputFileName, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay);
         //Update the spec with the new values
         spec.origFile = 'Not Applicable';
         spec.origFile = 'Not Applicable';
@@ -320,7 +320,7 @@ exports.getSolvedXML = function(req, res){
       var solvedXMLFileName = splitPath[splitPath.length - 1];
       var solvedXMLPath = './solved/'+ solvedXMLFileName;
       j2eeClient.getSolvedXML(specId, solvedXMLPath, function() {
-        xmlUtils.solvedXMLParser(specId, solvedXMLPath, function () {
+        xmlUtils.solvedXMLParser(specId, solvedXMLPath, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay, function () {
           Spec.update({'_id' : specId}, {$set : {'state' : 'Timetable Generated and Available for use'}}, function(){
             res.status(200).send({'uploadState' : 'Timetable Generated and Available for use' });
           });

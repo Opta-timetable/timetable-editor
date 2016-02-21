@@ -24,6 +24,14 @@ var SpecSchema = new Schema({
 		trim: true,
     unique: true
 	},
+  numberOfWorkingDaysInAWeek: {
+    type: Number,
+    default: 5
+  },
+  numberOfPeriodsInADay: {
+    type: Number,
+    default: 8
+  },
 	created: {
 		type: Date,
 		default: Date.now

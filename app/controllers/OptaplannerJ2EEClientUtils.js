@@ -140,13 +140,15 @@ var download = function(specID, dest, cb) {
     method   : 'GET'
   };
   var req = http.request(options, function(response) {
-    //console.log('response is %j', response);
+    console.log('Received response to download spec file');
     response.pipe(file);
     file.on('finish', function() {
-      file.close(cb);  // close() is async, call cb after close completes.
+      console.log('Received file finish event');
+      file.close(cb);
     });
   });
   req.on('error', function(err) { // Handle errors
+    console.log('Received error from request');
     fs.unlink(dest); // Delete the file async. (But we don't check the result)
     if (cb) cb(err.message);
   });

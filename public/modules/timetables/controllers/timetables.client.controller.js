@@ -166,6 +166,18 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     }
 
+    function getDayNameFromIndex(index){
+      var days = {
+        0 : 'Monday',
+        1 : 'Tuesday',
+        2 : 'Wednesday',
+        3 : 'Thursday',
+        4 : 'Friday',
+        5 : 'Saturday',
+        6 : 'Sunday'
+      };
+      return days[index];
+    }
     $scope.$watch('timetableForCurriculum.courses', function () {
       // Thanks to the great SO answer that explains Angular's digest cycle, $watch and $apply
       // http://stackoverflow.com/a/15113029/218882
@@ -210,12 +222,24 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       //$scope.teachers = Teachers.query({
       //  specId : $stateParams.specId
       //});
-      //The following should eventually come from a configuration tied to the user and school
-      $scope.workingDays = [{dayName:'Monday', dayIndex:0},
-        {dayName:'Tuesday', dayIndex:1},
-        {dayName:'Wednesday', dayIndex:2},
-        {dayName:'Thursday', dayIndex:3},
-        {dayName:'Friday', dayIndex:4}];
+
+      $http.get('/specs/' + $stateParams.specId, {})
+        .success(function (data, status, headers, config) {
+          $scope.workingDays = [];
+          for (var dayCount=0; dayCount<data.numberOfWorkingDaysInAWeek; dayCount++){
+            var dayObj = {};
+            dayObj.dayIndex = dayCount;
+            dayObj.dayName = getDayNameFromIndex(dayCount);
+            $scope.workingDays.push(dayObj);
+          }
+        })
+        .error(function (data, status, headers, config) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+          $scope.error = data.message;
+        });
+
+
     };
 
     $scope.findOne = function () {
@@ -236,7 +260,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         5 : 'Saturday',
         6 : 'Sunday'
       };
-      return $filter('date')(allocation.timestamp, 'short') + ': Period ' + (parseInt(allocation.periodIndex, 10) + 1) + ' - ' + days[allocation.dayIndex] +
+      return $filter('date')(allocation.timestamp, 'short') + ': Period ' + (parseInt(allocation.periodIndex, 10) + 1) + ' - ' + getDayNameFromIndex(allocation.dayIndex) +
         ': Allocated ' + allocation.after.subject + ' (' + allocation.after.teacher + ') in place of ' +
         allocation.before.subject + ' (' + allocation.before.teacher + ')';
     };

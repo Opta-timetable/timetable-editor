@@ -12,6 +12,18 @@
           </div>
         </div>
         <div class="form-group">
+          <label class="control-label" for="numberOfWorkingDaysInAWeek">Number of Working Days in a Week</label>
+          <div class="controls">
+            <input type="text" data-ng-model="numberOfWorkingDaysInAWeek" id="numberOfWorkingDaysInAWeek" class="form-control" placeholder="(Default 5)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="numberOfPeriodsInADay">Number of Periods in a Day</label>
+          <div class="controls">
+            <input type="text" data-ng-model="numberOfPeriodsInADay" id="numberOfPeriodsInADay" class="form-control" placeholder="(Default 8)">
+          </div>
+        </div>
+        <div class="form-group">
           <label class="control-label" for="SpecificationsFile">Timetable Specifications File (Optional)</label>
           <div class="controls">
             <input type="file" id="SpecificationsFile" class="form-control" ngf-select ngf-change="upload($files)" required>
