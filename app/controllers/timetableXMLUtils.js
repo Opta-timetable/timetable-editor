@@ -73,6 +73,11 @@ var Curriculums = function () {
       }
     }
   };
+  this.emptyCurriculumsArray = function () {
+    while(this.curriculumList.length > 0) {
+        this.curriculumList.pop();
+    }
+  };
 };
 
 var curriculums = new Curriculums();
@@ -109,6 +114,12 @@ var Teachers = function () {
       if (this.teacherList[i].code === code) {
         return this.teacherList[i].id;
       }
+    }
+  };
+  this.emptyTeachersArray = function(){
+    //Going for the safest option in spite of the potential performance hit
+    while(this.teacherList.length > 0) {
+      this.teacherList.pop();
     }
   };
 };
@@ -149,6 +160,11 @@ var Lectures = function () {
     }
     xmlcontent.endElement();//lectureList
     return xmlcontent;
+  };
+  this.emptyLecturesArray = function(){
+    while(this.lectureList.length > 0) {
+        this.lectureList.pop();
+    }
   };
 };
 
@@ -385,6 +401,13 @@ exports.prepareXML = function (opfile, numberOfWorkingDaysInAWeek, numberOfPerio
   //Enough of fooling around and start with the real work...
   var rooms = new Rooms();
   var courses = new Courses();
+  //Clear the global teachers and curriculums objects. Because of their interdependencies
+  //for simpler coding implementation those variables were in the global scope.
+  curriculums.emptyCurriculumsArray();
+  lectures.emptyLecturesArray();
+  teachers.emptyTeachersArray();
+
+  //Start taking data from the CSV line by line.
   for (var rowCount = 0; rowCount < rawData.length; rowCount++) {
     curriculums.addCurriculum(rawData[rowCount].Class);
     teachers.addTeacher(rawData[rowCount].Teacher);
