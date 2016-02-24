@@ -1007,14 +1007,19 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     $scope.create = function() {
       // Create new Spec object
       var spec = new Specs();
+      spec.name = this.name;
+      if ($scope.numberOfWorkingDaysInAWeek !== undefined){
+        spec.numberOfWorkingDaysInAWeek = $scope.numberOfWorkingDaysInAWeek;
+      }
+      if ($scope.numberOfPeriodsInADay !== undefined){
+        spec.numberOfPeriodsInADay = $scope.numberOfPeriodsInADay;
+      }
       if (this.csvFileUploaded === true){
-          spec.name = this.name;
           spec.specFile = this.specFileName;
           spec.origFile = this.fileOriginalName;
           spec.unsolvedXML = this.outputFileName;
           spec.state = this.uploadState;
       }else{
-          spec.name = this.name;
           spec.specFile = '';
           spec.origFile = '';
           spec.unsolvedXML = '';
@@ -1160,15 +1165,13 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     };
 
     function isSubjectAssignedToSection(currentAssignments, subjectCode, section){
-      var found = false;
       for (var i=0; i < currentAssignments.length; i++){
         var assignment = currentAssignments[i];
         if ((assignment.subjectCode === subjectCode) && (assignment.section === section)){
-          found = true;
-          break;
+          return {teacherCode: assignment.teacherCode, numberOfClassesInAWeek: assignment.numberOfClassesInAWeek};
         }
       }
-      return found;
+      return null;
     }
 
     function prepareSectionAssignmentsHolder(sections, currentAssignments) {
@@ -1182,7 +1185,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           var subjectCopy = {}; //Creating a copy to allow multi-select for multiple input-models corresponding to each accordion group.
           angular.copy(subject, subjectCopy);
           //Tick subject if it is already assigned
-          if (isSubjectAssignedToSection(currentAssignments, subjectCopy.name, section) === true){
+          if (isSubjectAssignedToSection(currentAssignments, subjectCopy.name, section) !== null){
             subjectCopy.ticked = true;
             thisSection.selectedSubjects.push(subjectCopy);
           }
@@ -1198,9 +1201,9 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
        console.log('received following sections: %j', sections);
        //Now get the assignments in case sections have subjects assigned already
        $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
-         var currentAssignments = data;
-         console.log('received following assignments: %j', currentAssignments);
-         prepareSectionAssignmentsHolder(sections, currentAssignments);
+         $scope.currentAssignments = data;
+         console.log('received following assignments: %j', $scope.currentAssignments);
+         prepareSectionAssignmentsHolder(sections, $scope.currentAssignments);
        });
 
      }).error(function (data, status, headers, config){
@@ -1251,13 +1254,20 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           var assignmentObject = {};
           assignmentObject.section = $scope.assignedSections[i].name;
           assignmentObject.subjectCode = $scope.assignedSections[i].selectedSubjects[j].name; //selectedSubjects is not a 'subject' obj.
-          assignmentObject.teacherCode = '';
-          assignmentObject.numberOfClassesInAWeek = 0;
-
+          //Check if this was already assigned previously and if yes pick up existing teacher code and numberOfClassesInAWeek
+          var currentAssignment = isSubjectAssignedToSection($scope.currentAssignments, assignmentObject.subjectCode, assignmentObject.section);
+          if (currentAssignment === null){
+            assignmentObject.teacherCode = '';
+            assignmentObject.numberOfClassesInAWeek = 0;
+          }else{
+            assignmentObject.teacherCode = currentAssignment.teacherCode;
+            assignmentObject.numberOfClassesInAWeek = currentAssignment.numberOfClassesInAWeek;
+          }
           assignments.push(assignmentObject);
         }
       }
-      $http.put('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
+      $scope.currentAssignments = [];
+      $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
         .success(function(data, status, headers, config){
           $location.path('specs/' + $stateParams.specId + '/assignTeachers');
         })
@@ -1783,7 +1793,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
 
     function assignBackgroundColorForSubjects(){
       //Assume a class won't have more than 16 colors
-      //We might need to add a bg-color property to the cell in the timetable itself so that the same color remains across refreshes as well
+      //We might need to add a bg-color property to the cell in the timetable itself
+      // so that the same color remains across refreshes as well
       var colors= ['plum', 'orchid', 'coral', 'teal', 'bisque', 'peru',
       'thistle', 'olive', 'pink', 'sienna', 'ivory', 'linen', 'orange', 'gold', 'purple', 'crimson'];
       $scope.backgroundColorForSubjects = {};
@@ -1929,6 +1940,18 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       }
     }
 
+    function getDayNameFromIndex(index){
+      var days = {
+        0 : 'Monday',
+        1 : 'Tuesday',
+        2 : 'Wednesday',
+        3 : 'Thursday',
+        4 : 'Friday',
+        5 : 'Saturday',
+        6 : 'Sunday'
+      };
+      return days[index];
+    }
     $scope.$watch('timetableForCurriculum.courses', function () {
       // Thanks to the great SO answer that explains Angular's digest cycle, $watch and $apply
       // http://stackoverflow.com/a/15113029/218882
@@ -1973,12 +1996,22 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       //$scope.teachers = Teachers.query({
       //  specId : $stateParams.specId
       //});
-      //The following should eventually come from a configuration tied to the user and school
-      $scope.workingDays = [{dayName:'Monday', dayIndex:0},
-        {dayName:'Tuesday', dayIndex:1},
-        {dayName:'Wednesday', dayIndex:2},
-        {dayName:'Thursday', dayIndex:3},
-        {dayName:'Friday', dayIndex:4}];
+
+      $http.get('/specs/' + $stateParams.specId, {})
+        .success(function (data, status, headers, config) {
+          $scope.workingDays = [];
+          for (var dayCount=0; dayCount<data.numberOfWorkingDaysInAWeek; dayCount++){
+            var dayObj = {};
+            dayObj.dayIndex = dayCount;
+            dayObj.dayName = getDayNameFromIndex(dayCount);
+            $scope.workingDays.push(dayObj);
+          }
+        })
+        .error(function (data, status, headers, config) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+          $scope.error = data.message;
+        });
     };
 
     $scope.findOne = function () {
@@ -1999,7 +2032,7 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
         5 : 'Saturday',
         6 : 'Sunday'
       };
-      return $filter('date')(allocation.timestamp, 'short') + ': Period ' + (parseInt(allocation.periodIndex, 10) + 1) + ' - ' + days[allocation.dayIndex] +
+      return $filter('date')(allocation.timestamp, 'short') + ': Period ' + (parseInt(allocation.periodIndex, 10) + 1) + ' - ' + getDayNameFromIndex(allocation.dayIndex) +
         ': Allocated ' + allocation.after.subject + ' (' + allocation.after.teacher + ') in place of ' +
         allocation.before.subject + ' (' + allocation.before.teacher + ')';
     };
