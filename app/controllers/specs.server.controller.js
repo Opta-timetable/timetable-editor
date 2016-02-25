@@ -149,24 +149,20 @@ exports.hasAuthorization = function(req, res, next) {
  * Utility function to create the unsolved XML format of the timetable
  * Note: Copied from optatimetablegenerator project for the CLI part
  */
-var createHandler = function (ipFile, opFile, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
-  //TODO Validations for CSV file
-  var csv = require('csv-parser');
-  var theReadStream = fs.createReadStream(ipFile)
-    .pipe(csv());
+var createHandler = function (csvStringBuffer, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
+
   xmlUtils.clearRawData();
-  theReadStream.on('data', function (data) {
-    console.log('row', data);
-    xmlUtils.addRawData(data);
-  });
-  theReadStream.on('end', function () {
-    console.log('Reached End of File');
-    xmlUtils.prepareXML(opFile, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay);
-  });
+    for (var j=0; j<csvStringBuffer.length; j++){
+      console.log('row :', csvStringBuffer[j]);
+      xmlUtils.addRawData(csvStringBuffer[j]);
+    }
+    var xmlString = xmlUtils.prepareXML(numberOfWorkingDaysInAWeek, numberOfPeriodsInADay);
+  return xmlString;
 
 };
 /*
  * Upload Spec file - Used if CSV is uploaded by user
+ * TODO Arun 24/2/2016 Remove upload CSV flow for spec generation
  */
 exports.uploadSpecFile = function(req, res){
   //console.dir(req.files);
@@ -196,44 +192,20 @@ exports.generateSpecFile = function(req, res){
         message : errorHandler.getErrorMessage(err)
       });
     } else {
-      var assignments = spec.assignments;
-      var ipfile = './uploads/' + specId + '.csv';
-      var fs = require('fs');
-      var stream = fs.createWriteStream(ipfile);
-      stream.once('open', function(fd) {
-        stream.write('Class,Subject,Teacher,PeriodsInAWeek\n');
-        for (var i=0; i<assignments.length; i++){
-          stream.write(assignments[i].section + ',' +
-            assignments[i].subjectCode + ',' +
-            assignments[i].teacherCode + ',' +
-            assignments[i].numberOfClassesInAWeek + '\n');
-        }
-        stream.end();
-        console.log('spec file is ' + ipfile);
-        console.log('original file name is ' + 'Not Applicable');
-        console.log('converting CSV to Optaplanner InputXML');
-        var outputFileName = ipfile.replace('csv', 'xml');
-        console.log('output file name is ' + outputFileName);
-        createHandler(ipfile, outputFileName, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay);
-        //Update the spec with the new values
-        spec.origFile = 'Not Applicable';
-        spec.origFile = 'Not Applicable';
         spec.state = 'Data ready for timetable generation';
-        spec.unsolvedXML = outputFileName;
+        //spec.unsolvedXML = outputFileName;
         spec.save(function(err){
           if (err){
             return res.status(400).send({
               message : errorHandler.getErrorMessage(err)
             });
           }else{
-            res.status(200).send({specFileName: ipfile,
+            res.status(200).send({specFileName: 'Not Applicable',
               fileOriginalName: 'Not Applicable',
-              outputFileName: outputFileName,
+              outputFileName: 'Not Applicable',
               uploadState: 'Data ready for timetable generation'});
           }
         });
-
-      });
     }
   });
 };
@@ -261,19 +233,36 @@ exports.solve = function(req, res){
  		if (! spec) return (new Error('Failed to load Spec ' + specId));
  		console.log('Spec for this operation is %j', spec);
  	}).then(function(spec) {
-    //Got the record, take the spec file and upload it to Optaplanner J2EE Server
-    var unsolvedXMLFilePath = './' + spec.unsolvedXML;
-    var splitPath = unsolvedXMLFilePath.split('/');
-    var unsolvedXMLFileName = splitPath[splitPath.length - 1]; //name will be last
-    console.log('unsolvedXML file name is ' + unsolvedXMLFileName);
-    console.log('unsolvedXML file is in path %j', unsolvedXMLFilePath);
+    var csvStringBuffer = [];
+    var assignments = spec.assignments;
+    if (spec.assignments && spec.assignments.length > 0){
+      //csvStringBuffer.push('Class,Subject,Teacher,PeriodsInAWeek');
+      for (var i=0; i<assignments.length; i++){
+        csvStringBuffer.push(assignments[i].section + ',' +
+        assignments[i].subjectCode + ',' +
+        assignments[i].teacherCode + ',' +
+        assignments[i].numberOfClassesInAWeek);
+      }
+      console.log('Assignments in Comma Separated Values Prepared: %j', csvStringBuffer);
 
-    j2eeClient.uploadUnsolvedFile(specId, unsolvedXMLFilePath, unsolvedXMLFileName, function(){
-      j2eeClient.startSolver(specId, function(){
-        res.status(200).send();
+      //Generate the unsolved XML string buffer
+      var xmlString = createHandler(csvStringBuffer, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay);
+      console.log('Unsolved XML Array is :' + xmlString);
+
+      j2eeClient.uploadUnsolvedFile(specId, xmlString, function(){
+        j2eeClient.startSolver(specId, function(){
+          res.status(200).send();
+        });
       });
-    });
+
+    }else{
+      //No assignments found
+      res.status(500).send({
+        message : 'No Assignments found for this Spec'
+      });
+    }
   });
+
 };
 
 /*
@@ -310,17 +299,15 @@ exports.currentSolutionScore = function(req, res) {
  */
 exports.getSolvedXML = function(req, res){
   console.log('Req is ' + req.params.specId);
+  var xmlSolution = {'solution' : ''};
     var specId = req.params.specId;
     Spec.findById(specId).exec(function(err, spec) {
    		if (err) return err;
    		if (!spec) return (new Error('Failed to load Spec ' + specId));
    		console.log('Spec for this operation is %j', spec);
    	}).then(function(spec) {
-      var splitPath = spec.unsolvedXML.split('/'); //Unsolved and solved XMLs have the same name
-      var solvedXMLFileName = splitPath[splitPath.length - 1];
-      var solvedXMLPath = './solved/'+ solvedXMLFileName;
-      j2eeClient.getSolvedXML(specId, solvedXMLPath, function() {
-        xmlUtils.solvedXMLParser(specId, solvedXMLPath, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay, function () {
+      j2eeClient.getSolvedXML(specId, xmlSolution, function() {
+        xmlUtils.solvedXMLParser(specId, xmlSolution, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay, function () {
           Spec.update({'_id' : specId}, {$set : {'state' : 'Timetable Generated and Available for use'}}, function(){
             res.status(200).send({'uploadState' : 'Timetable Generated and Available for use' });
           });

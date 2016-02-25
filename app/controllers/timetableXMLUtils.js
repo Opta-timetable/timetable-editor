@@ -382,16 +382,11 @@ exports.addRawData = function (row) {
   rawData.push(row);
 };
 
-exports.prepareXML = function (opfile, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
+exports.prepareXML = function (numberOfWorkingDaysInAWeek, numberOfPeriodsInADay) {
   //reset uniqueID and rawData
   uniqueId = 0;
-  var XMLWriter = require('xml-writer'),
+  var XMLWriter = require('xml-writer');
 
-    fs = require('fs');
-  var ws = fs.createWriteStream(opfile);
-  ws.on('close', function () {
-    console.log(fs.readFileSync(opfile, 'UTF-8'));
-  });
   var xw = new XMLWriter(true);
   xw.startDocument();
   xw.startElement('CourseSchedule').writeAttribute('id', idProvider());
@@ -409,11 +404,20 @@ exports.prepareXML = function (opfile, numberOfWorkingDaysInAWeek, numberOfPerio
 
   //Start taking data from the CSV line by line.
   for (var rowCount = 0; rowCount < rawData.length; rowCount++) {
-    curriculums.addCurriculum(rawData[rowCount].Class);
-    teachers.addTeacher(rawData[rowCount].Teacher);
-    rooms.addRoom(rawData[rowCount].Class); //Assuming 1 room for 1 class
-    courses.addCourse(rawData[rowCount].Class, rawData[rowCount].Teacher,
-      rawData[rowCount].Subject, rawData[rowCount].PeriodsInAWeek);
+    //Split on comma and consume the fields
+    //Each row will be like this: Class,Subject,Teacher,PeriodsInAWeek
+    var splitData = rawData[rowCount].split(',');
+    if (splitData.length !== 4){
+      //Trouble
+      return null;
+    }
+    curriculums.addCurriculum(splitData[0]); //Curriculum aka class
+    rooms.addRoom(splitData[0]); //Assuming 1 room for 1 class
+    teachers.addTeacher(splitData[2]); //Teacher
+    courses.addCourse(splitData[0], //Class
+      splitData[2], //Teacher
+      splitData[1], //subject
+      splitData[3]); //number of periods in a week
 
   }
   console.log('After adding all curriculums, list is ' + JSON.stringify(curriculums.curriculumList));
@@ -424,8 +428,6 @@ exports.prepareXML = function (opfile, numberOfWorkingDaysInAWeek, numberOfPerio
   curriculums.getCurriculumListXMLContent(xw);
   courses.getCourseXMLContent(xw);
 
-  //Initialise the days/periods/timeslots based on hardcoded values
-  //Values will be picked up from a preference.json file later
   var days = new Days(numberOfWorkingDaysInAWeek, numberOfPeriodsInADay);
   days.init();
   days.getDayListXMLContent(xw);
@@ -441,16 +443,11 @@ exports.prepareXML = function (opfile, numberOfWorkingDaysInAWeek, numberOfPerio
 
   xw.endElement(); //CourseSchedule
   xw.endDocument();
-
-  //console.log("Final XML is : " + xw.toString());
-  //Write to opfile
-  ws.write(xw.toString(), 'UTF-8');
-  ws.end();
-
+  return xw.toString();
 };
 
 //Parse Solved XML and upload the data to the database
-exports.solvedXMLParser = function (specID, filename, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay, callback) {
+exports.solvedXMLParser = function (specID, xmlSolution, numberOfWorkingDaysInAWeek, numberOfPeriodsInADay, callback) {
 
   console.log('Starting solvedXMLParser');
   //mongoose.connect('mongodb://localhost/timetable-dev');
@@ -542,8 +539,6 @@ exports.solvedXMLParser = function (specID, filename, numberOfWorkingDaysInAWeek
     var dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     //Initialise - Assuming hardcoded metadata (number of days, number of periods)
-    // If we're anyway hard-coding what is the point of doing it two places?
-    // Rather than the magic number 5 below, we could iterate through the dayName array above, right?
     for (var i = 0; i < numberOfWorkingDaysInAWeek; i++) {
       var allocationsForDayOfWeek = {};
       allocationsForDayOfWeek.dayOfWeek = dayName[i];
@@ -562,12 +557,8 @@ exports.solvedXMLParser = function (specID, filename, numberOfWorkingDaysInAWeek
     return timeTableData;
   };
 
-  console.log('You entered file: ' + filename);
-
   var parser = new xml2js.Parser({'explicitArray' : false});
-
-  fs.readFile(filename, function (err, data) {
-    parser.parseString(data, function (err, result) {
+    parser.parseString(xmlSolution.solution, function (err, result) {
 
       // cache xml lists into variables to improve brevity
       var courseList = result.CourseSchedule.courseList.Course;
@@ -712,6 +703,6 @@ exports.solvedXMLParser = function (specID, filename, numberOfWorkingDaysInAWeek
         teacher.save(saveTeacherCallback);
       }
     });
-  });
+  //});
 
 };

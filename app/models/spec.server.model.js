@@ -15,6 +15,7 @@ var AssignmentSchema = new Schema({
 
 /**
  * Spec Schema
+ * TODO Remove file related stuff
  */
 var SpecSchema = new Schema({
 	name: {

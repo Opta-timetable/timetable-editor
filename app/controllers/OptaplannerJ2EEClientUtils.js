@@ -4,7 +4,7 @@ var fs = require('fs'),
   http = require('http'),
   config = require('../../config/config');
 
-exports.uploadUnsolvedFile = function(specID, filePath, fileName, callback) {
+exports.uploadUnsolvedFile = function(specID, unsolvedXMLString, callback) {
 
   var options = {
     hostname : config.optaplannerService.hostname,
@@ -27,19 +27,10 @@ exports.uploadUnsolvedFile = function(specID, filePath, fileName, callback) {
 
   // write data to request body
   req.setHeader('Content-Type', 'text/plain');
-  fs.stat(filePath, function (err, stats) {
-    if (err) {
-      //TO DO
-      console.log('Request error ' + err);
-    } else {
-      req.setHeader('Content-Length', stats.size);
-      fs.createReadStream(filePath, {bufferSize : 4 * 1024})
-        .on('end', function () {
-          console.log('Reached EOF of file');
-        })
-        .pipe(req, {end : false});
-    }
-  });
+  req.setHeader('Content-Length', unsolvedXMLString.length);
+  req.write(unsolvedXMLString);
+  req.end();
+
   console.log('completed HTTP Request');
 };
 
@@ -129,10 +120,7 @@ exports.getScore = function(specID, callback){
       req.end();
 };
 
-// Using the method described here:
-// http://stackoverflow.com/questions/11944932/how-to-download-a-file-with-node-js
-var download = function(specID, dest, cb) {
-  var file = fs.createWriteStream(dest);
+var download = function(specID, xmlSolution, cb) {
   var options = {
     hostname : config.optaplannerService.hostname,
     port     : config.optaplannerService.port,
@@ -140,24 +128,33 @@ var download = function(specID, dest, cb) {
     method   : 'GET'
   };
   var req = http.request(options, function(response) {
+    var solutionString = '';
     console.log('Received response to download spec file');
-    response.pipe(file);
-    file.on('finish', function() {
-      console.log('Received file finish event');
-      file.close(cb);
+    console.log('STATUS: ' + response.statusCode);
+    console.log('HEADERS: ' + JSON.stringify(response.headers));
+    response.setEncoding('utf8');
+    response.on('data', function(chunk){
+      console.log('BODY: ' + chunk);
+      solutionString = solutionString.concat(chunk);
+    });
+    response.on('end', function(){
+      console.log('No more data in response.');
+      xmlSolution.solution = solutionString;
+      console.log('Complete Solution received is + ' + xmlSolution.solution);
+      cb();
     });
   });
+
   req.on('error', function(err) { // Handle errors
     console.log('Received error from request');
-    fs.unlink(dest); // Delete the file async. (But we don't check the result)
     if (cb) cb(err.message);
   });
   req.end();
 };
 
-exports.getSolvedXML = function(specID, solvedXMLPath, callback){
+exports.getSolvedXML = function(specID, xmlSolution, callback){
   console.log('Calling j2ee client utils getSolvedXML');
-  download(specID, solvedXMLPath, callback);
+  download(specID, xmlSolution, callback);
 };
 
 exports.deleteSpec = function(specID, callback){
