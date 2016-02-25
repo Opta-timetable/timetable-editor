@@ -13,6 +13,7 @@ exports.uploadUnsolvedFile = function(specID, unsolvedXMLString, callback) {
     method   : 'POST'
   };
 
+  console.log('Using options : %j', options);
   var req = http.request(options, function (res) {
     console.log('STATUS: ' + res.statusCode);
     res.on('data', function (chunk) {

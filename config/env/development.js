@@ -7,7 +7,7 @@ module.exports = {
     description: 'An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.'
   },
   optaplannerService : {
-    host : 'localhost',
+    hostname : 'localhost',
     port : 8080,
     basepath : '/timetablesolverservice-1.0'
   },
