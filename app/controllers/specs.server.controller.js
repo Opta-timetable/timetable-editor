@@ -72,40 +72,29 @@ exports.delete = function(req, res) {
   //Delete Courses, Curriculums, Lecturers, Timetables where the Spec Id matches and finally the
   //Spec itself
 
-  Course.remove({specReference : spec._id}).exec()
+  Course.find({specReference : spec._id}).remove().exec()
     .then(function(){
-      return Curriculum.remove({specReference : spec._id}).exec();
+      return Curriculum.find({specReference : spec._id}).remove().exec();
     })
     .then(function(){
-      return Teacher.remove({specReference : spec._id}).exec();
+      return Teacher.find({specReference : spec._id}).remove().exec();
     })
     .then(function(){
-      return Timetable.remove({specReference : spec._id}).exec();
+      return Timetable.find({specReference : spec._id}).remove().exec();
     })
     .then(function(){
-      return Lecture.remove({specReference : spec._id}).exec();
+      return Lecture.find({specReference : spec._id}).remove().exec();
     })
     .then(function(){
-      return spec.remove().exec();
+      return Spec.findByIdAndRemove(spec._id).exec();
+    }).then(function(){
+      res.jsonp(spec);
     })
     .then(null, function(err){
-      if (err instanceof Error) {
-        return res.status(400).send({
-          message : errorHandler.getErrorMessage(err)
-        });
-      }else{
-        res.jsonp(spec);
-      }
+      return res.status(400).send({
+        message : errorHandler.getErrorMessage(err)
+      });
     });
-	//spec.remove(function(err) {
-	//	if (err) {
-	//		return res.status(400).send({
-	//			message: errorHandler.getErrorMessage(err)
-	//		});
-	//	} else {
-	//		res.jsonp(spec);
-	//	}
-	//});
 };
 
 /**
