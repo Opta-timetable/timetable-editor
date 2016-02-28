@@ -247,7 +247,7 @@ exports.solve = function(req, res){
 
       //Generate the unsolved XML string buffer
       var xmlString = createHandler(csvStringBuffer, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay);
-      console.log('Unsolved XML Array is :' + xmlString);
+      //console.log('Unsolved XML Array is :' + xmlString);
 
       j2eeClient.uploadUnsolvedFile(specId, xmlString, function(){
         j2eeClient.startSolver(specId, function(){
