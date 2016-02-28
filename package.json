@@ -43,6 +43,7 @@
     "passport-twitter": "1.0.x",
     "swig": "1.4.x",
     "querystring":"0.2.x",
+    "connect-multiparty":"2.0.x",
     "xml2js":"0.4.x",
     "xml-writer": "1.6.x",
     "request-promise": "2.0.x"
