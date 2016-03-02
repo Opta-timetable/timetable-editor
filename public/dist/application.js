@@ -6,7 +6,7 @@ var ApplicationConfiguration = (function () {
   var applicationModuleName = 'timetable';
   var applicationModuleVendorDependencies = [
     'ngResource', 'ngCookies', 'ngAnimate', 'ngTouch', 'ngSanitize', 'ui.router', 'ui.bootstrap', 'ui.utils',
-    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb', 'ngFileUpload', 'multi-select'
+    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb', 'ngFileUpload', 'multi-select', 'angularSpinner'
   ];
 
   // Add a new vertical module
@@ -689,14 +689,18 @@ angular.module('schools').controller('SchoolsController', ['$scope', '$statePara
 
 		// Find a list of Schools
 		$scope.find = function() {
-			$scope.schools = Schools.query();
+			$scope.schools = Schools.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing School
 		$scope.findOne = function() {
 			$scope.school = Schools.get({ 
 				schoolId: $stateParams.schoolId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);
@@ -805,17 +809,24 @@ angular.module('sections').controller('SectionsController', ['$scope', '$statePa
 
 		// Find a list of Sections
 		$scope.find = function() {
-			$scope.sections = Sections.query();
+      $scope.showSpinner = true;
+			$scope.sections = Sections.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Section
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.section = Sections.get({ 
 				sectionId: $stateParams.sectionId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);
+
 'use strict';
 
 //Sections service used to communicate Sections REST endpoints
@@ -1075,14 +1086,20 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 
 		// Find a list of Specs
 		$scope.find = function() {
-			$scope.specs = Specs.query();
+      $scope.showSpinner = true;
+			$scope.specs = Specs.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Spec
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.spec = Specs.get({ 
 				specId: $stateParams.specId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 
     $scope.upload = function (files) {
@@ -1431,14 +1448,20 @@ angular.module('subjects').controller('SubjectsController', ['$scope', '$statePa
 
 		// Find a list of Subjects
 		$scope.find = function() {
-			$scope.subjects = Subjects.query();
+      $scope.showSpinner = true;
+			$scope.subjects = Subjects.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Subject
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.subject = Subjects.get({ 
 				subjectId: $stateParams.subjectId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);
@@ -1551,14 +1574,20 @@ angular.module('teachers').controller('TeachersController', ['$scope', '$statePa
 
 		// Find a list of Teachers
 		$scope.find = function() {
-			$scope.teachers = Teachers.query();
+      $scope.showSpinner = true;
+			$scope.teachers = Teachers.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Teacher
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.teacher = Teachers.get({ 
         teacherId: $stateParams.teacherId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);
@@ -1726,10 +1755,13 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
     };
 
     $scope.findOne = function () {
+      $scope.showSpinner = true;
       $scope.specId = $stateParams.specId;
       $scope.timetable = Days.get({
         specId : $scope.specId,
         dayIndex : $stateParams.dayIndex
+      }, function(){
+        $scope.showSpinner = false;
       });
       $scope.teachers = Teachers.query({specId : $scope.specId});
     };
@@ -1761,10 +1793,13 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
     };
 
     $scope.findOne = function () {
+      $scope.showSpinner = true;
       $scope.specId = SpecIdHolder.getSpecId();
       $scope.timetableForTeacher = TimetableForTeacher.get({
         specId : $scope.specId,
         id : $stateParams.id
+      }, function(){
+        $scope.showSpinner = false;
       });
 
     };
@@ -1969,11 +2004,16 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     });
 
     $scope.list = function() {
-      $scope.allTimetables = Timetables.query();
-    //Get all the generated timetables
+      $scope.showSpinner = true;
+      Timetables.query(function(data){
+        $scope.allTimetables = data;
+        console.log('At end of allTimetables query');
+        $scope.showSpinner = false;
+      });
     };
 
     $scope.find = function () {
+      $scope.showSpinner = true;
       //pick specId in context
       $scope.specId = $stateParams.specId;
       //Set specId into Holder so that other controllers can access it
@@ -1981,6 +2021,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query({
         specId : $stateParams.specId
+      }, function(){
+        $scope.showSpinner = false;
       });
 
       $http.get('/specs/' + $stateParams.specId + '/teachers', {})
@@ -2015,9 +2057,12 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.findOne = function () {
+      $scope.showSpinner = true;
       $scope.timetableForCurriculum = TimetableForCurriculum.get({
         specId : $stateParams.specId,
         curriculumId : $stateParams.curriculumId
+      }, function(){
+        $scope.showSpinner = false;
       });
       $scope.specId = $stateParams.specId;
     };
