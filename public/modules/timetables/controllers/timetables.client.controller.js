@@ -196,11 +196,16 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     });
 
     $scope.list = function() {
-      $scope.allTimetables = Timetables.query();
-    //Get all the generated timetables
+      $scope.showSpinner = true;
+      Timetables.query(function(data){
+        $scope.allTimetables = data;
+        console.log('At end of allTimetables query');
+        $scope.showSpinner = false;
+      });
     };
 
     $scope.find = function () {
+      $scope.showSpinner = true;
       //pick specId in context
       $scope.specId = $stateParams.specId;
       //Set specId into Holder so that other controllers can access it
@@ -208,6 +213,8 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       //one timetable each for one curriculum
       $scope.curriculums = Timetables.query({
         specId : $stateParams.specId
+      }, function(){
+        $scope.showSpinner = false;
       });
 
       $http.get('/specs/' + $stateParams.specId + '/teachers', {})
@@ -242,9 +249,12 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
     };
 
     $scope.findOne = function () {
+      $scope.showSpinner = true;
       $scope.timetableForCurriculum = TimetableForCurriculum.get({
         specId : $stateParams.specId,
         curriculumId : $stateParams.curriculumId
+      }, function(){
+        $scope.showSpinner = false;
       });
       $scope.specId = $stateParams.specId;
     };

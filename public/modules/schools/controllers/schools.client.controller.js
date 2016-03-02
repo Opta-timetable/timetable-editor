@@ -54,14 +54,18 @@ angular.module('schools').controller('SchoolsController', ['$scope', '$statePara
 
 		// Find a list of Schools
 		$scope.find = function() {
-			$scope.schools = Schools.query();
+			$scope.schools = Schools.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing School
 		$scope.findOne = function() {
 			$scope.school = Schools.get({ 
 				schoolId: $stateParams.schoolId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);

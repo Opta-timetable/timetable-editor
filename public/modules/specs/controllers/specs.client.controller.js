@@ -80,14 +80,20 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 
 		// Find a list of Specs
 		$scope.find = function() {
-			$scope.specs = Specs.query();
+      $scope.showSpinner = true;
+			$scope.specs = Specs.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Spec
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.spec = Specs.get({ 
 				specId: $stateParams.specId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 
     $scope.upload = function (files) {

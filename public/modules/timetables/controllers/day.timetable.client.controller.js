@@ -52,10 +52,13 @@ angular.module('timetables').controller('DayTimetableController', ['$http', '$sc
     };
 
     $scope.findOne = function () {
+      $scope.showSpinner = true;
       $scope.specId = $stateParams.specId;
       $scope.timetable = Days.get({
         specId : $scope.specId,
         dayIndex : $stateParams.dayIndex
+      }, function(){
+        $scope.showSpinner = false;
       });
       $scope.teachers = Teachers.query({specId : $scope.specId});
     };

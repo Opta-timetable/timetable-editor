@@ -6,7 +6,7 @@ var ApplicationConfiguration = (function () {
   var applicationModuleName = 'timetable';
   var applicationModuleVendorDependencies = [
     'ngResource', 'ngCookies', 'ngAnimate', 'ngTouch', 'ngSanitize', 'ui.router', 'ui.bootstrap', 'ui.utils',
-    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb', 'ngFileUpload', 'multi-select'
+    'ngDraggable', 'ngTableToCsv', 'ncy-angular-breadcrumb', 'ngFileUpload', 'multi-select', 'angularSpinner'
   ];
 
   // Add a new vertical module

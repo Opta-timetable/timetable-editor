@@ -3,6 +3,7 @@
     <h1>{{ "Timetable for " + timetableForTeacher.teacherCode}}</h1>
   </div>
   <div ncy-breadcrumb></div>
+  <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
   <div class="clearfix">
     <div class="pull-right">
       <a class="btn btn-info" title="Export Timetable" ng-click='csv.generate()' ng-href="{{ csv.link() }}"

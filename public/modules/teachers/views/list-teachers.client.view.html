@@ -2,6 +2,7 @@
     <div class="page-header">
         <h1>Teachers</h1>
     </div>
+  <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
     <div class="list-group">
         <a data-ng-repeat="teacher in teachers" data-ng-href="#!/teachers/{{teacher._id}}" class="list-group-item">
           <h4 class="list-group-item-heading" data-ng-bind="teacher.code"></h4>

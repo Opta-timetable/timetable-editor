@@ -57,14 +57,20 @@ angular.module('teachers').controller('TeachersController', ['$scope', '$statePa
 
 		// Find a list of Teachers
 		$scope.find = function() {
-			$scope.teachers = Teachers.query();
+      $scope.showSpinner = true;
+			$scope.teachers = Teachers.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Teacher
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.teacher = Teachers.get({ 
         teacherId: $stateParams.teacherId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);

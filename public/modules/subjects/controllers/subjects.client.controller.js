@@ -54,14 +54,20 @@ angular.module('subjects').controller('SubjectsController', ['$scope', '$statePa
 
 		// Find a list of Subjects
 		$scope.find = function() {
-			$scope.subjects = Subjects.query();
+      $scope.showSpinner = true;
+			$scope.subjects = Subjects.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Subject
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.subject = Subjects.get({ 
 				subjectId: $stateParams.subjectId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);

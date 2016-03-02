@@ -53,14 +53,20 @@ angular.module('sections').controller('SectionsController', ['$scope', '$statePa
 
 		// Find a list of Sections
 		$scope.find = function() {
-			$scope.sections = Sections.query();
+      $scope.showSpinner = true;
+			$scope.sections = Sections.query(function(){
+        $scope.showSpinner = false;
+      });
 		};
 
 		// Find existing Section
 		$scope.findOne = function() {
+      $scope.showSpinner = true;
 			$scope.section = Sections.get({ 
 				sectionId: $stateParams.sectionId
-			});
+			}, function(){
+        $scope.showSpinner = false;
+      });
 		};
 	}
 ]);

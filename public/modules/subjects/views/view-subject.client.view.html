@@ -3,6 +3,7 @@
 		<h1 data-ng-bind="subject.name"></h1>
     <h2 data-ng-bind="subject.code"></h2>
 	</div>
+  <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
 	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == subject.user._id))">
 		<a class="btn btn-primary" href="/#!/subjects/{{subject._id}}/edit">
 			<i class="glyphicon glyphicon-edit"></i>

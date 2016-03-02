@@ -28,7 +28,9 @@ module.exports = {
         'public/lib/ng-table-to-csv/dist/ng-table-to-csv.min.js',
         'public/lib/angular-breadcrumb/release/angular-breadcrumb.min.js',
         'public/lib/ng-file-upload/ng-file-upload-all.min.js',
-        'public/lib/isteven-angular-multiselect/angular-multi-select.js'
+        'public/lib/isteven-angular-multiselect/angular-multi-select.js',
+        'public/lib/spin.js/spin.js',
+        'public/lib/angular-spinner/angular-spinner.js'
       ]
     },
     css : 'public/dist/application.min.css',

@@ -19,10 +19,13 @@ angular.module('timetables').controller('TeacherTimetableController', ['$http', 
     };
 
     $scope.findOne = function () {
+      $scope.showSpinner = true;
       $scope.specId = SpecIdHolder.getSpecId();
       $scope.timetableForTeacher = TimetableForTeacher.get({
         specId : $scope.specId,
         id : $stateParams.id
+      }, function(){
+        $scope.showSpinner = false;
       });
 
     };
