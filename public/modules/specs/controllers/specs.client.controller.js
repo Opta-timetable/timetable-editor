@@ -152,6 +152,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     };
 
     $scope.initSections = function(){
+      $scope.showSpinner = true;
       $scope.allSections = [];
       $scope.selectedSections = []; //TODO: There is a console error for ticked property. It doesn't impact the flow but may need to be looked at
       var allSections = Sections.query(function(){
@@ -167,8 +168,10 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
                   section.ticked = true;
                 }
               });
+              $scope.showSpinner = false;
             }).error(function (data, status, headers, config){
               $scope.error = data.message;
+              $scope.showSpinner = false;
             });
           }
         });
@@ -243,12 +246,14 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     };
 
     $scope.initSubjects = function(){
+      $scope.showSpinner = true;
       $scope.allSubjects = [];
       var allSubjects = Subjects.query(function(){
         allSubjects.forEach(function(subject){
           $scope.allSubjects.push({name: subject.code, ticked: false});
         });
         getSectionsForSpec();
+        $scope.showSpinner = false;
       });
       $scope.sectionsAccordionOneAtATime = true;
       $scope.sectionsAccordionStatus = {
@@ -289,13 +294,16 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 
     $scope.initAssignments = function(){
       //Pick up assignments for this spec
+      $scope.showSpinner = true;
       $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
         console.log('received following assignments: %j', data);
         $scope.assignments = data;
+        $scope.showSpinner = false;
 
       }).error(function (data, status, headers, config){
         $scope.error = data.message;
         $scope.assignments = [];
+        $scope.showSpinner = false;
       });
       //Pick up All Teachers
       $scope.allTeachers = [];
