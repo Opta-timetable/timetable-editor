@@ -13,7 +13,7 @@ var SectionSchema = new Schema({
 	name: {
 		type: String,
 		default: '',
-		required: 'Please fill Section name - For example: X-A',
+		required: 'Please fill Class name - For example: X-A',
 		trim: true
 	},
 	created: {

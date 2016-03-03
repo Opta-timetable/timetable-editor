@@ -6,11 +6,11 @@ module.exports = function(app) {
 
 	// Sections Routes
 	app.route('/sections')
-		.get(sections.list)
+		.get(users.requiresLogin, sections.list)
 		.post(users.requiresLogin, sections.create);
 
 	app.route('/sections/:sectionId')
-		.get(sections.read)
+		.get(users.requiresLogin, sections.read)
 		.put(users.requiresLogin, sections.hasAuthorization, sections.update)
 		.delete(users.requiresLogin, sections.hasAuthorization, sections.delete);
 

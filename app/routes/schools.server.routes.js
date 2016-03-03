@@ -6,11 +6,11 @@ module.exports = function(app) {
 
 	// Schools Routes
 	app.route('/schools')
-		.get(schools.list)
+		.get(users.requiresLogin, schools.list)
 		.post(users.requiresLogin, schools.create);
 
 	app.route('/schools/:schoolId')
-		.get(schools.read)
+		.get(users.requiresLogin, schools.read)
 		.put(users.requiresLogin, schools.hasAuthorization, schools.update)
 		.delete(users.requiresLogin, schools.hasAuthorization, schools.delete);
 

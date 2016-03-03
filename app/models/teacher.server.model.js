@@ -9,7 +9,15 @@ var TeacherSchema = new Schema({
   lastName : String,
   email : String,
   details : String,
-  code: String
+  code: String,
+  created: {
+  	type: Date,
+    default: Date.now
+  },
+  user: {
+  	type: Schema.ObjectId,
+  	ref: 'User'
+  }
 });
 
 mongoose.model('Teacher', TeacherSchema);

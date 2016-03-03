@@ -101,7 +101,7 @@ exports.delete = function(req, res) {
  * List of Specs
  */
 exports.list = function(req, res) { 
-	Spec.find().sort('-created').populate('user', 'displayName').exec(function(err, specs) {
+	Spec.find({user: req.user.id}).sort('-created').populate('user', 'displayName').exec(function(err, specs) {
 		if (err) {
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)

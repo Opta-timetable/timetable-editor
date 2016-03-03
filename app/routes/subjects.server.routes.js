@@ -6,11 +6,11 @@ module.exports = function(app) {
 
 	// Subjects Routes
 	app.route('/subjects')
-		.get(subjects.list)
+		.get(users.requiresLogin, subjects.list)
 		.post(users.requiresLogin, subjects.create);
 
 	app.route('/subjects/:subjectId')
-		.get(subjects.read)
+		.get(users.requiresLogin, subjects.read)
 		.put(users.requiresLogin, subjects.hasAuthorization, subjects.update)
 		.delete(users.requiresLogin, subjects.hasAuthorization, subjects.delete);
 

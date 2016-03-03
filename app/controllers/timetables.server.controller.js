@@ -54,7 +54,7 @@ exports.read = function (req, res, next, id) {
  * Get all specs that have a timetable generated
  */
 exports.list = function(req, res){
-  Spec.find({'state' : 'Timetable Generated and Available for use'}).sort('created').exec(function(err, specs){
+  Spec.find({'state' : 'Timetable Generated and Available for use', user: req.user.id}).sort('created').exec(function(err, specs){
     if (err) {
           return res.status(400).send({
             message : errorHandler.getErrorMessage(err)

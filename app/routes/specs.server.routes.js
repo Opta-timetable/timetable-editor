@@ -6,7 +6,7 @@ module.exports = function(app) {
 
 	// Specs Routes
 	app.route('/specs')
-		.get(specs.list)
+		.get(users.requiresLogin, specs.list)
 		.post(users.requiresLogin, specs.create);
 
 	app.route('/specs/:specId')
@@ -15,34 +15,34 @@ module.exports = function(app) {
 		.delete(users.requiresLogin, specs.hasAuthorization, specs.delete);
 
   app.route('/specs/upload')
-      .post(specs.uploadSpecFile);
+      .post(users.requiresLogin, specs.uploadSpecFile);
 
   app.route('/specs/:specId/generate')
-    .post(specs.generateSpecFile);
+    .post(users.requiresLogin, specs.generateSpecFile);
 
   app.route('/specs/solve')
-    .post(specs.solve);
+    .post(users.requiresLogin, specs.solve);
 
   app.route('/specs/:specId/solution')
-    .get(specs.isSolving);
+    .get(users.requiresLogin, specs.isSolving);
 
   app.route('/specs/:specId/solution')
-    .delete(specs.terminateSolving);
+    .delete(users.requiresLogin, specs.terminateSolving);
 
   app.route('/specs/:specId/solutionFile')
-    .get(specs.getSolvedXML);
+    .get(users.requiresLogin, specs.getSolvedXML);
 
   app.route('/specs/:specId/teachers')
-      .get(specs.listTeachers);
+      .get(users.requiresLogin, specs.listTeachers);
 
   app.route('/specs/:specId/sections')
-    .get(specs.getSectionsForSpec)
-    .post(specs.addSectionsForSpec);
+    .get(users.requiresLogin, specs.getSectionsForSpec)
+    .post(users.requiresLogin, specs.addSectionsForSpec);
 
   app.route('/specs/:specId/assignments')
-    .get(specs.getAssignmentsForSpec)
+    .get(users.requiresLogin, specs.getAssignmentsForSpec)
     //.put(specs.addAssignmentsForSpec)
-    .post(specs.updateAssignmentsForSpec);
+    .post(users.requiresLogin, specs.updateAssignmentsForSpec);
 
 	// Finish by binding the Spec middleware
 	app.param('specId', specs.specByID);
