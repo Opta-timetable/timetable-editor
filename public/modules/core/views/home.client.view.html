@@ -3,49 +3,43 @@
     <p class="lead">&#160;</p>
   </div>
   <div class="jumbotron text-center">
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3 col-xs-12">
-        <img alt="MEAN.JS" class="img-responsive text-center" src="modules/core/img/brand/logo.png"/>
+    <div class="media">
+      <div class="media-left media-middle">
+        <a href="#">
+          <img class="media-object" width="200" height="150" src="modules/core/img/brand/new-logo.png" alt="timeStable logo">
+        </a>
+
+      </div>
+      <div class="media-body">
+        <p class="lead">
+          Auto-generate, visualize and fine-tune high-quality, well-balanced school timetables
+        </p>
+        <small> Powered by: <span> <a href="http://optaplanner.org">
+          <img class="img-responsive center-block" width="100" height="20" src="modules/core/img/brand/optaPlannerLogo.png"/>
+        </a></span></small>
+        <div class="row" data-ng-hide="authentication.user">
+              <p class="lead">&#160;</p>
+              <p>
+                <a class="btn btn-success btn-lg" href="/#!/signin">Sign In</a>
+              </p>
+            </div>
+            <div class="row" data-ng-show="authentication.user">
+              <p class="lead">&#160;</p>
+              <p>
+                <a class="btn btn-info btn-lg" href="#!/timetables">Edit your Timetables</a>
+                <a class="btn btn-info btn-lg" href="#!/specs">Generate a new Timetable</a>
+              </p>
+            </div>
       </div>
     </div>
     <br>
-    <div class="row">
-      <p class="lead">
-        Simple and powerful Timetables
-      </p>
-      <br>
-      <a href="http://optaplanner.org">
-        <img class="img-responsive center-block" width="320" height="60" src="modules/core/img/brand/optaPlannerLogo.png"/>
-      </a>
-    </div>
-    <div class="row" data-ng-hide="authentication.user">
-      <p class="lead">&#160;</p>
-      <p>
-        <a class="btn btn-success btn-lg" href="/#!/signin">Sign In</a>
-      </p>
-    </div>
-    <div class="row" data-ng-show="authentication.user">
-      <p class="lead">&#160;</p>
-      <p>
-        <a class="btn btn-info btn-lg" href="#!/timetables">Edit your Timetables</a>
-        <a class="btn btn-info btn-lg" href="#!/specs">Generate a Timetable</a>
-      </p>
-    </div>
+
     <div class="row">
       <div class="text-danger text-right text-nowrap" data-ng-bind="version.versionString"></div>
+
+      <small>Businessman graphic by <a href="http://www.freepik.com/">Freepik</a> from <a href="http://www.flaticon.com/">Flaticon</a>
+        is licensed under <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>.
+        Made with <a href="http://logomakr.com" title="Logo Maker">Logo Maker</a></small>
     </div>
-  </div>
-  <div class="col-md-12">
-    <p class="lead"><u>Translations</u></p>
-    <dl class="dl-horizontal">
-      <dt>Curriculum</dt>
-      <dd>Class</dd>
-      <dt>Courses</dt>
-      <dd>Subjects</dd>
-      <dt>Periods</dt>
-      <dd>Day and Time combination</dd>
-      <dt>Lectures</dt>
-      <dd>Subjects for Class assigned to Periods</dd>
-    </dl>
   </div>
 </section>
