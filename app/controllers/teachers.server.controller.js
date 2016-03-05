@@ -14,7 +14,7 @@ var mongoose = require('mongoose'),
 exports.create = function(req, res) {
 	var teacher = new Teacher(req.body);
   console.log('req.user is ' + req.user);
-	//teacher.user = req.user;
+	teacher.user = req.user;
   teacher._id = mongoose.Types.ObjectId();
 console.log('Received Teacher is %j', teacher);
 	teacher.save(function(err) {

@@ -4,11 +4,11 @@
 	</div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
 	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == section.user._id))">
-		<a class="btn btn-primary" href="/#!/sections/{{section._id}}/edit">
-			<i class="glyphicon glyphicon-edit"></i>
+		<a class="btn btn-success" href="/#!/sections/{{section._id}}/edit">
+			<i class="glyphicon glyphicon-edit"></i>&#160;Edit
 		</a>
-		<a class="btn btn-primary" data-ng-click="remove();">
-			<i class="glyphicon glyphicon-trash"></i>
+		<a class="btn btn-warning" data-ng-click="remove();">
+			<i class="glyphicon glyphicon-trash"></i>&#160;Delete
 		</a>
 	</div>
 	<small>
