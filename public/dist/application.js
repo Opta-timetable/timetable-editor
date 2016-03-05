@@ -59,15 +59,6 @@ angular.element(document).ready(function () {
 ApplicationConfiguration.registerModule('core');
 'use strict';
 
-// Use application configuration module to register a new module
-ApplicationConfiguration.registerModule('courses');
-
-'use strict';
-
-// Use applicaion configuration module to register a new module
-ApplicationConfiguration.registerModule('curriculums');
-'use strict';
-
 // Use applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('schools');
 'use strict';
@@ -350,264 +341,16 @@ angular.module('core').factory('Version', ['$resource',
 
 'use strict';
 
-// Courses module config
-angular.module('courses').run(['Menus',
-  function (Menus) {
-    // Set top bar menu items
-    //Hiding Courses as it is "internal"
-    //Menus.addMenuItem('topbar', 'Courses', 'courses', 'dropdown', '/courses(/create)?');
-    //Menus.addSubMenuItem('topbar', 'courses', 'List Courses', 'courses');
-    //Menus.addSubMenuItem('topbar', 'courses', 'New Course', 'courses/create');
-  }
-]);
-
-'use strict';
-
-// Setting up route
-angular.module('courses').config(['$stateProvider',
-  function ($stateProvider) {
-    // Courses state routing
-    $stateProvider.
-      state('listCourses', {
-        url           : '/courses',
-        templateUrl   : 'modules/courses/views/list-courses.client.view.html',
-        ncyBreadcrumb : {
-          label  : 'Courses',
-          parent : 'home'
-        }
-      }).
-      state('createCourse', {
-        url           : '/courses/create',
-        templateUrl   : 'modules/courses/views/create-course.client.view.html',
-        ncyBreadcrumb : {
-          label  : 'Add Course',
-          parent : 'listCourses'
-        }
-      }).
-      state('viewCourse', {
-        url           : '/courses/:courseId',
-        templateUrl   : 'modules/courses/views/view-course.client.view.html',
-        ncyBreadcrumb : {
-          label  : 'Course',
-          parent : 'listCourses'
-        }
-      }).
-      state('editCourse', {
-        url           : '/courses/:courseId/edit',
-        templateUrl   : 'modules/courses/views/edit-course.client.view.html',
-        ncyBreadcrumb : {
-          label  : 'Edit Course',
-          parent : 'viewCourse'
-        }
-      });
-  }
-]);
-
-/*jshint unused: false */
-'use strict';
-
-angular.module('courses').controller('CoursesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Courses',
-  function ($scope, $stateParams, $location, Authentication, Courses) {
-    $scope.authentication = Authentication;
-
-    $scope.create = function () {
-      var course = new Courses({
-        studentSize       : this.course.studentSize,
-        minWorkingDaySize : this.course.minWorkingDaySize,
-        lectureSize       : this.course.lectureSize,
-        code              : this.course.code,
-        courseID          : this.course.courseID,
-        _teacher          : 0
-      });
-      course.$save(function (response) {
-        $location.path('courses/' + response._id);
-
-        $scope.course = {};
-      }, function (errorResponse) {
-        $scope.error = errorResponse.data.message;
-      });
-    };
-
-    $scope.remove = function (course) {
-      if (course) {
-        course.$remove();
-
-        for (var i in $scope.courses) {
-          if ($scope.courses[i] === course) {
-            $scope.courses.splice(i, 1);
-          }
-        }
-      } else {
-        $scope.course.$remove(function () {
-          $location.path('courses');
-        });
-      }
-    };
-
-    $scope.update = function () {
-      var course = $scope.course;
-
-      course.$update(function () {
-        $location.path('courses/' + course._id);
-      }, function (errorResponse) {
-        $scope.error = errorResponse.data.message;
-      });
-    };
-
-    $scope.find = function () {
-      $scope.courses = Courses.query();
-    };
-
-    $scope.findOne = function () {
-      $scope.course = Courses.get({
-        courseId : $stateParams.courseId
-      });
-    };
-  }
-]);
-
-'use strict';
-
-angular.module('courses').factory('Courses', ['$resource',
-  function ($resource) {
-    return $resource('courses/:courseId', {
-      courseId : '@_id'
-    }, {
-      update : {
-        method : 'PUT'
-      }
-    });
-  }
-]);
-
-'use strict';
-
-// Configuring the Articles module
-angular.module('curriculums').run(['Menus',
-	function(Menus) {
-		// Set top bar menu items
-    //Hiding "Curriculums" as it is internal
-		//Menus.addMenuItem('topbar', 'Curriculums', 'curriculums', 'dropdown', '/curriculums(/create)?');
-		//Menus.addSubMenuItem('topbar', 'curriculums', 'List Curriculums', 'curriculums');
-		//Menus.addSubMenuItem('topbar', 'curriculums', 'New Curriculum', 'curriculums/create');
-	}
-]);
-
-'use strict';
-
-//Setting up route
-angular.module('curriculums').config(['$stateProvider',
-	function($stateProvider) {
-		// Curriculums state routing
-		$stateProvider.
-		state('listCurriculums', {
-			url: '/curriculums',
-			templateUrl: 'modules/curriculums/views/list-curriculums.client.view.html'
-		}).
-		state('createCurriculum', {
-			url: '/curriculums/create',
-			templateUrl: 'modules/curriculums/views/create-curriculum.client.view.html'
-		}).
-		state('viewCurriculum', {
-			url: '/curriculums/:curriculumId',
-			templateUrl: 'modules/curriculums/views/view-curriculum.client.view.html'
-		}).
-		state('editCurriculum', {
-			url: '/curriculums/:curriculumId/edit',
-			templateUrl: 'modules/curriculums/views/edit-curriculum.client.view.html'
-		});
-	}
-]);
-'use strict';
-
-// Curriculums controller
-angular.module('curriculums').controller('CurriculumsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Curriculums',
-	function($scope, $stateParams, $location, Authentication, Curriculums) {
-		$scope.authentication = Authentication;
-
-		// Create new Curriculum
-		$scope.create = function() {
-			// Create new Curriculum object
-			var curriculum = new Curriculums ({
-				name: this.name
-			});
-
-			// Redirect after save
-			curriculum.$save(function(response) {
-				$location.path('curriculums/' + response._id);
-
-				// Clear form fields
-				$scope.name = '';
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
-		};
-
-		// Remove existing Curriculum
-		$scope.remove = function(curriculum) {
-			if ( curriculum ) { 
-				curriculum.$remove();
-
-				for (var i in $scope.curriculums) {
-					if ($scope.curriculums [i] === curriculum) {
-						$scope.curriculums.splice(i, 1);
-					}
-				}
-			} else {
-				$scope.curriculum.$remove(function() {
-					$location.path('curriculums');
-				});
-			}
-		};
-
-		// Update existing Curriculum
-		$scope.update = function() {
-			var curriculum = $scope.curriculum;
-
-			curriculum.$update(function() {
-				$location.path('curriculums/' + curriculum._id);
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
-		};
-
-		// Find a list of Curriculums
-		$scope.find = function() {
-			$scope.curriculums = Curriculums.query();
-		};
-
-		// Find existing Curriculum
-		$scope.findOne = function() {
-			$scope.curriculum = Curriculums.get({ 
-				curriculumId: $stateParams.curriculumId
-			});
-		};
-	}
-]);
-'use strict';
-
-//Curriculums service used to communicate Curriculums REST endpoints
-angular.module('curriculums').factory('Curriculums', ['$resource',
-	function($resource) {
-		return $resource('curriculums/:curriculumId', { curriculumId: '@_id'
-		}, {
-			update: {
-				method: 'PUT'
-			}
-		});
-	}
-]);
-'use strict';
-
 // Configuring the Articles module
 angular.module('schools').run(['Menus',
 	function(Menus) {
 		// Set top bar menu items
-		Menus.addMenuItem('topbar', 'Schools', 'schools', 'dropdown', '/schools(/create)?');
+		Menus.addMenuItem('topbar', 'Schools', 'schools', 'dropdown', '/schools(/create)?', null, null, 1);
 		Menus.addSubMenuItem('topbar', 'schools', 'List Schools', 'schools');
 		Menus.addSubMenuItem('topbar', 'schools', 'New School', 'schools/create');
 	}
 ]);
+
 'use strict';
 
 //Setting up route
@@ -724,11 +467,14 @@ angular.module('schools').factory('Schools', ['$resource',
 angular.module('sections').run(['Menus',
 	function(Menus) {
 		// Set top bar menu items
-		Menus.addMenuItem('topbar', 'Sections', 'sections', 'dropdown', '/sections(/create)?');
-		Menus.addSubMenuItem('topbar', 'sections', 'List Sections', 'sections');
-		Menus.addSubMenuItem('topbar', 'sections', 'New Section', 'sections/create');
+    // I wanted to create a module called "class" but JS didn't allow that. Used "Sections" instead for the module.
+    // However, let the end user see "Classes" itself as that would make more sense
+		Menus.addMenuItem('topbar', 'Classes', 'sections', 'dropdown', '/sections(/create)?', null, null, 2);
+		Menus.addSubMenuItem('topbar', 'sections', 'List Classes', 'sections');
+		Menus.addSubMenuItem('topbar', 'sections', 'New Class', 'sections/create');
 	}
 ]);
+
 'use strict';
 
 //Setting up route
@@ -846,7 +592,7 @@ angular.module('sections').factory('Sections', ['$resource',
 angular.module('specs').run(['Menus',
   function(Menus) {
     // Set top bar menu items
-    Menus.addMenuItem('topbar', 'Specs', 'specs', 'dropdown', '/specs(/create)?');
+    Menus.addMenuItem('topbar', 'Specs', 'specs', 'dropdown', '/specs(/create)?', null, null, 5);
     Menus.addSubMenuItem('topbar', 'specs', 'List Specs', 'specs');
     Menus.addSubMenuItem('topbar', 'specs', 'New Spec', 'specs/create');
   }
@@ -1158,6 +904,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     };
 
     $scope.initSections = function(){
+      $scope.showSpinner = true;
       $scope.allSections = [];
       $scope.selectedSections = []; //TODO: There is a console error for ticked property. It doesn't impact the flow but may need to be looked at
       var allSections = Sections.query(function(){
@@ -1173,8 +920,10 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
                   section.ticked = true;
                 }
               });
+              $scope.showSpinner = false;
             }).error(function (data, status, headers, config){
               $scope.error = data.message;
+              $scope.showSpinner = false;
             });
           }
         });
@@ -1249,12 +998,14 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
     };
 
     $scope.initSubjects = function(){
+      $scope.showSpinner = true;
       $scope.allSubjects = [];
       var allSubjects = Subjects.query(function(){
         allSubjects.forEach(function(subject){
           $scope.allSubjects.push({name: subject.code, ticked: false});
         });
         getSectionsForSpec();
+        $scope.showSpinner = false;
       });
       $scope.sectionsAccordionOneAtATime = true;
       $scope.sectionsAccordionStatus = {
@@ -1295,13 +1046,16 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 
     $scope.initAssignments = function(){
       //Pick up assignments for this spec
+      $scope.showSpinner = true;
       $http.get('/specs/' + $stateParams.specId + '/assignments').success(function(data, status, headers, config){
         console.log('received following assignments: %j', data);
         $scope.assignments = data;
+        $scope.showSpinner = false;
 
       }).error(function (data, status, headers, config){
         $scope.error = data.message;
         $scope.assignments = [];
+        $scope.showSpinner = false;
       });
       //Pick up All Teachers
       $scope.allTeachers = [];
@@ -1362,11 +1116,12 @@ angular.module('specs').factory('Specs', ['$resource',
 angular.module('subjects').run(['Menus',
 	function(Menus) {
 		// Set top bar menu items
-		Menus.addMenuItem('topbar', 'Subjects', 'subjects', 'dropdown', '/subjects(/create)?');
+		Menus.addMenuItem('topbar', 'Subjects', 'subjects', 'dropdown', '/subjects(/create)?', null, null, 3);
 		Menus.addSubMenuItem('topbar', 'subjects', 'List Subjects', 'subjects');
 		Menus.addSubMenuItem('topbar', 'subjects', 'New Subject', 'subjects/create');
 	}
 ]);
+
 'use strict';
 
 //Setting up route
@@ -1485,11 +1240,12 @@ angular.module('subjects').factory('Subjects', ['$resource',
 angular.module('teachers').run(['Menus',
 	function(Menus) {
 		// Set top bar menu items
-		Menus.addMenuItem('topbar', 'Teachers', 'teachers', 'dropdown', '/teachers(/create)?');
+		Menus.addMenuItem('topbar', 'Teachers', 'teachers', 'dropdown', '/teachers(/create)?', null, null, 4);
 		Menus.addSubMenuItem('topbar', 'teachers', 'List Teachers', 'teachers');
 		Menus.addSubMenuItem('topbar', 'teachers', 'New Teacher', 'teachers/create');
 	}
 ]);
+
 'use strict';
 
 //Setting up route
@@ -1611,7 +1367,7 @@ angular.module('teachers').factory('Teachers', ['$resource',
 angular.module('timetables').run(['Menus',
   function (Menus) {
     // Set top bar menu items
-    Menus.addMenuItem('topbar', 'Timetables', 'timetables', 'item', '/timetables');
+    Menus.addMenuItem('topbar', 'Timetables', 'timetables', 'item', '/timetables', null, null, 6);
   }
 ]);
 
@@ -1830,11 +1586,21 @@ angular.module('timetables').controller('TimetablesController', ['$http', '$scop
       //Assume a class won't have more than 16 colors
       //We might need to add a bg-color property to the cell in the timetable itself
       // so that the same color remains across refreshes as well
-      var colors= ['plum', 'orchid', 'coral', 'teal', 'bisque', 'peru',
-      'thistle', 'olive', 'pink', 'sienna', 'ivory', 'linen', 'orange', 'gold', 'purple', 'crimson'];
+      var colors= [
+        'AntiqueWhite', 'LightCoral', 'LightCyan', 'LightBlue', 'MistyRose',
+        'Moccasin', 'Lavender', 'PapayaWhip', 'MistyRose', 'MediumTurquoise',
+        'plum', 'orchid', 'coral', 'teal', 'bisque',
+        'peru', 'thistle', 'olive', 'pink', 'sienna',
+        'ivory', 'linen', 'orange', 'gold', 'purple'
+        ];
       $scope.backgroundColorForSubjects = {};
       var index = 0;
       $scope.timetableForCurriculum.courses.forEach(function (course){
+        if (index >= colors.length){
+          //reset index to 0. In the unlikely event of a class having more than 25 subjects
+          //let the colours repeat
+          index = 0;
+        }
         $scope.backgroundColorForSubjects[course.code] = colors[index];
         index++;
       });
