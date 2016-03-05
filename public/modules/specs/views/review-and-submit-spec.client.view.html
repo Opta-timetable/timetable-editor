@@ -1,44 +1,49 @@
 <section data-ng-controller="SpecsController" data-ng-init="initAssignments()">
   <div class="page-header">
-    <h1>New Specification for Timetable</h1>
-    <ol class="progtrckr" data-progtrckr-steps="5">
-        <li class="progtrckr-done">Define Spec</li>
-        <li class="progtrckr-done">Add Sections</li>
-        <li class="progtrckr-done">Assign Subjects to Sections</li>
-        <li class="progtrckr-done">Assign Teachers to Subjects</li>
-        <li class="progtrckr-inprog">Review and Submit</li>
-    </ol>
+    <h1>Work with your Specification</h1>
   </div>
+  <nav>
+    <ul class="pagination">
+      <li ng-click="backTo('edit')"><a href="#">Define</a></li>
+      <li ng-click="backTo('addSections')"><a href="#">Select Classes</a></li>
+      <li ng-click="backTo('assignSubjects')"><a href="#">Select Subjects</a></li>
+      <li ng-click="backTo('assignTeachers')"><a href="#">Assign Teachers</a></li>
+      <li class="active"><a href="#">Submit</a></li>
+    </ul>
+  </nav>
+
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="col-md-12">
-    <!--<label class="checkbox">
-        <input type="checkbox" ng-model="sectionsAccordionOneAtATime">
-        Open only one Section at a time
-      </label>-->
-    <h2> Review Assignments </h2>
-    <div class="form-group">
-      <label class="control-label" for="assignmentFilter">Filter: </label>
-      <div class="controls">
-        <input type="text" data-ng-model="assignmentFilter" id="assignmentFilter" class="form-control" placeholder="Enter Section, Subject or Teacher Code to Filter...">
+  <div class="panel panel-default">
+      <div class="panel-heading"><h4 class="panel-title">Review Assignments</h4></div>
+      <div class="panel-body">
+        <div class="form-group">
+              <label class="control-label" for="assignmentFilter">Filter: </label>
+              <div class="controls">
+                <input type="text" data-ng-model="assignmentFilter" id="assignmentFilter" class="form-control" placeholder="Enter Section, Subject or Teacher Code to Filter...">
+              </div>
+            </div>
+            <table class="table table-bordered">
+              <tr>
+                <th>Section</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+                <th>Number of Periods in a week</th>
+              </tr>
+              <tr ng-repeat="assignment in assignments | filter:assignmentFilter | orderBy: 'section'">
+                <td>{{ assignment.section }}</td>
+                <td>{{ assignment.subjectCode }}</td>
+                <td>{{assignment.teacherCode}}</td>
+                <td>{{assignment.numberOfClassesInAWeek}}</td>
+              </tr>
+            </table>
       </div>
     </div>
-    <table class="table table-bordered">
-      <tr>
-        <th>Section</th>
-        <th>Subject</th>
-        <th>Teacher</th>
-        <th>Number of Periods in a week</th>
-      </tr>
-      <tr ng-repeat="assignment in assignments | filter:assignmentFilter | orderBy: 'section'">
-        <td>{{ assignment.section }}</td>
-        <td>{{ assignment.subjectCode }}</td>
-        <td>{{assignment.teacherCode}}</td>
-        <td>{{assignment.numberOfClassesInAWeek}}</td>
-      </tr>
-    </table>
-  </div>
+
   <div class="form-group">
-    <button ng-click="backTo('assignTeachers')" class="btn btn-primary">Back</button>
-    <button ng-click="submitSpec()" class="btn btn-primary">Finish</button>
+    <a class="btn btn-group-sm btn-warning" ng-click="backTo('assignTeachers')">
+      <i class="glyphicon glyphicon-backward"></i> &#160;Back
+    </a>
+    <a class="btn btn-group-sm btn-success" ng-click="submitSpec()">Finish
+    </a>
   </div>
 </section>

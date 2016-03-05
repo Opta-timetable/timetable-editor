@@ -1,9 +1,17 @@
 <section data-ng-controller="SpecsController" data-ng-init="findOne()">
   <div class="page-header">
-    <h1>Edit Specification for Timetable</h1>
+    <h1>Edit Specification</h1>
   </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="col-md-12">
+  <nav>
+    <ul class="pagination">
+      <li class="active"><a href="#">Define</a></li>
+      <li class="disabled"><a href="#">Select Classes</a></li>
+      <li class="disabled"><a href="#">Select Subjects</a></li>
+      <li class="disabled"><a href="#">Assign Teachers</a></li>
+      <li class="disabled"><a href="#">Submit</a></li>
+    </ul>
+  </nav>
     <form class="form-horizontal" data-ng-submit="update()" novalidate>
       <fieldset>
         <div class="form-group">
@@ -24,21 +32,14 @@
             <input type="text" data-ng-model="numberOfPeriodsInADay" id="numberOfPeriodsInADay" class="form-control" placeholder="(Default 8)">
           </div>
         </div>
-        <!--<div class="form-group">-->
-          <!--<label class="control-label" for="SpecificationsFile">Timetable Specifications File (Optional)</label>-->
-          <!--<div class="controls">-->
-            <!--<input type="file" id="SpecificationsFile" class="form-control" ngf-select ngf-change="upload($files)" required>-->
-          <!--</div>-->
-        <!--</div>-->
         <div class="form-group">
-          <input type="submit" value="Update" class="btn btn-default"> 
-          <!--ng-disabled="csvFileUploaded===false">-->
-          <!--<button ng-click="update()" class="btn btn-primary" ng-disabled="csvFileUploaded===true">Next</button>-->
+          <a class="btn btn-group-sm btn-default" ng-click="update()">
+            <i class="glyphicon glyphicon-forward"></i> &#160;Next
+          </a>
         </div>
         <div data-ng-show="error" class="text-danger">
           <strong data-ng-bind="error"></strong>
         </div>
       </fieldset>
     </form>
-  </div>
 </section>

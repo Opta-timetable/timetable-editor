@@ -1,56 +1,62 @@
 <section data-ng-controller="SpecsController" data-ng-init="initAssignments()">
   <div class="page-header">
-    <h1>New Specification for Timetable</h1>
-    <ol class="progtrckr" data-progtrckr-steps="5">
-        <li class="progtrckr-done">Define Spec</li>
-        <li class="progtrckr-done">Add Sections</li>
-        <li class="progtrckr-done">Assign Subjects to Sections</li>
-        <li class="progtrckr-inprog">Assign Teachers to Subjects</li>
-        <li class="progtrckr-todo">Review and Submit</li>
-    </ol>
+    <h1>Work with your Specification</h1>
   </div>
+  <nav>
+    <ul class="pagination">
+      <li ng-click="backTo('edit')"><a href="#">Define</a></li>
+      <li ng-click="backTo('addSections')"><a href="#">Select Classes</a></li>
+      <li ng-click="backTo('assignSubjects')"><a href="#">Select Subjects</a></li>
+      <li class="active"><a href="#">Assign Teachers</a></li>
+      <li class="disabled"><a href="#">Submit</a></li>
+    </ul>
+  </nav>
+
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="col-md-12">
-    <!--<label class="checkbox">
-        <input type="checkbox" ng-model="sectionsAccordionOneAtATime">
-        Open only one Section at a time
-      </label>-->
-    <h2> Assign Teachers to Subjects </h2>
-    <div class="form-group">
-      <label class="control-label" for="assignmentFilter">Filter: </label>
-      <div class="controls">
-        <input type="text" data-ng-model="assignmentFilter" id="assignmentFilter" class="form-control" placeholder="Enter Section, Subject or Teacher Code to Filter...">
+  <div class="panel panel-default">
+      <div class="panel-heading"><h4 class="panel-title">Assign Teachers to Subjects</h4></div>
+      <div class="panel-body">
+            <div class="form-group">
+              <label class="control-label" for="assignmentFilter">Filter: </label>
+              <div class="controls">
+                <input type="text" data-ng-model="assignmentFilter" id="assignmentFilter" class="form-control" placeholder="Enter Section, Subject or Teacher Code to Filter...">
+              </div>
+            </div>
+            <table class="table table-bordered">
+              <tr>
+                <th>Section</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+                <th>Number of Periods in a week</th>
+              </tr>
+              <tr ng-repeat="assignment in assignments | filter:assignmentFilter | orderBy: 'section'">
+                <td>{{ assignment.section }}</td>
+                <td>{{ assignment.subjectCode }}</td>
+                <td>
+                  <form class="form-inline">
+                    <div class="form-group">
+                      <input class="form-control" autocomplete="off" ng-model="assignment.teacherCode" placeholder="Search..." type="text"
+                             typeahead="teacher for teacher in allTeachers | filter:$viewValue" required/>
+                    </div>
+                    <div class="form-group">
+                      <select class="form-control" ng-model="assignment.teacherCode" ng-options="teacher for teacher in allTeachers">
+                        <option value="">Select</option>
+                      </select>
+                    </div>
+                  </form>
+                </td>
+                <td><input class="form-control" type="number" ng-model="assignment.numberOfClassesInAWeek" required/></td>
+              </tr>
+            </table>
       </div>
     </div>
-    <table class="table table-bordered">
-      <tr>
-        <th>Section</th>
-        <th>Subject</th>
-        <th>Teacher</th>
-        <th>Number of Periods in a week</th>
-      </tr>
-      <tr ng-repeat="assignment in assignments | filter:assignmentFilter | orderBy: 'section'">
-        <td>{{ assignment.section }}</td>
-        <td>{{ assignment.subjectCode }}</td>
-        <td>
-          <form class="form-inline">
-            <div class="form-group">
-              <input class="form-control" autocomplete="off" ng-model="assignment.teacherCode" placeholder="Search..." type="text"
-                     typeahead="teacher for teacher in allTeachers | filter:$viewValue" required/>
-            </div>
-            <div class="form-group">
-              <select class="form-control" ng-model="assignment.teacherCode" ng-options="teacher for teacher in allTeachers">
-                <option value="">Select</option>
-              </select>
-            </div>
-          </form>
-        </td>
-        <td><input class="form-control" type="number" ng-model="assignment.numberOfClassesInAWeek" required/></td>
-      </tr>
-    </table>
-  </div>
+
   <div class="form-group">
-    <button ng-click="backTo('assignSubjects')" class="btn btn-primary">Back</button>
-    <button ng-click="assignTeachersAndProceed()" class="btn btn-primary">Next</button>
+    <a class="btn btn-group-sm btn-default" ng-click="backTo('assignSubjects')">
+      <i class="glyphicon glyphicon-backward"></i> &#160;Back
+    </a>
+    <a class="btn btn-group-sm btn-default" ng-click="assignTeachersAndProceed()">
+      <i class="glyphicon glyphicon-forward"></i> &#160;Next
+    </a>
   </div>
 </section>

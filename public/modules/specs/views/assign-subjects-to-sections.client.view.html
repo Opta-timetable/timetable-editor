@@ -1,32 +1,36 @@
 <section data-ng-controller="SpecsController" data-ng-init="initSubjects()">
   <div class="page-header">
-    <h1>New Specification for Timetable</h1>
-    <ol class="progtrckr" data-progtrckr-steps="5">
-        <li class="progtrckr-done">Define Spec</li>
-        <li class="progtrckr-done">Add Sections</li>
-        <li class="progtrckr-inprog">Assign Subjects to Sections</li>
-        <li class="progtrckr-todo">Assign Teachers to Subjects</li>
-        <li class="progtrckr-todo">Review and Submit</li>
-    </ol>
+    <h1>Work with your Specification</h1>
   </div>
+  <nav>
+    <ul class="pagination">
+      <li ng-click="backTo('edit')"><a href="#">Define</a></li>
+      <li ng-click="backTo('addSections')"><a href="#">Select Classes</a></li>
+      <li class="active"><a href="#">Select Subjects</a></li>
+      <li class="disabled"><a href="#">Assign Teachers</a></li>
+      <li class="disabled"><a href="#">Submit</a></li>
+    </ul>
+  </nav>
+
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="col-md-12">
-    <!--<label class="checkbox">
-        <input type="checkbox" ng-model="sectionsAccordionOneAtATime">
-        Open only one Section at a time
-      </label>-->
-    <h2> Add Subjects to Sections</h2>
-    <accordion close-others="sectionsAccordionOneAtATime">
-        <accordion-group ng-repeat="section in assignedSections" heading="{{section.name}}">
-          <h3>Select Subjects</h3>
-          <div multi-select input-model="section.allSubjects" output-model="section.selectedSubjects" button-label="name" item-label="name"
-               tick-property="ticked">
-          </div>
-        </accordion-group>
-      </accordion>
-  </div>
+  <div class="panel panel-default">
+      <div class="panel-heading"><h4 class="panel-title">Select Subjects for each Class below</h4></div>
+      <div class="panel-body">
+        <accordion close-others="sectionsAccordionOneAtATime">
+          <accordion-group ng-repeat="section in assignedSections" heading="{{section.name}}">
+            <div multi-select input-model="section.allSubjects" output-model="section.selectedSubjects" button-label="name" item-label="name"
+                 tick-property="ticked">
+            </div>
+          </accordion-group>
+        </accordion>
+      </div>
+    </div>
   <div class="form-group">
-    <button ng-click="backTo('addSections')" class="btn btn-primary">Back</button>
-    <button ng-click="saveSubjectsAndProceed()" class="btn btn-primary">Next</button>
+    <a class="btn btn-group-sm btn-default" ng-click="backTo('addSections')">
+      <i class="glyphicon glyphicon-backward"></i> &#160;Back
+    </a>
+    <a class="btn btn-group-sm btn-default" ng-click="saveSubjectsAndProceed()">
+      <i class="glyphicon glyphicon-forward"></i> &#160;Next
+    </a>
   </div>
 </section>

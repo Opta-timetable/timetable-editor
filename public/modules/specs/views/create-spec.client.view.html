@@ -1,14 +1,17 @@
 <section data-ng-controller="SpecsController">
   <div class="page-header">
-    <h1>New Specification for Timetable</h1>
-    <ol class="progtrckr" data-progtrckr-steps="5">
-        <li class="progtrckr-todo">Define Spec</li>
-        <li class="progtrckr-todo">Add Sections</li>
-        <li class="progtrckr-todo">Assign Subjects to Sections</li>
-        <li class="progtrckr-todo">Assign Teachers to Subjects</li>
-        <li class="progtrckr-todo">Review and Submit</li>
-    </ol>
+    <h1>New Specification</h1>
   </div>
+  <nav>
+    <ul class="pagination">
+      <li class="active"><a href="#">Define</a></li>
+      <li class="disabled"><a href="#">Select Classes</a></li>
+      <li class="disabled"><a href="#">Select Subjects</a></li>
+      <li class="disabled"><a href="#">Assign Teachers</a></li>
+      <li class="disabled"><a href="#">Submit</a></li>
+    </ul>
+  </nav>
+
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
   <div class="col-md-12">
     <form class="form-horizontal" data-ng-submit="create()" novalidate>
@@ -31,16 +34,10 @@
             <input type="text" data-ng-model="numberOfPeriodsInADay" id="numberOfPeriodsInADay" class="form-control" placeholder="(Default 8)">
           </div>
         </div>
-        <!--<div class="form-group">-->
-          <!--<label class="control-label" for="SpecificationsFile">Timetable Specifications File (Optional)</label>-->
-          <!--<div class="controls">-->
-            <!--<input type="file" id="SpecificationsFile" class="form-control" ngf-select ngf-change="upload($files)">-->
-          <!--</div>-->
-        <!--</div>-->
-
         <div class="form-group">
-          <!--<button ng-click="create()" class="btn btn-primary">Next</button>-->
-          <input type="submit" class="btn btn-default">
+          <a class="btn btn-group-sm btn-default" ng-click="create()">
+            <i class="glyphicon glyphicon-forward"></i> &#160;Next
+          </a>
         </div>
         <div data-ng-show="error" class="text-danger">
           <strong data-ng-bind="error"></strong>
