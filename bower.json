@@ -1,6 +1,6 @@
 {
   "name": "timetable",
-  "version": "0.2.23",
+  "version": "0.2.24",
   "description": "An awesome web-app for creating/editing timetables that uses Apache OptaPlanner behind the scenes.",
   "dependencies": {
     "bootstrap": "~3",
