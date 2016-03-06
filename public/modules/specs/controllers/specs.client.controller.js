@@ -114,6 +114,11 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 				specId: $stateParams.specId
 			}, function(){
         $scope.showSpinner = false;
+        $scope.disableGenerateButton = true;
+        if (($scope.spec.state === 'Data ready for timetable generation') ||
+          ($scope.spec.state === 'Timetable Generated and Available for use')){
+          $scope.disableGenerateButton = false;
+        }
       });
 		};
 

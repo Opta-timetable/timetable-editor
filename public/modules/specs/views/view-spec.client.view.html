@@ -19,14 +19,9 @@
       <h4>{{spec.name}}</h4>
     </div>
     <div class="panel-body">
-      <h5>Number of Working Days in a Week <span class="label label-default">{{spec.numberOfWorkingDaysInAWeek}}</span></h5>
-      <h5>Number of Periods in a Working Day <span class="label label-default">{{spec.numberOfPeriodsInADay}}</span></h5>
-      <dl class="dl-horizontal">
-        <dt>Specifications File:</label></dt>
-        <dd>{{spec.origFile}}</dd>
-        <dt>State:</dt>
-        <dd>{{spec.state}}</dd>
-      </dl>
+      <h5>Number of Working Days in a Week: <span class="label label-default">{{spec.numberOfWorkingDaysInAWeek}}</span></h5>
+      <h5>Number of Periods in a Working Day: <span class="label label-default">{{spec.numberOfPeriodsInADay}}</span></h5>
+      <h5>State: <span class="label label-default">{{spec.state}}</span></h5>
     </div>
     <div class="panel-footer">
       <small>
@@ -41,7 +36,7 @@
   </div>
 
   <div data-ng-show="((authentication.user) && (authentication.user._id == spec.user._id))">
-  		<a class="btn btn-success" data-ng-click="generateTimetable()">
+  		<a class="btn btn-success" data-ng-click="generateTimetable()" data-ng-disabled="disableGenerateButton">
   			<i class="glyphicon glyphicon-play"></i> &#160;Generate Timetable
   		</a>
   		<a class="btn btn-primary" href="/#!/specs">
