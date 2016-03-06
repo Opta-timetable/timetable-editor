@@ -294,14 +294,45 @@ exports.getSolvedXML = function(req, res){
    		if (err) return err;
    		if (!spec) return (new Error('Failed to load Spec ' + specId));
    		console.log('Spec for this operation is %j', spec);
-   	}).then(function(spec) {
-      j2eeClient.getSolvedXML(specId, xmlSolution, function() {
-        xmlUtils.solvedXMLParser(specId, xmlSolution, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay, function () {
-          Spec.update({'_id' : specId}, {$set : {'state' : 'Timetable Generated and Available for use'}}, function(){
-            res.status(200).send({'uploadState' : 'Timetable Generated and Available for use' });
+    }).then(function(spec) {
+      if (spec.state === 'Timetable Generated and Available for use'){
+        console.log('Clear existing data for this spec before importing to keep data consistent');
+        Course.find({specReference : spec._id}).remove().exec()
+          .then(function(){
+            return Curriculum.find({specReference : spec._id}).remove().exec();
+          })
+          .then(function(){
+            return Teacher.find({specReference : spec._id}).remove().exec();
+          })
+          .then(function(){
+            return Timetable.find({specReference : spec._id}).remove().exec();
+          })
+          .then(function(){
+            return Lecture.find({specReference : spec._id}).remove().exec();
+          })
+          .then(function(){
+            j2eeClient.getSolvedXML(specId, xmlSolution, function() {
+              xmlUtils.solvedXMLParser(specId, xmlSolution, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay, function () {
+                Spec.update({'_id' : specId}, {$set : {'state' : 'Timetable Generated and Available for use'}}, function(){
+                  res.status(200).send({'uploadState' : 'Timetable Generated and Available for use' });
+                });
+              });
+            });
+          }).then(null, function(err) {
+            return res.status(400).send({
+              message : errorHandler.getErrorMessage(err)
+            });
+          });
+      }else{
+        console.log('This spec doesn\'t have a timetable generated');
+        j2eeClient.getSolvedXML(specId, xmlSolution, function() {
+          xmlUtils.solvedXMLParser(specId, xmlSolution, spec.numberOfWorkingDaysInAWeek, spec.numberOfPeriodsInADay, function () {
+            Spec.update({'_id' : specId}, {$set : {'state' : 'Timetable Generated and Available for use'}}, function(){
+              res.status(200).send({'uploadState' : 'Timetable Generated and Available for use' });
+            });
           });
         });
-      });
+      }
     });
 };
 

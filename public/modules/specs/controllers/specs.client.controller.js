@@ -155,7 +155,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
             animation: true,
             templateUrl: 'generate.timetable.modal.client.view.html',
             controller: 'GenerateModalInstanceCtrl',
-            size: size,
+            size: 'lg',
             resolve: {
               specId: function () {
                 return $stateParams.specId;
@@ -172,7 +172,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         });
     };
 
-    $scope.generateTimetable = function(size){
+    $scope.generateTimetable = function(){
       //Confirm that user really wants to if the spec has a timetable generated already
       if ($scope.spec.state === 'Timetable Generated and Available for use'){
         var confirmationDialogModalInstance = $modal.open({
