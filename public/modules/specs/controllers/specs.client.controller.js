@@ -46,21 +46,42 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 		};
 
 		// Remove existing Spec
-		$scope.remove = function(spec) {
-			if ( spec ) { 
-				spec.$remove();
+    $scope.remove = function(spec) {
 
-				for (var i in $scope.specs) {
-					if ($scope.specs [i] === spec) {
-						$scope.specs.splice(i, 1);
-					}
-				}
-			} else {
-				$scope.spec.$remove(function() {
-					$location.path('specs');
-				});
-			}
-		};
+      var confirmationDialogModalInstance = $modal.open({
+        animation: true,
+        templateUrl: 'ConfirmationDialogModal.html',
+        controller: 'ConfirmationDialogController',
+        size: 'sm',
+        resolve: {
+          message: function () {
+            return 'This action will delete your specification along with generated timetables if any. ' +
+              'Please confirm.';
+          }
+        }
+      });
+
+      confirmationDialogModalInstance.result.then(function (result) {
+        console.log('result is ' + result);
+        //Take an action depending on user's confirmation
+        if (result.confirm === true){
+          if ( spec ) {
+            spec.$remove();
+            for (var i in $scope.specs) {
+              if ($scope.specs [i] === spec) {
+                $scope.specs.splice(i, 1);
+              }
+            }
+          } else {
+            $scope.spec.$remove(function() {
+              $location.path('specs');
+            });
+          }
+        }
+      }, function () {
+        console.info('Modal dismissed at: ' + new Date());
+      });
+    };
 
 		// Update existing Spec
 		$scope.update = function() {
@@ -123,7 +144,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       }
     };
 
-    $scope.generateTimetable = function(size){
+    function startSolving(){
       //Inform server to start solving
       $http.post('/specs/solve', {
         specID : $stateParams.specId
@@ -149,6 +170,36 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         .error(function (data, status, headers, config) {
 
         });
+    };
+
+    $scope.generateTimetable = function(size){
+      //Confirm that user really wants to if the spec has a timetable generated already
+      if ($scope.spec.state === 'Timetable Generated and Available for use'){
+        var confirmationDialogModalInstance = $modal.open({
+          animation: true,
+          templateUrl: 'ConfirmationDialogModal.html',
+          controller: 'ConfirmationDialogController',
+          size: 'sm',
+          resolve: {
+            message: function () {
+              return 'You will lose the timetable that is already available. ' +
+                'Please confirm.';
+            }
+          }
+        });
+        confirmationDialogModalInstance.result.then(function (result) {
+          console.log('result is ' + result);
+          //Take an action depending on user's confirmation
+          if (result.confirm === true){
+            startSolving();
+          }
+        }, function () {
+          console.info('Modal dismissed at: ' + new Date());
+        });
+
+      }else{
+        startSolving();
+      }
     };
 
     $scope.initSections = function(){

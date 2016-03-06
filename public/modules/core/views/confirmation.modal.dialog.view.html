@@ -1,0 +1,18 @@
+<script type="text/ng-template" id="ConfirmationDialogModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Are you sure?</h3>
+  </div>
+  <div class="modal-body">
+    {{confirmationMessage}}
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn btn-warning" data-ng-click="ok()">
+      <i class="glyphicon glyphicon-ok-circle"></i> &#160;OK
+    </a>
+    <a class="btn btn-primary" data-ng-click="cancel()">
+      <i class="glyphicon glyphicon-remove-circle"></i> &#160;Cancel
+    </a>
+
+  </div>
+</script>
