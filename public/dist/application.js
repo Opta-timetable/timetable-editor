@@ -622,9 +622,9 @@ angular.module('sections').factory('Sections', ['$resource',
 angular.module('specs').run(['Menus',
   function(Menus) {
     // Set top bar menu items
-    Menus.addMenuItem('topbar', 'Specs', 'specs', 'dropdown', '/specs(/create)?', null, null, 5);
-    Menus.addSubMenuItem('topbar', 'specs', 'List Specs', 'specs');
-    Menus.addSubMenuItem('topbar', 'specs', 'New Spec', 'specs/create');
+    Menus.addMenuItem('topbar', 'Plans', 'specs', 'dropdown', '/specs(/create)?', null, null, 5);
+    Menus.addSubMenuItem('topbar', 'specs', 'List Plans', 'specs');
+    Menus.addSubMenuItem('topbar', 'specs', 'New Plan', 'specs/create');
   }
 ]);
 
@@ -897,9 +897,13 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
 			}, function(){
         $scope.showSpinner = false;
         $scope.disableGenerateButton = true;
+        $scope.disableWorkWithTimetableButton = true;
         if (($scope.spec.state === 'Data ready for timetable generation') ||
           ($scope.spec.state === 'Timetable Generated and Available for use')){
           $scope.disableGenerateButton = false;
+        }
+        if ($scope.spec.state === 'Timetable Generated and Available for use'){
+          $scope.disableWorkWithTimetableButton = false;
         }
       });
 		};
