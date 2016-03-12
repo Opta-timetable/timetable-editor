@@ -13,6 +13,10 @@ angular.module('specs').config(['$stateProvider',
         url: '/specs/create',
         templateUrl: 'modules/specs/views/create-spec.client.view.html'
       }).
+      state('createSpecFromExisting', {
+        url: '/specs/createFromExisting',
+        templateUrl: 'modules/specs/views/create-spec-from-existing.client.view.html'
+      }).
       state('viewSpec', {
         url: '/specs/:specId',
         templateUrl: 'modules/specs/views/view-spec.client.view.html'

@@ -126,6 +126,35 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       });
 		};
 
+    // Create a new Spec from an Existing one
+    $scope.createSpecFromExisting = function(specID){
+      $scope.showSpinner = true;
+      $scope.spec = Specs.get({
+        specId: specID
+      }, function(){
+        $scope.showSpinner = false;
+        $scope.disableGenerateButton = true;
+        $scope.disableWorkWithTimetableButton = true;
+        var newSpec = new Specs();
+        newSpec.name = 'Copy of ' + $scope.spec.name;
+        newSpec.numberOfWorkingDaysInAWeek = $scope.spec.numberOfWorkingDaysInAWeek;
+        newSpec.numberOfPeriodsInADay = $scope.spec.numberOfPeriodsInADay;
+        newSpec.specFile = '';
+        newSpec.origFile = '';
+        newSpec.unsolvedXML = '';
+        newSpec.state = 'Initialized. Data not defined yet.';
+        newSpec.sections = $scope.spec.sections;
+        newSpec.assignments = $scope.spec.assignments;
+  			// Redirect after save
+        newSpec.$save(function(response) {
+          $scope.showSpinner = false;
+          $location.path('specs/' + response._id);
+  			}, function(errorResponse) {
+  				$scope.error = errorResponse.data.message;
+  			});
+      });
+    };
+
     $scope.upload = function (files) {
       if (files && files.length) {
           var file = files[0]; //Only 1 file allowed in this app
@@ -398,7 +427,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         console.log('Performing Auto-save');
         $scope.showSpinner = true;
         saveAssignments($scope.assignments, null);
-      }, 10000); //Once in 30 seconds
+      }, 30000); //Once in 30 seconds
     };
 
     $scope.assignTeachersAndProceed = function(){
