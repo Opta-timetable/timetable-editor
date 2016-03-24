@@ -45,4 +45,8 @@ footer {
   z-index  : 5;
 }
 
+.jumbotron {
+    /* change bootstrap jumbotron text color */
+    background-color: #FFF;
+}
 

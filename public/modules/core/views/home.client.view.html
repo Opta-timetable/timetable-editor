@@ -2,44 +2,67 @@
   <div class="row">
     <p class="lead">&#160;</p>
   </div>
-  <div class="jumbotron text-center">
-    <div class="media">
-      <div class="media-left media-middle">
-        <a href="#">
-          <img class="media-object" width="200" height="150" src="modules/core/img/brand/new-logo.png" alt="timeStable logo">
-        </a>
+  <div class="jumbotron text-center background='white'">
+    <div class="row" data-ng-hide="authentication.user">
+    <img class="img-responsive center-block" width="600" height="250" src="modules/core/img/brand/timeStable-Logo.png" alt="timeStable logo">
+    <h2>
+      The smart way to create and manage school timetables
+    </h2><br>
+    <!--<small> Powered by: <span> <a href="http://optaplanner.org">
+      <img class="img-responsive center-block" width="100" height="20" src="modules/core/img/brand/optaPlannerLogo.png"/>
+    </a></span></small>-->
 
+      <!-- Adding a row and column to reduce the embed video size -->
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" width="800" height="450" src="https://www.youtube.com/embed/f4jIWbQpjdE" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="col-md-2"></div>
       </div>
-      <div class="media-body">
-        <p class="lead">
-          Auto-generate, visualize and fine-tune high-quality, well-balanced school timetables
-        </p>
-        <small> Powered by: <span> <a href="http://optaplanner.org">
-          <img class="img-responsive center-block" width="100" height="20" src="modules/core/img/brand/optaPlannerLogo.png"/>
-        </a></span></small>
-        <div class="row" data-ng-hide="authentication.user">
-              <p class="lead">&#160;</p>
-              <p>
-                <a class="btn btn-success btn-lg" href="/#!/signin">Sign In</a>
-              </p>
-            </div>
-            <div class="row" data-ng-show="authentication.user">
-              <p class="lead">&#160;</p>
-              <p>
-                <a class="btn btn-info btn-lg" href="#!/timetables">Edit your Timetables</a>
-                <a class="btn btn-info btn-lg" href="#!/specs">Generate a new Timetable</a>
-              </p>
-            </div>
+
+      <br>
+      <p class="lead">Getting started? Click to watch the video.</p>
+      <p>
+        <a class="btn btn-primary btn-lg" href="/#!/signin">Login</a>
+      </p>
+    </div>
+    <div class="container" data-ng-show="authentication.user">
+      <div class="row">
+        <h2> What would you like to do today, {{authentication.user.firstName}}?</h2>
+        <p class="lead">&#160;</p>
       </div>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-3">
+          <a href="#!/specs">
+            <img class="img-responsive img-rounded center-block" height="200" width="200" src="modules/core/img/brand/Create-icon.png">
+            <p class="lead">Create timetable </p>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="#!/timetables">
+            <img class="img-responsive img-rounded center-block" height="200" width="200" src="modules/core/img/brand/Edit-icon.png">
+            <p class="lead">Edit timetable </p>
+          </a>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+      <br><br>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" width="800" height="450" src="https://www.youtube.com/embed/f4jIWbQpjdE" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <p class="lead"> Need help? Click to watch the video.</p>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+
     </div>
     <br>
-
-    <div class="row">
-      <div class="text-danger text-right text-nowrap" data-ng-bind="version.versionString"></div>
-
-      <small>Businessman graphic by <a href="http://www.freepik.com/">Freepik</a> from <a href="http://www.flaticon.com/">Flaticon</a>
-        is licensed under <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>.
-        Made with <a href="http://logomakr.com" title="Logo Maker">Logo Maker</a></small>
-    </div>
   </div>
 </section>
