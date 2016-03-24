@@ -1,20 +1,25 @@
 <section data-ng-controller="SubjectsController" data-ng-init="find()">
   <div class="page-header">
-    <h1>Subjects</h1>
+    <h1>Your Subjects</h1>
   </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="list-group">
-    <a data-ng-repeat="subject in subjects" data-ng-href="#!/subjects/{{subject._id}}" class="list-group-item">
-      <small class="list-group-item-text">
-        Posted on
-        <span data-ng-bind="subject.created | date:'medium'"></span>
-        by
-        <span data-ng-bind="subject.user.displayName"></span>
-      </small>
-      <h4 class="list-group-item-heading">{{subject.name + " - " + subject.code}}</h4>
-    </a>
-  </div>
-  <div class="alert alert-warning text-center" data-ng-hide="!subjects.$resolved || subjects.length">
-    No Subjects yet, why don't you <a href="/#!/subjects/create">create one</a>?
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <img class="img-responsive img-rounded" src="modules/core/img/icons/Subjects.png">
+      </div>
+      <div class="col-md-10">
+        <table class="table table-striped">
+          <tr data-ng-repeat="subject in subjects">
+            <td>
+              <a data-ng-href="#!/subjects/{{subject._id}}"> {{subject.name + " - " + subject.code}} </a>
+            </td>
+          </tr>
+        </table>
+        <div class="alert alert-warning text-center" data-ng-hide="!subjects.$resolved || subjects.length">
+          No Subjects yet, why don't you <a href="/#!/subjects/create">create one</a>?
+        </div>
+      </div>
+    </div>
   </div>
 </section>
