@@ -499,9 +499,9 @@ angular.module('sections').run(['Menus',
 		// Set top bar menu items
     // I wanted to create a module called "class" but JS didn't allow that. Used "Sections" instead for the module.
     // However, let the end user see "Classes" itself as that would make more sense
-		Menus.addMenuItem('topbar', 'Classes', 'sections', 'dropdown', '/sections(/create)?', null, null, 2);
-		Menus.addSubMenuItem('topbar', 'sections', 'List Classes', 'sections');
-		Menus.addSubMenuItem('topbar', 'sections', 'New Class', 'sections/create');
+		Menus.addMenuItem('topbar', 'Sections', 'sections', 'dropdown', '/sections(/create)?', null, null, 2);
+		Menus.addSubMenuItem('topbar', 'sections', 'List Sections', 'sections');
+		Menus.addSubMenuItem('topbar', 'sections', 'New Section', 'sections/create');
 	}
 ]);
 
@@ -625,6 +625,7 @@ angular.module('specs').run(['Menus',
     Menus.addMenuItem('topbar', 'Plans', 'specs', 'dropdown', '/specs(/create)?', null, null, 5);
     Menus.addSubMenuItem('topbar', 'specs', 'List Plans', 'specs');
     Menus.addSubMenuItem('topbar', 'specs', 'New Plan', 'specs/create');
+    Menus.addSubMenuItem('topbar', 'specs', 'New Plan from Existing', 'specs/createFromExisting');
   }
 ]);
 
@@ -642,6 +643,10 @@ angular.module('specs').config(['$stateProvider',
       state('createSpec', {
         url: '/specs/create',
         templateUrl: 'modules/specs/views/create-spec.client.view.html'
+      }).
+      state('createSpecFromExisting', {
+        url: '/specs/createFromExisting',
+        templateUrl: 'modules/specs/views/create-spec-from-existing.client.view.html'
       }).
       state('viewSpec', {
         url: '/specs/:specId',
@@ -784,9 +789,9 @@ angular.module('specs').controller('GenerateModalInstanceCtrl', ["$scope", "$mod
 
 // Specs controller
 angular.module('specs').controller('SpecsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication',
-  '$modal', 'Specs', 'Upload', 'Sections', 'Subjects', 'Teachers',
+  '$modal', '$timeout', '$interval', 'Specs', 'Upload', 'Sections', 'Subjects', 'Teachers',
 	function($scope, $stateParams, $location, $http, Authentication,
-           $modal, Specs, Upload, Sections, Subjects, Teachers) {
+           $modal, $timeout, $interval, Specs, Upload, Sections, Subjects, Teachers) {
 		$scope.authentication = Authentication;
     $scope.csvFileUploaded = false;
 
@@ -907,6 +912,35 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         }
       });
 		};
+
+    // Create a new Spec from an Existing one
+    $scope.createSpecFromExisting = function(specID){
+      $scope.showSpinner = true;
+      $scope.spec = Specs.get({
+        specId: specID
+      }, function(){
+        $scope.showSpinner = false;
+        $scope.disableGenerateButton = true;
+        $scope.disableWorkWithTimetableButton = true;
+        var newSpec = new Specs();
+        newSpec.name = 'Copy of ' + $scope.spec.name;
+        newSpec.numberOfWorkingDaysInAWeek = $scope.spec.numberOfWorkingDaysInAWeek;
+        newSpec.numberOfPeriodsInADay = $scope.spec.numberOfPeriodsInADay;
+        newSpec.specFile = '';
+        newSpec.origFile = '';
+        newSpec.unsolvedXML = '';
+        newSpec.state = 'Initialized. Data not defined yet.';
+        newSpec.sections = $scope.spec.sections;
+        newSpec.assignments = $scope.spec.assignments;
+  			// Redirect after save
+        newSpec.$save(function(response) {
+          $scope.showSpinner = false;
+          $location.path('specs/' + response._id);
+  			}, function(errorResponse) {
+  				$scope.error = errorResponse.data.message;
+  			});
+      });
+    };
 
     $scope.upload = function (files) {
       if (files && files.length) {
@@ -1068,6 +1102,13 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
      });
     }
 
+    function periodicSave(){
+      $scope.showSpinner = true;
+      $timeout(function(){
+        $scope.showSpinner = false;
+      }, 5000);
+    }
+
     $scope.addSections = function(){
       var sections = [];
       $scope.selectedSections.forEach(function (selectedSection){
@@ -1104,8 +1145,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
       };
     };
 
-    $scope.saveSubjectsAndProceed = function(){
-      console.log('Subjects Assigned are: %j', $scope.assignedSections);
+    function prepareEmptyAssignmentsFromSubjects(){
       var assignments = [];
       for (var i = 0; i < $scope.assignedSections.length; i++){
         for (var j = 0; j < $scope.assignedSections[i].selectedSubjects.length; j++){
@@ -1113,7 +1153,9 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           assignmentObject.section = $scope.assignedSections[i].name;
           assignmentObject.subjectCode = $scope.assignedSections[i].selectedSubjects[j].name; //selectedSubjects is not a 'subject' obj.
           //Check if this was already assigned previously and if yes pick up existing teacher code and numberOfClassesInAWeek
-          var currentAssignment = isSubjectAssignedToSection($scope.currentAssignments, assignmentObject.subjectCode, assignmentObject.section);
+          var currentAssignment = isSubjectAssignedToSection($scope.currentAssignments,
+            assignmentObject.subjectCode,
+            assignmentObject.section);
           if (currentAssignment === null){
             assignmentObject.teacherCode = '';
             assignmentObject.numberOfClassesInAWeek = 0;
@@ -1124,14 +1166,28 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           assignments.push(assignmentObject);
         }
       }
-      $scope.currentAssignments = [];
+      return assignments;
+    }
+
+    function saveAssignments(assignments, next){
       $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: assignments})
         .success(function(data, status, headers, config){
-          $location.path('specs/' + $stateParams.specId + '/assignTeachers');
+          if (next !== null){
+            $location.path('specs/' + $stateParams.specId + '/' + next);
+          } //else stay where you are
+          $scope.showSpinner = false;
         })
         .error(function(data, status, headers, config){
           $scope.error = data.message;
-      });
+          $scope.showSpinner = false;
+        });
+    }
+
+    $scope.saveSubjectsAndProceed = function(){
+      console.log('Subjects Assigned are: %j', $scope.assignedSections);
+      var assignments = prepareEmptyAssignmentsFromSubjects();
+      $scope.currentAssignments = [];
+      saveAssignments(assignments, 'assignTeachers');
     };
 
     $scope.initAssignments = function(){
@@ -1154,19 +1210,20 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
           $scope.allTeachers.push(teacher.code);
         });
       });
+      $scope.autoSavePromise = $interval(function(){
+        console.log('Performing Auto-save');
+        $scope.showSpinner = true;
+        saveAssignments($scope.assignments, null);
+      }, 30000); //Once in 30 seconds
     };
 
     $scope.assignTeachersAndProceed = function(){
-      $http.post('/specs/' + $stateParams.specId + '/assignments', {assignments: $scope.assignments})
-        .success(function(data, status, headers, config){
-          $location.path('specs/' + $stateParams.specId + '/reviewAndSubmit');
-        })
-        .error(function(data, status, headers, config){
-          $scope.error = data.message;
-        });
+      $interval.cancel($scope.autoSavePromise);
+      saveAssignments($scope.assignments, 'reviewAndSubmit');
     };
 
     $scope.submitSpec = function(){
+      $interval.cancel($scope.autoSavePromise);
       $http.post('/specs/' + $stateParams.specId + '/generate',{})
         .success(function(data, status, headers, config){
           $scope.specFileName = data.specFileName;
@@ -1181,7 +1238,11 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
         });
     };
 
+    /*
+     * Utility function to use for going back between routes in the "Spec" editor
+     */
     $scope.backTo = function(location){
+      $interval.cancel($scope.autoSavePromise);
       $location.path('/specs/' + $stateParams.specId + '/' + location);
     };
 	}
