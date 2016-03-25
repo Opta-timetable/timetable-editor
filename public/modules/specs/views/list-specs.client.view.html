@@ -3,18 +3,24 @@
     <h1>Work with your Plans</h1>
   </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="list-group">
-    <a data-ng-repeat="spec in specs" data-ng-href="#!/specs/{{spec._id}}" class="list-group-item">
-      <small class="list-group-item-text">
-        Posted on
-        <span data-ng-bind="spec.created | date:'medium'"></span>
-        by
-        <span data-ng-bind="spec.user.displayName"></span>
-      </small>
-      <h4 class="list-group-item-heading" data-ng-bind="spec.name"></h4>
-    </a>
-  </div>
-  <div class="alert alert-warning text-center" data-ng-hide="!specs.$resolved || specs.length">
-    No Plans yet, why don't you <a href="/#!/specs/create">create one</a>?
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <img class="img-responsive img-rounded" src="modules/core/img/icons/Plan.png">
+      </div>
+      <div class="col-md-6">
+        <table class="table table-striped">
+          <tr data-ng-repeat="spec in specs">
+            <td>
+              <a data-ng-href="#!/specs/{{spec._id}}"> {{spec.name}}</a>
+            </td>
+          </tr>
+
+        </table>
+        <div class="alert alert-warning text-center" data-ng-hide="!specs.$resolved || specs.length">
+          No Plans yet, why don't you <a href="/#!/specs/create">create one</a>?
+        </div>
+      </div>
+    </div>
   </div>
 </section>

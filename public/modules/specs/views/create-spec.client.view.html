@@ -1,48 +1,61 @@
 <section data-ng-controller="SpecsController">
   <div class="page-header">
-    <h1>New Plan</h1>
+    <h1>Create a new Plan</h1>
   </div>
-  <nav>
-    <ul class="pagination">
-      <li class="active"><a href="#">Define</a></li>
-      <li class="disabled"><a href="#">Select Classes</a></li>
-      <li class="disabled"><a href="#">Select Subjects</a></li>
-      <li class="disabled"><a href="#">Assign Teachers</a></li>
-      <li class="disabled"><a href="#">Submit</a></li>
-    </ul>
-  </nav>
-
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="col-md-12">
-    <form class="form-horizontal" data-ng-submit="create()" novalidate>
-      <fieldset>
-        <div class="form-group">
-          <label class="control-label" for="name">Name (eg. Vidyodaya Academic Year 2015-2016)</label>
-          <div class="controls">
-            <input type="text" data-ng-model="name" id="name" class="form-control" placeholder="Name" required>
-          </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <img class="img-responsive img-rounded" src="modules/core/img/icons/Plan.png">
+      </div>
+      <div class="col-md-6">
+        <nav class="nav-justified">
+          <ul class="pagination">
+            <li class="active"><a href="#">Define</a></li>
+            <li class="disabled"><a href="#">Select Classes</a></li>
+            <li class="disabled"><a href="#">Select Subjects</a></li>
+            <li class="disabled"><a href="#">Assign Teachers</a></li>
+            <li class="disabled"><a href="#">Submit</a></li>
+          </ul>
+        </nav>
+        <form class="form-horizontal" data-ng-submit="create()" novalidate>
+          <fieldset>
+            <div class="form-group">
+              <label class="control-label" for="name">Name (eg. Vidyodaya Academic Year 2015-2016)</label>
+              <div class="controls">
+                <input type="text" data-ng-model="name" id="name" class="form-control" placeholder="Name" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="numberOfWorkingDaysInAWeek">Number of Working Days in a Week</label>
+              <div class="controls">
+                <input type="text" data-ng-model="numberOfWorkingDaysInAWeek" id="numberOfWorkingDaysInAWeek" class="form-control" placeholder="(Default 5)">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="numberOfPeriodsInADay">Number of Periods in a Day</label>
+              <div class="controls">
+                <input type="text" data-ng-model="numberOfPeriodsInADay" id="numberOfPeriodsInADay" class="form-control" placeholder="(Default 8)">
+              </div>
+            </div>
+            <div class="form-group">
+              <a class="btn btn-group-sm btn-default" ng-click="create()">
+                <i class="glyphicon glyphicon-forward"></i> &#160;Next
+              </a>
+            </div>
+            <div data-ng-show="error" class="text-danger">
+              <strong data-ng-bind="error"></strong>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      <div class="col-md-4">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe class="embed-responsive-item" width="800" height="450" src="https://www.youtube.com/embed/f4jIWbQpjdE" frameborder="0" allowfullscreen></iframe>
         </div>
-        <div class="form-group">
-          <label class="control-label" for="numberOfWorkingDaysInAWeek">Number of Working Days in a Week</label>
-          <div class="controls">
-            <input type="text" data-ng-model="numberOfWorkingDaysInAWeek" id="numberOfWorkingDaysInAWeek" class="form-control" placeholder="(Default 5)">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="control-label" for="numberOfPeriodsInADay">Number of Periods in a Day</label>
-          <div class="controls">
-            <input type="text" data-ng-model="numberOfPeriodsInADay" id="numberOfPeriodsInADay" class="form-control" placeholder="(Default 8)">
-          </div>
-        </div>
-        <div class="form-group">
-          <a class="btn btn-group-sm btn-default" ng-click="create()">
-            <i class="glyphicon glyphicon-forward"></i> &#160;Next
-          </a>
-        </div>
-        <div data-ng-show="error" class="text-danger">
-          <strong data-ng-bind="error"></strong>
-        </div>
-      </fieldset>
-    </form>
+        <p class="lead">Need help? Click to watch the video.</p>
+      </div>
+    </div>
   </div>
 </section>

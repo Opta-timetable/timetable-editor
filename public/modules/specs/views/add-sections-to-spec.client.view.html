@@ -2,37 +2,49 @@
   <div class="page-header">
     <h1>Work with your Plan</h1>
   </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <img class="img-responsive img-rounded" src="modules/core/img/icons/Plan.png">
+      </div>
+      <div class="col-md-6">
+        <nav>
+          <ul class="pagination">
+            <li><a href="#" ng-click="backTo('edit')">Define</a></li>
+            <li class="active"><a href="#">Select Classes</a></li>
+            <li class="disabled"><a href="#">Select Subjects</a></li>
+            <li class="disabled"><a href="#">Assign Teachers</a></li>
+            <li class="disabled"><a href="#">Submit</a></li>
+          </ul>
+        </nav>
+        <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
+          <label>Select classes</label>
+            <div
+                multi-select
+                input-model="allSections"
+                output-model="selectedSections"
+                button-label="name"
+                item-label="name"
+                tick-property="ticked"
+                >
+            </div>
+        <br>
+          <div class="form-group">
+            <a class="btn btn-group-sm btn-default" ng-click="backTo('edit')">
+              <i class="glyphicon glyphicon-backward"></i> &#160;Back
+            </a>
+            <a class="btn btn-group-sm btn-default" ng-click="addSections()">
+              <i class="glyphicon glyphicon-forward"></i> &#160;Next
+            </a>
+          </div>
 
-  <nav>
-    <ul class="pagination">
-      <li><a href="#" ng-click="backTo('edit')">Define</a></li>
-      <li class="active"><a href="#">Select Classes</a></li>
-      <li class="disabled"><a href="#">Select Subjects</a></li>
-      <li class="disabled"><a href="#">Assign Teachers</a></li>
-      <li class="disabled"><a href="#">Submit</a></li>
-    </ul>
-  </nav>
-  <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="panel panel-default">
-    <div class="panel-heading"><h4 class="panel-title">Select classes from list below</h4></div>
-    <div class="panel-body">
-      <div
-          multi-select
-          input-model="allSections"
-          output-model="selectedSections"
-          button-label="name"
-          item-label="name"
-          tick-property="ticked"
-          >
+      </div>
+      <div class="col-md-4">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe class="embed-responsive-item" width="800" height="450" src="https://www.youtube.com/embed/f4jIWbQpjdE" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p class="lead">Need help? Click to watch the video.</p>
       </div>
     </div>
   </div>
-    <div class="form-group">
-      <a class="btn btn-group-sm btn-default" ng-click="backTo('edit')">
-        <i class="glyphicon glyphicon-backward"></i> &#160;Back
-      </a>
-      <a class="btn btn-group-sm btn-default" ng-click="addSections()">
-        <i class="glyphicon glyphicon-forward"></i> &#160;Next
-      </a>
-    </div>
 </section>

@@ -1,78 +1,90 @@
 <section data-ng-controller="SpecsController" data-ng-init="findOne()">
-	<div class="page-header">
-		<h1>View Timetable Plan</h1>
+  <div class="page-header">
+    <h1>Viewing Timetable Plan <small> {{spec.name}} </small></h1>
   </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="clearfix">
-    <div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == spec.user._id))">
-   		<a class="btn btn-success" href="/#!/specs/{{spec._id}}/edit">
-   			<i class="glyphicon glyphicon-edit"></i> &#160;Edit
-   		</a>
-   		<a class="btn btn-warning" data-ng-click="remove();">
-   			<i class="glyphicon glyphicon-trash"></i> &#160;Delete
-   		</a>
-   	</div>
-	</div>
-  <br/>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4>{{spec.name}}</h4>
+  <div class="row">
+    <div class="col-md-2">
+      <img class="img-responsive img-rounded" src="modules/core/img/icons/Plan.png">
     </div>
-    <div class="panel-body">
-      <h5>Number of Working Days in a Week: <span class="label label-default">{{spec.numberOfWorkingDaysInAWeek}}</span></h5>
-      <h5>Number of Periods in a Working Day: <span class="label label-default">{{spec.numberOfPeriodsInADay}}</span></h5>
-      <h5>State: <span class="label label-default">{{spec.state}}</span></h5>
+    <div class="col-md-6">
+      <h3>{{spec.state}}</h3>
+      <br/>
+      <h5>Number of Working Days in a Week: <span class="badge badge-default">{{spec.numberOfWorkingDaysInAWeek}}</span></h5>
+      <h5>Number of Periods in a Working Day: <span class="badge badge-default">{{spec.numberOfPeriodsInADay}}</span></h5>
+      <br>
+      <br>
+      <div data-ng-show="((authentication.user) && (authentication.user._id == spec.user._id))">
+        <a class="btn btn-success" data-ng-click="generateTimetable()" data-ng-disabled="disableGenerateButton">
+          <i class="glyphicon glyphicon-play"></i> &#160;Generate Timetable
+        </a>
+        <a class="btn btn-info" data-ng-href="#!/timetables/{{spec._id}}" data-ng-disabled="disableWorkWithTimetableButton">
+          <i class="glyphicon glyphicon-list"></i> &#160;Work with Timetable
+        </a>
+        <a class="btn btn-primary" href="/#!/specs">
+          <i class="glyphicon glyphicon-circle-arrow-left"></i> &#160;Back
+        </a>
+      </div>
     </div>
-    <div class="panel-footer">
-      <small>
-        <em class="text-muted">
-          Posted on
-          <span data-ng-bind="spec.created | date:'mediumDate'"></span>
-          by
-          <span data-ng-bind="spec.user.displayName"></span>
-        </em>
-      </small>
+    <div class="col-md-4">
+      <div class="clearfix">
+        <div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == spec.user._id))">
+          <a class="btn btn-success" href="/#!/specs/{{spec._id}}/edit">
+            <i class="glyphicon glyphicon-edit"></i> &#160;Edit
+          </a>
+          <a class="btn btn-warning" data-ng-click="remove();">
+            <i class="glyphicon glyphicon-trash"></i> &#160;Delete
+          </a>
+        </div>
+      </div>
     </div>
-  </div>
+    <!--  <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4>{{spec.name}}</h4>
+        </div>
+        <div class="panel-body">
+          <h5>Number of Working Days in a Week: <span class="label label-default">{{spec.numberOfWorkingDaysInAWeek}}</span></h5>
+          <h5>Number of Periods in a Working Day: <span class="label label-default">{{spec.numberOfPeriodsInADay}}</span></h5>
+          <h5>State: <span class="label label-default">{{spec.state}}</span></h5>
+        </div>
+        <div class="panel-footer">
+          <small>
+            <em class="text-muted">
+              Posted on
+              <span data-ng-bind="spec.created | date:'mediumDate'"></span>
+              by
+              <span data-ng-bind="spec.user.displayName"></span>
+            </em>
+          </small>
+        </div>
+      </div>-->
 
-  <div data-ng-show="((authentication.user) && (authentication.user._id == spec.user._id))">
-  		<a class="btn btn-success" data-ng-click="generateTimetable()" data-ng-disabled="disableGenerateButton">
-  			<i class="glyphicon glyphicon-play"></i> &#160;Generate Timetable
-  		</a>
-      <a class="btn btn-info" data-ng-href="#!/timetables/{{spec._id}}" data-ng-disabled="disableWorkWithTimetableButton">
-        <i class="glyphicon glyphicon-list"></i> &#160;Work with Timetable
-      </a>
-  		<a class="btn btn-primary" href="/#!/specs">
-  			<i class="glyphicon glyphicon-circle-arrow-left"></i> &#160;Back
-  		</a>
-  	</div>
+    <!-- Solution Status Modal Dialog-->
+    <script type="text/ng-template" id="generate.timetable.modal.client.view.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Timetable Generation Progress</h3>
+      </div>
+      <div class="modal-body">
+        <p> Solution State : {{state}}</p>
+        <p> Solution Score  : {{solutionHealth}}</p>
+        <progressbar class="progress-striped active" animate="true" value="progress" type="success">
+          <b>{{progress}}%</b></progressbar>
 
-  <!-- Solution Status Modal Dialog-->
-  <script type="text/ng-template" id="generate.timetable.modal.client.view.html">
-    <div class="modal-header">
-      <h3 class="modal-title">Timetable Generation Progress</h3>
-    </div>
-    <div class="modal-body">
-      <p> Solution State : {{state}}</p>
-      <p> Solution Score  : {{solutionHealth}}</p>
-      <progressbar class="progress-striped active" animate="true" value="progress" type="success">
-        <b>{{progress}}%</b></progressbar>
+      </div>
 
-    </div>
+      <div class="modal-footer">
+        <a class="btn btn-warning" ng-disabled="disableStop" data-ng-click="terminateSolving()">
+          <i class="glyphicon glyphicon-stop"></i> &#160;Stop Solving
+        </a>
+        <a class="btn btn-primary" data-ng-click="dismiss()">
+          <i class="glyphicon glyphicon-remove-circle"></i> &#160;Close
+        </a>
 
-    <div class="modal-footer">
-      <a class="btn btn-warning" ng-disabled="disableStop" data-ng-click="terminateSolving()">
-        <i class="glyphicon glyphicon-stop"></i> &#160;Stop Solving
-      </a>
-      <a class="btn btn-primary" data-ng-click="dismiss()">
-        <i class="glyphicon glyphicon-remove-circle"></i> &#160;Close
-      </a>
+      </div>
+    </script>
+    <!-- Solution Status Modal Dialog-->
 
-    </div>
-  </script>
-  <!-- Solution Status Modal Dialog-->
-
-  <!-- Confirmation Dialog -->
-  <div ng-include="'modules/core/views/confirmation.modal.dialog.view.html'"> </div>
+    <!-- Confirmation Dialog -->
+    <div ng-include="'modules/core/views/confirmation.modal.dialog.view.html'"> </div>
 
 </section>
