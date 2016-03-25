@@ -935,7 +935,7 @@ angular.module('specs').controller('SpecsController', ['$scope', '$stateParams',
   			// Redirect after save
         newSpec.$save(function(response) {
           $scope.showSpinner = false;
-          $location.path('specs/' + response._id);
+          $location.path('specs/' + response._id + '/edit');
   			}, function(errorResponse) {
   				$scope.error = errorResponse.data.message;
   			});
