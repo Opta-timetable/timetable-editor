@@ -1,22 +1,35 @@
 <section data-ng-controller="SchoolsController" data-ng-init="findOne()">
-	<div class="page-header">
-		<h1> {{school.name + '-' + school.code}}</h1>
-	</div>
+  <div class="page-header">
+    <h1> {{school.code}}</h1>
+  </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == school.user._id))">
-		<a class="btn btn-success" href="/#!/schools/{{school._id}}/edit">
-			<i class="glyphicon glyphicon-edit"></i>&#160;Edit
-		</a>
-		<a class="btn btn-warning" data-ng-click="remove();">
-			<i class="glyphicon glyphicon-trash"></i>&#160;Delete
-		</a>
-	</div>
-	<small>
-		<em class="text-muted">
-			Posted on
-			<span data-ng-bind="school.created | date:'mediumDate'"></span>
-			by
-			<span data-ng-bind="school.user.displayName"></span>
-		</em>
-	</small>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <img class="img-responsive img-rounded" src="modules/core/img/icons/School.png">
+      </div>
+      <div class="col-md-6">
+        <label>Name</label>
+        <p class="form-control-static">{{ school.name }}</p>
+        <small>
+          <em class="text-muted">
+            Posted on
+            <span data-ng-bind="school.created | date:'mediumDate'"></span>
+            by
+            <span data-ng-bind="school.user.displayName"></span>
+          </em>
+        </small>
+        </div>
+      <div class="col-md-4">
+        <div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == school.user._id))">
+          <a class="btn btn-success" href="/#!/schools/{{school._id}}/edit">
+            <i class="glyphicon glyphicon-edit"></i>&#160;Edit
+          </a>
+          <a class="btn btn-warning" data-ng-click="remove();">
+            <i class="glyphicon glyphicon-trash"></i>&#160;Delete
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>

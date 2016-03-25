@@ -3,27 +3,34 @@
     <h1>Edit your school</h1>
   </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-
-  <div class="col-md-12">
-    <form class="form-horizontal" data-ng-submit="update()" novalidate>
-      <fieldset>
-        <div class="form-group">
-          <label class="control-label" for="name">Name</label>
-          <div class="controls">
-            <input type="text" data-ng-model="school.name" id="name" class="form-control" placeholder="Name" required>
-          </div>
-          <label class="control-label" for="code">School Code</label>
-          <div class="controls">
-            <input type="text" data-ng-model="school.code" id="code" class="form-control" placeholder="School Code" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <input type="submit" value="Update" class="btn btn-default">
-        </div>
-        <div data-ng-show="error" class="text-danger">
-          <strong data-ng-bind="error"></strong>
-        </div>
-      </fieldset>
-    </form>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <img class="img-responsive img-rounded" src="modules/core/img/icons/School.png">
+      </div>
+      <div class="col-md-6">
+        <form class="form-horizontal" data-ng-submit="update()" novalidate>
+          <fieldset>
+            <div class="form-group">
+              <label class="control-label" for="name">Name</label>
+              <div class="controls">
+                <input type="text" data-ng-model="school.name" id="name" class="form-control" placeholder="Name" required>
+              </div>
+              <label class="control-label" for="code">School Code</label>
+              <div class="controls">
+                <input type="text" data-ng-model="school.code" id="code" class="form-control" placeholder="School Code" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <input type="submit" value="Update" class="btn btn-default">
+            </div>
+            <div data-ng-show="error" class="text-danger">
+              <strong data-ng-bind="error"></strong>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      <div class="col-md-4"></div>
+    </div>
   </div>
 </section>

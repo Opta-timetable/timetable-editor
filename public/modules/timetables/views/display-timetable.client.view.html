@@ -4,77 +4,56 @@
   </div>
   <div ncy-breadcrumb></div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-on="showSpinner"></span>
-  <div class="row">
-    <div class="col-md-4">
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <h3 class="panel-title">View and Edit Class Timetables</h3>
-        </div>
-        <div class="panel-body">
-          <p class="lead">Select a class to continue</p>
-          <div class="list-group">
-            <a data-ng-repeat="curriculum in curriculums" data-ng-href="#!/timetables/{{specId}}/curriculum/{{curriculum.id}}" class="list-group-item">
-              <h4 class="list-group-item-heading" data-ng-bind="curriculum.code"></h4>
-              <p class="list-group-item-text">
-                <span>ID: </span>
-                <span data-ng-bind="curriculum.id"></span>
-              </p>
-              <p class="list-group-item-text">
-                <span>Curriculum ID: </span>
-                <span data-ng-bind="curriculum.curriculumID"></span>
-              </p>
-              <p class="list-group-item-text">
-                <span>Curriculum: </span>
-                <span data-ng-bind="curriculum.code"></span>
-              </p>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <img class="img-responsive img-rounded" src="modules/core/img/icons/Timetable.png">
+      </div>
+    <div class="col-md-3">
+          <h4>View and Edit Class Timetables</h4>
+          <label>Select a class to continue</label>
+      <table class="table table-striped">
+        <tr data-ng-repeat="curriculum in curriculums">
+          <td>
+            <a data-ng-href="#!/timetables/{{specId}}/curriculum/{{curriculum.id}}">
+              {{ curriculum.code }}
             </a>
-          </div>
-        </div>
+          </td>
+        </tr>
+      </table>
         <div class="alert alert-warning text-center" data-ng-if="curriculums.$resolved && !curriculums.length">
           No curricula yet, initialise using the command line?
         </div>
-      </div>
     </div>
-    <div class="col-md-4">
-      <div class="panel panel-info">
-        <div class="panel-heading">
-          <h3 class="panel-title">View Teacher Timetables</h3>
-        </div>
-        <div class="panel-body">
-          <p class="lead">Select a Teacher</p>
+    <div class="col-md-3">
+          <h4>View Teacher Timetables</h4>
+          <label>Select a Teacher</label>
           <div class="list-group">
-            <a data-ng-repeat="teacher in teachers" data-ng-href="#!/timetables/{{specId}}/teacher/{{teacher.teacherID}}" class="list-group-item">
-              <h4 class="list-group-item-heading" data-ng-bind="teacher.code"></h4>
-              <p class="list-group-item-text">
-                <span>Teacher ID: </span>
-                <span data-ng-bind="teacher.teacherID"></span>
-              </p>
-              <p class="list-group-item-text">
-                <span>Code: </span>
-                <span data-ng-bind="teacher.code"></span>
-              </p>
+            <table class="table table-striped">
+              <tr data-ng-repeat="teacher in teachers">
+                <td>
+                  <a data-ng-href="#!/timetables/{{specId}}/teacher/{{teacher.teacherID}}">
+                    {{teacher.code}}
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </div>
+    </div>
+    <div class="col-md-3">
+            <h4>View Day-wise Timetables</h4>
+            <label>Select a Day</label>
+      <table class="table table-striped">
+        <tr data-ng-repeat="day in workingDays">
+          <td>
+            <a data-ng-href="#!/timetables/{{specId}}/day/{{day.dayIndex}}">
+              {{day.dayName}}
             </a>
-          </div>
-        </div>
-      </div>
-
+          </td>
+        </tr>
+      </table>
     </div>
-    <div class="col-md-4">
-      <div class="panel panel-info">
-        <div class="panel-heading">
-            <h3 class="panel-title">View Day-wise Timetables</h3>
-          </div>
-          <div class="panel-body">
-            <p class="lead">Select a Day</p>
-            <div class="list-group">
-              <a data-ng-repeat="day in workingDays" data-ng-href="#!/timetables/{{specId}}/day/{{day.dayIndex}}" class="list-group-item">
-                <h4 class="list-group-item-heading" data-ng-bind="day.dayName"></h4>
-              </a>
-            </div>
-          </div>
-      </div>
-
-    </div>
+      <div class="col-md-1"></div>
   </div>
-
+</div>
 </section>
