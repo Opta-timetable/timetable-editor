@@ -622,10 +622,10 @@ angular.module('sections').factory('Sections', ['$resource',
 angular.module('specs').run(['Menus',
   function(Menus) {
     // Set top bar menu items
-    Menus.addMenuItem('topbar', 'Plans', 'specs', 'dropdown', '/specs(/create)?', null, null, 5);
-    Menus.addSubMenuItem('topbar', 'specs', 'List Plans', 'specs');
-    Menus.addSubMenuItem('topbar', 'specs', 'New Plan', 'specs/create');
-    Menus.addSubMenuItem('topbar', 'specs', 'New Plan from Existing', 'specs/createFromExisting');
+    Menus.addMenuItem('topbar', 'Allocations', 'specs', 'dropdown', '/specs(/create)?', null, null, 5);
+    Menus.addSubMenuItem('topbar', 'specs', 'List Allocations', 'specs');
+    Menus.addSubMenuItem('topbar', 'specs', 'New Allocation', 'specs/create');
+    Menus.addSubMenuItem('topbar', 'specs', 'New Allocation from Existing', 'specs/createFromExisting');
   }
 ]);
 
