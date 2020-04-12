@@ -15,7 +15,7 @@
   "dependencies": {
     "async": "1.5.x",
     "body-parser": "1.15.x",
-    "bower": "1.7.x",
+    "bower": "1.8.x",
     "chalk": "1.1.x",
     "compression": "1.6.x",
     "connect-flash": "0.1.x",
