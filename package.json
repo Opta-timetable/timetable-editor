@@ -31,7 +31,7 @@
     "helmet": "1.1.x",
     "lodash": "4.5.x",
     "method-override": "2.3.x",
-    "mongoose": "4.4.x",
+    "mongoose": "5.9.x",
     "morgan": "1.7.x",
     "nodemailer": "2.2.x",
     "passport": "0.3.x",
