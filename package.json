@@ -32,7 +32,7 @@
     "lodash": "4.5.x",
     "method-override": "2.3.x",
     "mongoose": "4.4.x",
-    "morgan": "1.7.x",
+    "morgan": "1.10.x",
     "nodemailer": "2.2.x",
     "passport": "0.3.x",
     "passport-facebook": "2.1.x",
