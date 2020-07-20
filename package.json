@@ -29,7 +29,7 @@
     "glob": "7.0.x",
     "grunt-cli": "0.1.x",
     "helmet": "1.1.x",
-    "lodash": "4.5.x",
+    "lodash": "4.17.x",
     "method-override": "2.3.x",
     "mongoose": "4.4.x",
     "morgan": "1.7.x",
